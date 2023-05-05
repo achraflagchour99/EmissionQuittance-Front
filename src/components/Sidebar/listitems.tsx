@@ -44,6 +44,15 @@ export const mainListItems = (
       <ListItemText primary="Quittance" />
     </ListItemButton>
     </Link>
+
+    <Link to="/quittance-search" style={{ textDecoration: 'none' , color: 'inherit' }} >
+    <ListItemButton>
+      <ListItemIcon>
+        <ListIcon style={{ color: 'white' }}/>
+      </ListItemIcon>
+      <ListItemText primary="Rechercher Quittance" />
+    </ListItemButton>
+    </Link>
   </div>
 );
 

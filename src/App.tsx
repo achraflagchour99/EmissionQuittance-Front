@@ -11,8 +11,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from "./pages/Dashboard";
 import SearchPolice from "./components/Forms/SearchPolice";
 import Searchpolicepage from "./pages/Searchpolicepage";
-import AddQuittance from "./components/Forms/Quittance/AddQuittance";
-
+import AddQuittance from "./components/Forms/Quittance/Add/AddQuittance";
+import SearchForm from "./components/Forms/Quittance/Search/SearchForm";
 
 const mdTheme = createTheme();
 
@@ -31,6 +31,8 @@ function App() {
                         <Route index                         element={<Dashboard />} />
                         <Route path='police-search'      element={<Searchpolicepage />} />
                         <Route path='quittance-add'      element={<AddQuittance />} />
+                        <Route path='quittance-search'      element={<SearchForm />} />
+                        
                     </Route>
                 </Route>
             </Routes>
