@@ -80,7 +80,7 @@ function SearchPolice() {
         // hide last border
         '&:last-child td, &:last-child th': {
             border: 0,
-        },
+        }, 
     }));
 
     return (
