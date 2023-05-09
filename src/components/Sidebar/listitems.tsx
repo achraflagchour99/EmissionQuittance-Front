@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 export const mainListItems = (
   <div>
     
-    <Link to="/" style={{ textDecoration: 'none' , color: 'inherit' }} >
+    <Link to="/police-add" style={{ textDecoration: 'none' , color: 'inherit' }} >
     <ListItemButton>
       <ListItemIcon>
         <AddchartIcon style={{ color: 'white' }}/>

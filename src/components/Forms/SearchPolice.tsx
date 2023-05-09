@@ -8,11 +8,19 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TextField from "@mui/material/TextField";
-import {Box, tableCellClasses} from "@mui/material";
+import {Box, CircularProgress, InputLabel, MenuItem, Select, tableCellClasses} from "@mui/material";
 import Button from "@mui/material/Button";
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import "./SearchPolice.css"
 import {styled} from "@mui/material/styles";
+import TablePagination from "@mui/material/TablePagination";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UpdateIcon from '@mui/icons-material/Update';
+import ManageSearchRoundedIcon from '@mui/icons-material/ManageSearchRounded';
+import IconButton from "@mui/material/IconButton";
+import ConsultPolicePage from "../../pages/ConsultPolicePage";
+import {Link} from "react-router-dom";
+
 
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
@@ -33,39 +41,72 @@ interface Resultat {
     mnt_taxe_eve: number;
     mnt_taxe_parafiscale: number;
 }
+
 interface TablePaginationActionsProps {
-count: number;
-page: number;
-rowsPerPage: number;
-onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement>,
-    newPage: number,
-) => void;
+    count: number;
+    page: number;
+    rowsPerPage: number;
+    onPageChange: (
+        event: React.MouseEvent<HTMLButtonElement>,
+        newPage: number,
+    ) => void;
 }
+
 function SearchPolice() {
     const [numClient, setNumeroClient] = useState('');
     const [codePolice, setCodePolice] = useState('');
     const [nomcommercial, setNomCommercial] = useState('');
     const [ville, setVille] = useState('');
     const [resultats, setResultats] = useState<Resultat[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [totalItems, setTotalItems] = useState(0);
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const fetchData = async (page: number, rowsPerPage: number) => {
+        setIsLoading(true);
         try {
-            const params: { [key: string]: string } = {};
+            const params: { [key: string]: string | number } = {
+                page: page,
+                size: rowsPerPage,
+            };
             if (numClient) params.numClient = numClient;
             if (codePolice) params.codePolice = codePolice;
             if (nomcommercial) params.nomcommercial = nomcommercial;
             if (ville) params.ville = ville;
-            const response = await axios.get<Resultat[]>(ENDPOINT_URL, {params});
+            const response = await axios.get<Resultat[]>(ENDPOINT_URL, { params });
             setResultats(response.data);
+            setTotalItems(parseInt(response.headers['x-total-count']));
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const handleChangePage = (
+        event: React.MouseEvent<HTMLButtonElement> | null,
+        newPage: number,
+    ) => {
+        setPage(newPage);
+        fetchData(newPage, rowsPerPage);
+    };
+
+    const handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        const newRowsPerPage = parseInt(event.target.value, 10);
+        setRowsPerPage(newRowsPerPage);
+        fetchData(page, newRowsPerPage);
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        fetchData(page,rowsPerPage); // Fetch data using the current page number
     };
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         [`&.${tableCellClasses.head}`]: {
-            backgroundColor: "#0f2ea2",
+            backgroundColor: "#243075FF",
             color: theme.palette.common.white,
         },
         [`&.${tableCellClasses.body}`]: {
@@ -80,6 +121,9 @@ function SearchPolice() {
         // hide last border
         '&:last-child td, &:last-child th': {
             border: 0,
+        },
+        '&.selected': {
+            backgroundColor: theme.palette.action.hover,
         },
     }));
 
@@ -129,23 +173,25 @@ function SearchPolice() {
             </form>
                 </div>
             </Box>
-            {resultats.length > 0 ? (
+        {isLoading ? (
+            // Show the loading animation if isLoading is true
+            <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                <CircularProgress />
+            </div>
+        ) : resultats.length > 0 ? (
                 <div className={"results-box"}>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
-                            <TableRow className={"row-names"}>
-                                <StyledTableCell>Code Police</StyledTableCell>
+                            <TableRow>
+                                <StyledTableCell >Code Police</StyledTableCell>
                                 <StyledTableCell>Numéro client</StyledTableCell>
                                 <StyledTableCell>Raison sociale</StyledTableCell>
-                                <StyledTableCell>Adresse</StyledTableCell>
                                 <StyledTableCell>Date d'effet</StyledTableCell>
-                                <StyledTableCell>Prime nette</StyledTableCell>
-                                <StyledTableCell>Taxe</StyledTableCell>
-                                <StyledTableCell>Acce</StyledTableCell>
-                                <StyledTableCell>Taux comm</StyledTableCell>
                                 <StyledTableCell>Date de terme</StyledTableCell>
                                 <StyledTableCell>Date d'état</StyledTableCell>
+                                <StyledTableCell>Consulter</StyledTableCell>
+                                <StyledTableCell>Modifier</StyledTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -154,19 +200,35 @@ function SearchPolice() {
                                     <StyledTableCell component="th" scope="row">{resultat.codePolice}</StyledTableCell>
                                     <StyledTableCell  align="left">{resultat.numClient}</StyledTableCell>
                                     <StyledTableCell align="left">{resultat.raisonSociale}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.adresse}</StyledTableCell>
                                     <StyledTableCell align="left">{resultat.dateEffet}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.primeNette}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.taxe}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.acce}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.tauxComm}</StyledTableCell>
                                     <StyledTableCell align="left">{resultat.dateTerme}</StyledTableCell>
                                     <StyledTableCell align="left">{resultat.dateEtat}</StyledTableCell>
+                                    <StyledTableCell>
+                                        <Link to={`/consult-page/${resultat.codePolice}`}>
+                                            <IconButton id="consult-icon" color="primary" component="button">
+                                                <ManageSearchRoundedIcon />
+                                            </IconButton>
+                                        </Link>
+                                    </StyledTableCell>
+                                    <StyledTableCell>
+                                        <IconButton id={"update-icon"} color="primary" component="button">
+                                       <UpdateIcon />
+                                        </IconButton>
+                                    </StyledTableCell>
                                 </StyledTableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
+                    <TablePagination
+                        component="div"
+                        rowsPerPageOptions={[5, 10, 25, 50]}
+                        count={totalItems}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
                 </div>
             ) : null}
         </div>

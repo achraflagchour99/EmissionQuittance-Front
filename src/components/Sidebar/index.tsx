@@ -94,15 +94,13 @@ const AppSidebar = ({
             <Box>
               <Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <StyledTypography >
-                    <RenderText value="ACHRAF" />
+                  <StyledTypography sx={{fontSize:15, marginTop:1}} >
+                    <RenderText value="EMISSION QUITTANCE" />
                   </StyledTypography>
-                  <StyledTypography sx={{ color: "#AF7F1F", fontSize:18 }}>
-                    <RenderText value="web" />
-                  </StyledTypography>
+
                 </Stack>
                 <Divider
-                  sx={{ height: "2px", bgcolor: "#AF7F1F", mt: "2px" }}
+                  sx={{ height: "2px", bgcolor: "#AF7F1F", mt: "4px" }}
                 />
               </Stack>
             </Box>
