@@ -1,103 +1,78 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from 'react';
 import axios from "axios";
+import fetchData from './SearchService';
+import SearchResultTable from './SearchResultTable';
+import { Form, Button } from "react-bootstrap";
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
+import TextField  from "@mui/material/TextField";
+import { makeStyles } from '@mui/material/styles';
+import "../../SearchPolice.css"  
+import Pagination from '@mui/material/Pagination';
 
-const SearchForm = () => {
-  const [refQuittanceid, setRefQuittanceid] = useState(null);
-  const [dateDebut, setDateDebut] = useState(null);
-  const [dateFin, setDateFin] = useState(null);
-  const [codePolice, setCodePolice] = useState(null);
-  const [pageNumber, setPageNumber] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [quittanceDTOs, setQuittanceDTOs] = useState(null);
+function SearchForm() {
+    const [refQuittanceid, setRefQuittanceid] = useState("");
+    const [dateDebut, setDateDebut] = useState("");
+    const [dateFin, setDateFin] = useState("");
+    const [codePolice, setCodePolice] = useState("");
+    const [pageNumber, setPageNumber] = useState(0);
+    const [pageSize, setPageSize] = useState(3);
+    const [data, setData] = useState(null);
+    const [page, setPage] = useState(1); // define `page` state
+    const handlePageChange = (event, value) => { // define `handlePageChange` function
+        setPageSize(value);
+    };
 
-  const handleSearch = async (event) => {
-    event.preventDefault();
-    try {
-      const response = await axios.get("http://localhost:8081/quittances/search", {
-        params: {
-          refQuittanceid,
-          dateDebut,
-          dateFin,
-          codePolice,
-          pageNumber,
-          pageSize,
-        },
-      });
-      setQuittanceDTOs(response.data);
-      console.log("data "+response.data);
-      console.log("datadata "+response);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSearch}>
-      <label>
-        Ref Quittance ID:
-        <input
-          type="number"
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const result = await fetchData(refQuittanceid, dateDebut, dateFin, codePolice, pageSize);
+      setData(result);
+    };
+  
+    return (
+        <Form onSubmit={handleSubmit} className="d-flex flex-wrap justify-content-center">
+        <TextField 
+          id="refQuittanceid"
+          label="RefQuittanceid"
+          type="text"
           value={refQuittanceid}
           onChange={(e) => setRefQuittanceid(e.target.value)}
         />
-      </label>
-      <label>
-        Date Debut:
-        <input
-          type="date"
+
+        <TextField 
+          id="dateDebut"
+          label="Date Debut"
+          type="text"
+          variant="outlined"
           value={dateDebut}
           onChange={(e) => setDateDebut(e.target.value)}
         />
-      </label>
-      <label>
-        Date Fin:
-        <input
-          type="date"
+
+        <TextField 
+          id="dateFin"
+          label="Date Fin"
+          type="text"
           value={dateFin}
           onChange={(e) => setDateFin(e.target.value)}
         />
-      </label>
-      <label>
-        Code Police:
-        <input
-          type="number"
+
+        <TextField 
+          id="codePolice"
+          label="Code Police"
+          type="text"
           value={codePolice}
           onChange={(e) => setCodePolice(e.target.value)}
         />
-      </label>
-      <label>
-        Page Number:
-        <input
-          type="number"
-          value={pageNumber}
-          onChange={(e) => setPageNumber(e.target.value)}
-        />
-      </label>
-      <label>
-        Page Size:
-        <input
-          type="number"
-          value={pageSize}
-          onChange={(e) => setPageSize(e.target.value)}
-        />
-      </label>
-      <button type="submit">Search</button>
 
-      {quittanceDTOs && (
-        <div>
-          {quittanceDTOs.content.map((quittance) => (
-            <div key={quittance.id}>
-              <p>ID: {quittance.id}</p>
-              <p>Amount: {quittance.amount}</p>
-              <p>Date debut: {quittance.dateDebut}</p>
-              <p>Date fin: {quittance.dateFin}</p>
-            </div>
-          ))}
-          <p>Total pages: {quittanceDTOs.totalPages}</p>
-        </div>
-      )}
-    </form>
-  );
-};
+        <Button id={"search-button"} type="submit" variant="contained" startIcon={<ContentPasteSearchIcon />}>
+          Rechercher
+        </Button>
 
-export default SearchForm;
+        {data && <SearchResultTable data={data} />}
+
+        <Pagination count={3} page={page} defaultValue={3} onChange={handlePageChange} /> 
+      </Form>
+    );
+  }
+  
+  export default SearchForm;

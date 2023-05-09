@@ -23,8 +23,8 @@ function App() {
   };
   return (
 
-        
-        <BrowserRouter>
+    
+        <BrowserRouter> 
             <Routes>
                 <Route>
                     <Route path='/' element={<MainContent />}>
@@ -37,7 +37,7 @@ function App() {
                 </Route>
             </Routes>
         </BrowserRouter>
-
+        
 
   );
 }
