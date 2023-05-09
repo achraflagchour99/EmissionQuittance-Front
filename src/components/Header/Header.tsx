@@ -1,7 +1,6 @@
 import React from "react";
 import { IconButton, Stack, Toolbar, styled } from "@mui/material";
 import ConnectedUserInfo from "./ConnectedUserInfo";
-import NotificationButton from "./NotificationButton";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { RmaLogo } from "./RmaLogo/RmaLogo";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -54,7 +53,6 @@ const Header = (props: { Handler: React.MouseEventHandler<HTMLButtonElement> | u
         </IconButton>
         <RmaLogo />
         <Stack direction="row" spacing={2} alignItems="center">
-          <NotificationButton />
           <ConnectedUserInfo />
         </Stack>
       </Toolbar>
