@@ -21,6 +21,8 @@ import {
 import { Delete, Edit } from '@mui/icons-material';
 import axios from "axios";
 
+const ENDPOINT_URL = 'http://localhost:8081/polices/search';
+
 export type Person = {
     id: number;
     codePolice: string;
@@ -36,7 +38,11 @@ const Example = () => {
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
     }>({});
-
+    const [totalItems, setTotalItems] = useState(0);
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 5, //customize the default page size
+    });
     const handleCreateNewRow = async (values: Person) => {
         try {
             // Make an API request to create a new person
@@ -71,24 +77,23 @@ const Example = () => {
                 exitEditingMode(); //required to exit editing mode and close modal
             }
         };
-    const fetchTableData = async () => {
+    const fetchTableData = async (pageIndex: number, pageSize: number) => {
         try {
-            const response = await axios.get('http://localhost:8081/polices/search');
-
-            if (response.status === 200) {
-                const data = response.data;
-                setTableData(data);
-            } else {
-                // Handle error case
-                console.error('Failed to fetch table data');
-            }
+            const params: { [key: string]: string | number } = {
+                page: pageIndex,
+                size: pageSize,
+            };
+            const response = await axios.get<Person[]>(ENDPOINT_URL, { params });
+            setTableData(response.data);
+            setTotalItems(parseInt(response.headers['x-total-count']));
         } catch (error) {
-            console.error('Failed to fetch table data', error);
+            console.error(error);
         }
     };
+
     useEffect(() => {
-        fetchTableData();
-    }, []);
+        fetchTableData(pagination.pageIndex,pagination.pageSize);
+    }, [tableData, pagination.pageIndex,pagination.pageSize]);
     const handleCancelRowEdits = () => {
         setValidationErrors({});
     };
@@ -195,6 +200,10 @@ const Example = () => {
                 }}
                 columns={columns}
                 data={tableData}
+                manualPagination
+                rowCount={totalItems}
+                onPaginationChange={setPagination}
+                state={{pagination}}
                 editingMode="modal" //default
                 enableColumnOrdering
                 enableEditing
