@@ -25,6 +25,9 @@ function QuittanceAdd() {
         dateeffet: "",
 
 
+        datedebut: "",
+        datefin: "",
+
         tauxtaxe:0,
         montantaccessoire:0,
         tauxcommission:25
@@ -236,6 +239,36 @@ function QuittanceAdd() {
               label="Date d'effet"
               variant="outlined"
               value={formData.dateeffet}
+              onChange={handleInputChange}
+              type="date"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              id="datedebut"
+              name="datedebut"
+              label="datedebut"
+              variant="outlined"
+              value={formData.datedebut}
+              onChange={handleInputChange}
+              type="date"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              id="datefin"
+              name="datefin"
+              label="datefin"
+              variant="outlined"
+              value={formData.datefin}
               onChange={handleInputChange}
               type="date"
               fullWidth

@@ -120,7 +120,7 @@ const Examples = () => {
 
     useEffect(() => {
         fetchTableData(pagination.pageIndex,pagination.pageSize);
-    }, [tableData, pagination.pageIndex,pagination.pageSize]);
+    }, [pagination.pageIndex,pagination.pageSize]);
     const handleCancelRowEdits = () => {
         setValidationErrors({});
     };
