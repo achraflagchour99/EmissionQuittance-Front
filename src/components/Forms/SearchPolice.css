@@ -2,7 +2,8 @@
 height: 17px;
 }
 .form-card{
-    display: flex;
+    margin-bottom: 5rem;
+    display: flex; 
     align-content: center;
     justify-content: center;
 }
@@ -10,6 +11,13 @@ height: 17px;
     height: 45px;
     margin-left: 10px;
     margin-top: 10px;
+    background-color: #243075FF;
+}
+#add-button{
+    height: 35px;
+    width: 11rem;
+    margin-left: 10px;
+    margin-top: 5px;
     background-color: #243075FF;
 }
 .results-box{

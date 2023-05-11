@@ -14,8 +14,6 @@ import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
 import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";
 
-
-
 const mdTheme = createTheme();
 
 function App() {
@@ -33,11 +31,11 @@ function App() {
                     <Route path='/' element={<MainContent />}>
                         <Route index                         element={<Dashboard />} />
                      <Route path='test'      element={<Example />} /> 
-                        <Route path='police-search'      element={<Searchpolicepage />} />
+                        <Route path='police-search'      element={<SearchPolice />} />
                         <Route path='police-add'      element={<AddPolice />} />
+                        <Route path="/quittance-add" element={<QuittanceAdd />} />
                         <Route path="/consult-page/:codePolice" element={<ConsultPolicePage/>} />
                        <Route path="/quittance-search" element={<Examples/>} />  
-                       <Route path="/quittance-add" element={<QuittanceAdd/>} /> 
                        
 
                        

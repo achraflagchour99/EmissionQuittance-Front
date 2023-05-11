@@ -1,241 +1,323 @@
-import React, {useState} from 'react';
-import axios from 'axios';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import TextField from "@mui/material/TextField";
-import {Box, CircularProgress, InputLabel, MenuItem, Select, tableCellClasses} from "@mui/material";
-import Button from "@mui/material/Button";
-import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import MaterialReactTable, {
+    type MaterialReactTableProps,
+    type MRT_Cell,
+    type MRT_ColumnDef,
+    type MRT_Row,
+} from 'material-react-table';
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    MenuItem,
+    Stack,
+    TextField,
+    Tooltip,
+} from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
+import axios from "axios";
 import "./SearchPolice.css"
-import {styled} from "@mui/material/styles";
-import TablePagination from "@mui/material/TablePagination";
-import DeleteIcon from "@mui/icons-material/Delete";
-import UpdateIcon from '@mui/icons-material/Update';
-import ManageSearchRoundedIcon from '@mui/icons-material/ManageSearchRounded';
-import IconButton from "@mui/material/IconButton";
-import ConsultPolicePage from "../../pages/ConsultPolicePage";
-import {Link} from "react-router-dom";
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
-interface Resultat {
+export type Person = {
     id: number;
     codePolice: string;
     numClient: string;
     raisonSociale: string;
     adresse: string;
     dateEffet: string;
-    primeNette: number;
-    taxe: number;
-    acce: number;
-    tauxComm: number;
-    dateTerme: string;
-    dateEtat: string;
-    ff: string;
-    mnt_taxe_eve: number;
-    mnt_taxe_parafiscale: number;
-}
+};
 
-interface TablePaginationActionsProps {
-    count: number;
-    page: number;
-    rowsPerPage: number;
-    onPageChange: (
-        event: React.MouseEvent<HTMLButtonElement>,
-        newPage: number,
-    ) => void;
-}
-
-function SearchPolice() {
-    const [numClient, setNumeroClient] = useState('');
-    const [codePolice, setCodePolice] = useState('');
-    const [nomcommercial, setNomCommercial] = useState('');
-    const [ville, setVille] = useState('');
-    const [resultats, setResultats] = useState<Resultat[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+const Example = () => {
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [tableData, setTableData] = useState<Person[]>([]);
+    const [validationErrors, setValidationErrors] = useState<{
+        [cellId: string]: string;
+    }>({});
     const [totalItems, setTotalItems] = useState(0);
-
-    const fetchData = async (page: number, rowsPerPage: number) => {
-        setIsLoading(true);
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 5, //customize the default page size
+    });
+    const handleCreateNewRow = async (values: Person) => {
         try {
-            const params: { [key: string]: string | number } = {
-                page: page,
-                size: rowsPerPage,
-            };
-            if (numClient) params.numClient = numClient;
-            if (codePolice) params.codePolice = codePolice;
-            if (nomcommercial) params.nomcommercial = nomcommercial;
-            if (ville) params.ville = ville;
-            const response = await axios.get<Resultat[]>(ENDPOINT_URL, { params });
-            setResultats(response.data);
-            setTotalItems(parseInt(response.headers['x-total-count']));
+            // Make an API request to create a new person
+            const response = await fetch('http://localhost:8081/polices/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+            });
+
+            if (response.ok) {
+                // If the API request is successful, fetch the updated data from the API
+                const newData = await fetch('http://localhost:8081/polices/add').then((res) => res.json());
+                setTableData(newData);
+            } else {
+                // Handle error case
+                console.error('Failed to create a new person');
+            }
         } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
+            console.error('Failed to create a new person', error);
         }
     };
 
-    const handleChangePage = (
-        event: React.MouseEvent<HTMLButtonElement> | null,
-        newPage: number,
-    ) => {
-        setPage(newPage);
-        fetchData(newPage, rowsPerPage);
+
+    const handleSaveRowEdits: MaterialReactTableProps<Person>['onEditingRowSave'] =
+        async ({ exitEditingMode, row, values }) => {
+            if (!Object.keys(validationErrors).length) {
+                tableData[row.index] = values;
+                //send/receive api updates here, then refetch or update local table data for re-render
+                setTableData([...tableData]);
+                exitEditingMode(); //required to exit editing mode and close modal
+            }
+        };
+    const fetchTableData = async (pageIndex: number, pageSize: number) => {
+        try {
+            const params: { [key: string]: string | number } = {
+                page: pageIndex,
+                size: pageSize,
+            };
+            const response = await axios.get<Person[]>(ENDPOINT_URL, { params });
+            setTableData(response.data);
+            setTotalItems(parseInt(response.headers['x-total-count']));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleChangeRowsPerPage = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => {
-        const newRowsPerPage = parseInt(event.target.value, 10);
-        setRowsPerPage(newRowsPerPage);
-        fetchData(page, newRowsPerPage);
+    useEffect(() => {
+        fetchTableData(pagination.pageIndex,pagination.pageSize);
+    }, [pagination]);
+    const handleCancelRowEdits = () => {
+        setValidationErrors({});
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        fetchData(page,rowsPerPage); // Fetch data using the current page number
-    };
-    const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        [`&.${tableCellClasses.head}`]: {
-            backgroundColor: "#243075FF",
-            color: theme.palette.common.white,
+    const handleDeleteRow = useCallback(
+        (row: MRT_Row<Person>) => {
+            //send api delete request here, then refetch or update local table data for re-render
+            tableData.splice(row.index, 1);
+            setTableData([...tableData]);
         },
-        [`&.${tableCellClasses.body}`]: {
-            fontSize: 14,
-        },
-    }));
+        [tableData],
+    );
 
-    const StyledTableRow = styled(TableRow)(({ theme }) => ({
-        '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover,
+    const getCommonEditTextFieldProps = useCallback(
+        (
+            cell: MRT_Cell<Person>,
+        ): MRT_ColumnDef<Person>['muiTableBodyCellEditTextFieldProps'] => {
+            return {
+                error: !!validationErrors[cell.id],
+                helperText: validationErrors[cell.id],
+                onBlur: (event) => {
+                    const isValid =
+                        cell.column.id === 'email'
+                            ? validateEmail(event.target.value)
+                            : cell.column.id === 'age'
+                                ? validateAge(+event.target.value)
+                                : validateRequired(event.target.value);
+                    if (!isValid) {
+                        //set validation error for cell if invalid
+                        setValidationErrors({
+                            ...validationErrors,
+                            [cell.id]: `${cell.column.columnDef.header} is required`,
+                        });
+                    } else {
+                        //remove validation error for cell if valid
+                        delete validationErrors[cell.id];
+                        setValidationErrors({
+                            ...validationErrors,
+                        });
+                    }
+                },
+            };
         },
-        // hide last border
-        '&:last-child td, &:last-child th': {
-            border: 0,
-        },
-        '&.selected': {
-            backgroundColor: theme.palette.action.hover,
-        },
-    }));
+        [validationErrors],
+    );
+
+    const columns = useMemo<MRT_ColumnDef<Person>[]>(
+        () => [
+            {
+                accessorKey: 'id',
+                header: 'ID',
+                enableColumnOrdering: false,
+                enableEditing: false, //disable editing on this column
+                enableSorting: false,
+                size: 80,
+            },
+            {
+                accessorKey: 'codePolice',
+                header: 'Code Police',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'numClient',
+                header: 'Numero Client',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'raisonSociale',
+                header: 'Raison sociale',
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                    type: 'string',
+                }),
+            },
+            {
+                accessorKey: 'adresse',
+                header: 'Adresse',
+                size: 80,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                    type: 'string',
+                }),
+            },
+        ],
+        [getCommonEditTextFieldProps],
+    );
 
     return (
-    <div>
-            <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
-                <div className={"form-card"}>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    id="outlined-basic"
-                    label="Numéro de client"
-                    variant="outlined"
-                    type="text"
-                    placeholder="Numéro de client"
-                    value={numClient}
-                    onChange={(event) => setNumeroClient(event.target.value)}
-
-                  
-                />
-                <TextField
-                    id="outlined-basic"
-                    label="Code Police"
-                    variant="outlined"
-                    type="text"
-                    value={codePolice}
-                    onChange={(event) => setCodePolice(event.target.value)}
-                />
-                <TextField
-                    id="outlined-basic"
-                    label="Nom commercial"
-                    variant="outlined"
-                    type="text"
-                    placeholder="Nom commercial"
-                    value={nomcommercial}
-                    onChange={(event) => setNomCommercial(event.target.value)}
-                />
-                <TextField
-                    id="outlined-basic"
-                    label="Ville"
-                    variant="outlined"
-                    type="text"
-                    placeholder="Ville"
-                    value={ville}
-                    onChange={(event) => setVille(event.target.value)}
-                />
-                <Button id={"search-button"} type="submit" variant="contained" startIcon={<ContentPasteSearchIcon />}>
-                Rechercher
-                </Button>
-            </form>
-                </div>
-            </Box>
-        {isLoading ? (
-            // Show the loading animation if isLoading is true
-            <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
-                <CircularProgress />
+        <>
+            <div className={"form-card"}>
+            <MaterialReactTable
+                displayColumnDefOptions={{
+                    'mrt-row-actions': {
+                        muiTableHeadCellProps: {
+                            align: 'center',
+                        },
+                        size: 120,
+                    },
+                }}
+                columns={columns}
+                data={tableData}
+                manualPagination
+                rowCount={totalItems}
+                onPaginationChange={setPagination}
+                state={{pagination}}
+                editingMode="modal" //default
+                enableColumnOrdering
+                enableEditing
+                onEditingRowSave={handleSaveRowEdits}
+                onEditingRowCancel={handleCancelRowEdits}
+                renderRowActions={({ row, table }) => (
+                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                        <Tooltip arrow placement="left" title="Modifier">
+                            <IconButton onClick={() => table.setEditingRow(row)}>
+                                <Edit />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip arrow placement="right" title="Consulter">
+                            <IconButton  onClick={() => handleDeleteRow(row)}>
+                                <VisibilityIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                )}
+                renderTopToolbarCustomActions={() => (
+                    <Button
+                        id={"add-button"}
+                        color="primary"
+                        onClick={() => setCreateModalOpen(true)}
+                        variant="contained"
+                    >
+                        Nouvelle Police
+                    </Button>
+                )}
+            />
             </div>
-        ) : resultats.length > 0 ? (
-                <div className={"results-box"}>
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <StyledTableCell >Code Police</StyledTableCell>
-                                <StyledTableCell>Numéro client</StyledTableCell>
-                                <StyledTableCell>Raison sociale</StyledTableCell>
-                                <StyledTableCell>Date d'effet</StyledTableCell>
-                                <StyledTableCell>Date de terme</StyledTableCell>
-                                <StyledTableCell>Date d'état</StyledTableCell>
-                                <StyledTableCell>Consulter</StyledTableCell>
-                                <StyledTableCell>Modifier</StyledTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {resultats.map((resultat) => (
-                                <StyledTableRow key={resultat.id}>
-                                    <StyledTableCell component="th" scope="row">{resultat.codePolice}</StyledTableCell>
-                                    <StyledTableCell  align="left">{resultat.numClient}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.raisonSociale}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.dateEffet}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.dateTerme}</StyledTableCell>
-                                    <StyledTableCell align="left">{resultat.dateEtat}</StyledTableCell>
-                                    <StyledTableCell>
-                                        <Link to={`/consult-page/${resultat.codePolice}`}>
-                                            <IconButton id="consult-icon" color="primary" component="button">
-                                                <ManageSearchRoundedIcon />
-                                            </IconButton>
-                                        </Link>
-                                    </StyledTableCell>
-                                    <StyledTableCell>
-                                        <IconButton id={"update-icon"} color="primary" component="button">
-                                       <UpdateIcon />
-                                        </IconButton>
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                    <TablePagination
-                        component="div"
-                        rowsPerPageOptions={[5, 10, 25, 50]}
-                        count={totalItems}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </div>
-            ) : null}
-        </div>
+            <CreateNewAccountModal
+                columns={columns}
+                open={createModalOpen}
+                onClose={() => setCreateModalOpen(false)}
+                onSubmit={handleCreateNewRow}
+            />
+        </>
     );
+};
+
+interface CreateModalProps {
+    columns: MRT_ColumnDef<Person>[];
+    onClose: () => void;
+    onSubmit: (values: Person) => void;
+    open: boolean;
 }
 
+//example of creating a mui dialog modal for creating new rows
+export const CreateNewAccountModal = ({
+                                          open,
+                                          columns,
+                                          onClose,
+                                          onSubmit,
+                                      }: CreateModalProps) => {
+    const [values, setValues] = useState<any>(() =>
+        columns.reduce((acc, column) => {
+            acc[column.accessorKey ?? ''] = '';
+            return acc;
+        }, {} as any),
+    );
 
-export default SearchPolice;
+    const handleSubmit = () => {
+        //put your validation logic here
+        onSubmit(values);
+        onClose();
+    };
+
+    return (
+        <Dialog open={open}>
+            <DialogTitle textAlign="center">Police</DialogTitle>
+            <DialogContent>
+                <form onSubmit={(e) => e.preventDefault()}>
+                    <Stack
+                        sx={{
+                            width: '100%',
+                            minWidth: { xs: '300px', sm: '360px', md: '400px' },
+                            gap: '1.5rem',
+                        }}
+                    >
+                        {columns.map((column) => (
+                            <TextField
+                                key={column.accessorKey}
+                                label={column.header}
+                                name={column.accessorKey}
+                                onChange={(e) =>
+                                    setValues({ ...values, [e.target.name]: e.target.value })
+                                }
+                            />
+                        ))}
+                    </Stack>
+                </form>
+            </DialogContent>
+            <DialogActions sx={{ p: '1.25rem' }}>
+                <Button variant="outlined" onClick={onClose}>Fermer</Button>
+                <Button color="primary" onClick={handleSubmit} variant="contained">
+                    Créer
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
+const validateRequired = (value: string) => !!value.length;
+const validateEmail = (email: string) =>
+    !!email.length &&
+    email
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        );
+const validateAge = (age: number) => age >= 18 && age <= 50;
+
+export default Example;
