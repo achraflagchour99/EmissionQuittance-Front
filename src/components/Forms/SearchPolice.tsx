@@ -140,6 +140,8 @@ function SearchPolice() {
                     placeholder="Numéro de client"
                     value={numClient}
                     onChange={(event) => setNumeroClient(event.target.value)}
+
+                  
                 />
                 <TextField
                     id="outlined-basic"
