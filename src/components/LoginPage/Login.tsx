@@ -188,9 +188,18 @@ window.location.href = '/';
                 sx={{ mt: 3, mb: 2 }}
                 onClick={authentifier}
               >
-                Login
+                Sign In
               </Button>
-              <Link href="/loginUp">login Up</Link> 
+             
+               <Link href="/loginUp"> <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }} 
+              >  
+               Sign up
+              </Button>
+              </Link> 
 
               <Copyright sx={{ mt: 5 }} />
             </Box>
