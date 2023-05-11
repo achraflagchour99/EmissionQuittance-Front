@@ -2,10 +2,9 @@
 height: 17px;
 }
 .form-card{
-    display: flex; 
+    display: flex;
     align-content: center;
     justify-content: center;
-    height: 100%;
 }
 #search-button{
     height: 45px;

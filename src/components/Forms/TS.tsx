@@ -45,7 +45,6 @@ const Example = () => {
     });
     const handleCreateNewRow = async (values: Person) => {
         try {
-            // Make an API request to create a new person
             const response = await fetch('http://localhost:8081/polices/add', {
                 method: 'POST',
                 headers: {
@@ -55,18 +54,15 @@ const Example = () => {
             });
 
             if (response.ok) {
-                // If the API request is successful, fetch the updated data from the API
-                const newData = await fetch('http://localhost:8081/polices/add').then((res) => res.json());
-                setTableData(newData);
+                const data = await response.json();
+                setTableData((prevData) => [...prevData, data]);
             } else {
-                // Handle error case
                 console.error('Failed to create a new person');
             }
         } catch (error) {
             console.error('Failed to create a new person', error);
         }
     };
-
 
     const handleSaveRowEdits: MaterialReactTableProps<Person>['onEditingRowSave'] =
         async ({ exitEditingMode, row, values }) => {
@@ -93,7 +89,7 @@ const Example = () => {
 
     useEffect(() => {
         fetchTableData(pagination.pageIndex,pagination.pageSize);
-    }, [tableData, pagination.pageIndex,pagination.pageSize]);
+    }, [pagination]);
     const handleCancelRowEdits = () => {
         setValidationErrors({});
     };
@@ -225,11 +221,11 @@ const Example = () => {
                 )}
                 renderTopToolbarCustomActions={() => (
                     <Button
-                        color="secondary"
+                        color="primary"
                         onClick={() => setCreateModalOpen(true)}
                         variant="contained"
                     >
-                        Create New Account
+                        Créer une Police
                     </Button>
                 )}
             />
