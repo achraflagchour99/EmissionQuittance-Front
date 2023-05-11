@@ -1,4 +1,4 @@
-import * as React from "react";
+ import React, {useCallback, useEffect, useMemo, useState,createContext} from 'react';
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -11,8 +11,22 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import rmaLogo from "../../assets/images/rma-logo.bmp";
 import rmaImage from "../../assets/images/rma-image.png";
 import classes from "./Login.module.css";
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
+import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom' 
+import store from './Store';
+import { useDispatch } from 'react-redux';
+
+type State = {
+  value: string;
+  setValue: (value: string) => void;
+};
 
 function Copyright(props: any) {
+
+ 
+
   return (
     <Typography
       variant="body2"
@@ -32,7 +46,9 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-export default function SignInSide() {
+export default function SignInSide(props: any) {
+
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -42,9 +58,49 @@ export default function SignInSide() {
     });
   };
 
+ 
+  const dispatch = useDispatch();
+     
+  const authentifier = (event: { preventDefault: () => void; }) => {
+
+
+    axios.post('http://localhost:8081/api/v1/auth/authenticate', login)
+    .then(response => {
+      console.log(response.data.access_token);
+      props.onDataReceived("Hello from Fille1 "+response.data);
+      window.location.href = '/';
+
+alert(response.data.access_token )
+      dispatch({ type: 'SET_VALUE', payload: response.data.access_token });
+
+
+      localStorage.setItem('token', response.data.access_token);
+
+    //  toast.success('Connexion réussie !');
+    })
+    .catch(error => {
+      toast.error('Connexion échouée.');
+      console.log(error);
+    });
+
+
+
+    event.preventDefault();
+    console.log(login);
+  };
+
+
+
+
+  const [login, setLogin] = useState({
+    email: '',
+    password: '', 
+  });
+
+
   return (
     <ThemeProvider theme={theme}>
-      
+      <ToastContainer />
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid
@@ -79,12 +135,10 @@ export default function SignInSide() {
               src={rmaLogo}
               alt=" dentreprise"
             ></img>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 1 }}
-            >
+              <Box    >
+
+
+                
               <TextField
                 margin="normal"
                 required
@@ -93,6 +147,9 @@ export default function SignInSide() {
                 label="utilisateur"
                 name="user"
                 autoFocus
+                onChange={(e) =>
+                  setLogin({ ...login, email: e.target.value })
+                }
               />
               <TextField
                 margin="normal"
@@ -103,12 +160,16 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) =>
+                  setLogin({ ...login, password: e.target.value })
+                }
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                onClick={authentifier}
               >
                 Login
               </Button>

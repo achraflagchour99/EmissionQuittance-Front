@@ -1,15 +1,37 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import {  Grid, Box } from '@mui/material';
-import {   MenuItem, Select,Divider  } from '@mui/material';
-import axios from 'axios';
+import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
+import axios from 'axios'; 
+import { useDispatch, useSelector } from 'react-redux';
+import store from "../../../LoginPage/Store";  
+
+interface MyState {
+    value: string;
+  }
+
+ 
+  
+
+ 
 
 
-function QuittanceAdd() {
+function QuittanceAdd( ) {  
 
+
+
+   
+
+
+    const dispatch = useDispatch();
+    const value = useSelector((state: MyState) => state.value);
+
+
+    dispatch({ type: 'SET_VALUE', payload: "response.data" });
+    console.log('fe '+value);  
 
     const [formData, setFormData] = useState({
         exercice: "",
@@ -60,13 +82,28 @@ function QuittanceAdd() {
 
       const options = [0, 10, 15, 20, 30];
 
- 
 
+
+      dispatch({ type: 'SET_VALUE', payload: "response.data" });
+      console.log('fe '+value);  
+
+
+      useEffect(() => {
+       
+      }, [value]);
+
+
+      
 
   return (
-    <>
-    <div>QuittanceAdd</div>
-     
+    <> 
+
+
+
+    
+    <Typography variant="h5" align="center" color="primary" gutterBottom>
+    Ajouter quittance
+    </Typography>
     <Box sx={{ padding: '1rem' }}>
       <form onSubmit={handleSubmit}>
 
@@ -278,7 +315,10 @@ function QuittanceAdd() {
             />
           </Grid>
 
-          <Divider orientation="vertical"  sx={{ my: 8 }}  variant="fullWidth" color="secondary"   /> 
+          <Divider orientation="vertical"  sx={{ my: 10 }}  variant="fullWidth" color="secondary"   /> 
+
+ 
+       
 
           <Grid item xs={12} sm={4} >
             <TextField
@@ -347,3 +387,7 @@ function QuittanceAdd() {
 }
 
 export default QuittanceAdd    
+
+function configureStore(arg0: { reducer: { value: any; }; }) {
+    throw new Error('Function not implemented.');
+}
