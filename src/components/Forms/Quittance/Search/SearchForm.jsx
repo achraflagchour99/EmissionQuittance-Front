@@ -19,15 +19,15 @@ function SearchForm() {
     const [pageSize, setPageSize] = useState(3);
     const [data, setData] = useState(null);
     const [page, setPage] = useState(1); // define `page` state
-    const handlePageChange = (event, value) => { // define `handlePageChange` function
-        setPageSize(value);
+    const handlePageChange = (event, value) => {
+        setPageSize(value); // mettre à jour la taille de page
     };
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
-      const result = await fetchData(refQuittanceid, dateDebut, dateFin, codePolice, pageSize);
-      setData(result);
-    };
+        e.preventDefault();
+        const result = await fetchData(refQuittanceid, dateDebut, dateFin, codePolice, pageSize);
+        setData(result);
+      };
   
     return (
         <Form onSubmit={handleSubmit} className="d-flex flex-wrap justify-content-center">
