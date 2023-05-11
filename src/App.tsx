@@ -26,7 +26,8 @@ function App() {
   };
   return (
 
-    
+
+
         <BrowserRouter> 
             <Routes>
                 <Route>
