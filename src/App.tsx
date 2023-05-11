@@ -14,8 +14,8 @@ import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
 import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";
 import SignInSide from "./components/LoginPage/Login";
-import { Provider } from "react-redux";
-import store from "./components/LoginPage/Store";
+import { Provider } from "react-redux"; 
+import PrivateRoute from "./routage/PrivateRoute";
 
 const mdTheme = createTheme();
 
@@ -32,20 +32,33 @@ function App() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  
+  // if (!localStorage.getItem('token')) {
+  //   return ( 
+  //             <BrowserRouter> 
+  //                 <Routes>
+  //                     <Route> 
+  //                         <Route path="/SignIn" element={<SignInSide/>} />
+  //                     </Route>
+  //                 </Routes>
+  //             </BrowserRouter> 
+  //       );
+  //     }else
+  {
   return (
 
-
-    <Provider store={store}>
+ 
         <BrowserRouter> 
             <Routes>
                 <Route>
-                    <Route path='/' element={<MainContent />}>
+                    <Route path='/' element={<PrivateRoute><MainContent /> </PrivateRoute>}>
                     
                      
 
 
-                        <Route index                         element={<Dashboard />} />
-                     <Route path='test'      element={<Example />} /> 
+                        <Route index  element={<Dashboard />} />
+                        <Route path='test'      element={<Example />} /> 
                         <Route path='police-search'      element={<SearchPolice />} />
                         <Route path='police-add'      element={<AddPolice />} />
                         <Route path="/quittance-add" element={<QuittanceAdd  />} />
@@ -58,10 +71,9 @@ function App() {
                     <Route path="/SignIn" element={<SignInSide onDataReceived={handleDataReceived}/>} />
                 </Route>
             </Routes>
-        </BrowserRouter>
-        </Provider>
+        </BrowserRouter> 
 
   );
-}
+}}
 
 export default App;

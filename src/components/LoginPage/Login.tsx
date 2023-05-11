@@ -14,9 +14,12 @@ import classes from "./Login.module.css";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom' 
-import store from './Store';
-import { useDispatch } from 'react-redux';
+import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'  
+import { useDispatch, useSelector } from 'react-redux';
+import store from './Store'; 
+import jwtDecode from 'jwt-decode';
+
+
 
 type State = {
   value: string;
@@ -46,6 +49,11 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
+interface MyState {
+  value: string;
+}
+
+
 export default function SignInSide(props: any) {
 
 
@@ -59,26 +67,37 @@ export default function SignInSide(props: any) {
   };
 
  
-  const dispatch = useDispatch();
+   
      
   const authentifier = (event: { preventDefault: () => void; }) => {
 
 
     axios.post('http://localhost:8081/api/v1/auth/authenticate', login)
     .then(response => {
-      console.log(response.data.access_token);
+      
       props.onDataReceived("Hello from Fille1 "+response.data);
-      window.location.href = '/';
+       
 
-alert(response.data.access_token )
-      dispatch({ type: 'SET_VALUE', payload: response.data.access_token });
+  
+      
+    store.dispatch({ type: 'SET_VALUE', payload: 'value' }); 
+ 
+    const decodedToken = jwtDecode(response.data.access_token);
+    const nom = (decodedToken as { lastname: string }).lastname;
+    const prenom = (decodedToken as { firstName: string }).firstName;
 
+    
+    const user = { nom, prenom };
+    localStorage.setItem('user', JSON.stringify(user));
+ 
+ 
 
       localStorage.setItem('token', response.data.access_token);
-
+window.location.href = '/';
     //  toast.success('Connexion réussie !');
     })
     .catch(error => {
+      console.log(login.email,login.password)
       toast.error('Connexion échouée.');
       console.log(error);
     });

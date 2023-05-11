@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
-
+import store from '../components/LoginPage/Store';
 
 
 interface MyState {
@@ -12,9 +12,9 @@ const Dashboard = () => {
 
  // dispatch({ type: 'SET_VALUE', payload: "response.data" });
  
-  const value = useSelector((state: MyState) => state.value);
-  console.log('redux '+ value); 
+ 
   console.log('local '+ localStorage.getItem('token')); 
+ 
   
   return (
     <div>Dashboadrd</div>

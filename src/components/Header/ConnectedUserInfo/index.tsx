@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   alpha,
   Avatar,
@@ -67,6 +67,26 @@ const ConnectedUserInfo = () => {
     setAnchorElUser(null);
   };
 
+  const signOut = () => {
+    window.location.href = '/SignIn';
+    localStorage.setItem('token', ''); 
+  };
+  
+
+  const [user, setUser] = useState({
+    nom: "",
+    prenom: "",
+     
+  });
+
+
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    setUser(storedUser);
+}, []);
+
+
   return (
     <>
       <Button
@@ -89,7 +109,7 @@ const ConnectedUserInfo = () => {
         sx={{ textTransform: "none", textAlign: "left", p: "3px 15px" }}
       >
         <ListItemText
-          primary="LAGCHOUR ACHRAF"
+          primary={user.nom + ' ' + user.prenom}
           secondary="Admin"
           primaryTypographyProps={{
             sx: {
@@ -132,7 +152,7 @@ const ConnectedUserInfo = () => {
         <MenuItem key="1">Roles</MenuItem>
         <MenuItem
           key="2"
-          //onClick={signOut}
+           onClick={signOut}
         >
           Log out
         </MenuItem>

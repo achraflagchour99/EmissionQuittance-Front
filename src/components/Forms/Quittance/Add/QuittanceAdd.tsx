@@ -5,9 +5,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import {  Grid, Box } from '@mui/material';
 import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
-import axios from 'axios'; 
-import { useDispatch, useSelector } from 'react-redux';
-import store from "../../../LoginPage/Store";  
+import axios from 'axios';  
 
 interface MyState {
     value: string;
@@ -21,17 +19,9 @@ interface MyState {
 
 function QuittanceAdd( ) {  
 
+ 
 
-
-   
-
-
-    const dispatch = useDispatch();
-    const value = useSelector((state: MyState) => state.value);
-
-
-    dispatch({ type: 'SET_VALUE', payload: "response.data" });
-    console.log('fe '+value);  
+ 
 
     const [formData, setFormData] = useState({
         exercice: "",
@@ -83,14 +73,9 @@ function QuittanceAdd( ) {
       const options = [0, 10, 15, 20, 30];
 
 
+ 
 
-      dispatch({ type: 'SET_VALUE', payload: "response.data" });
-      console.log('fe '+value);  
-
-
-      useEffect(() => {
-       
-      }, [value]);
+ 
 
 
       
