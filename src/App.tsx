@@ -12,6 +12,7 @@ import ConsultPolicePage from "./pages/ConsultPolicePage";
 import AddPolice from "./components/Forms/AddPolice";
 import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
+import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";
 
 
 
@@ -36,6 +37,7 @@ function App() {
                         <Route path='police-add'      element={<AddPolice />} />
                         <Route path="/consult-page/:codePolice" element={<ConsultPolicePage/>} />
                        <Route path="/quittance-search" element={<Examples/>} />  
+                       <Route path="/quittance-add" element={<QuittanceAdd/>} /> 
                        
 
                        
