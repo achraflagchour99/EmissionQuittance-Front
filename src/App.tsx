@@ -14,6 +14,8 @@ import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
 import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";
 import SignInSide from "./components/LoginPage/Login";
+import SignUpSide from "./components/LoginPage/Logup";
+
 import { Provider } from "react-redux"; 
 import PrivateRoute from "./routage/PrivateRoute";
 
@@ -68,6 +70,7 @@ function App() {
  
                        
                     </Route>
+                    <Route path="/loginUp" element={<SignUpSide/>} />
                     <Route path="/SignIn" element={<SignInSide onDataReceived={handleDataReceived}/>} />
                 </Route>
             </Routes>

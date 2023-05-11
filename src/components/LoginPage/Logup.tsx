@@ -17,7 +17,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'  
 import { useDispatch, useSelector } from 'react-redux';
 import store from './Store'; 
-import jwtDecode from 'jwt-decode'; 
+import jwtDecode from 'jwt-decode';
+
+
 
 type State = {
   value: string;
@@ -52,17 +54,9 @@ interface MyState {
 }
 
 
-export default function SignInSide(props: any) {
+export default function SignUpSide(props: any) {
 
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
+ 
 
  
    
@@ -70,15 +64,13 @@ export default function SignInSide(props: any) {
   const authentifier = (event: { preventDefault: () => void; }) => {
 
 
-    axios.post('http://localhost:8081/api/v1/auth/authenticate', login)
+    axios.post('http://localhost:8081/api/v1/auth/register', login)
     .then(response => {
       
-      props.onDataReceived("Hello from Fille1 "+response.data);
-       
+    
 
   
-      
-    store.dispatch({ type: 'SET_VALUE', payload: 'value' }); 
+       
  
     const decodedToken = jwtDecode(response.data.access_token);
     const nom = (decodedToken as { lastname: string }).lastname;
@@ -91,7 +83,8 @@ export default function SignInSide(props: any) {
  
 
       localStorage.setItem('token', response.data.access_token);
-window.location.href = '/';
+      toast.success('Utilisateur bien enregistrer');
+window.location.href = '/SignIn';
     //  toast.success('Connexion réussie !');
     })
     .catch(error => {
@@ -112,6 +105,9 @@ window.location.href = '/';
   const [login, setLogin] = useState({
     email: '',
     password: '', 
+    firstname: '', 
+    lastname: '', 
+
   });
 
 
@@ -120,23 +116,7 @@ window.location.href = '/';
       <ToastContainer />
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage: "url(https://source.unsplash.com/random)",
-            backgroundRepeat: "no-repeat",
-            backgroundColor: (t) =>
-              t.palette.mode === "light"
-                ? t.palette.grey[50]
-                : t.palette.grey[900],
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}>
-            <img src={rmaImage} className={classes.image} alt="rma headquartures"></img>
-          </Grid>
+       
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{
@@ -155,20 +135,43 @@ window.location.href = '/';
               <Box    >
 
 
-                
               <TextField
                 margin="normal"
                 required
                 fullWidth
                 id="user"
-                label="utilisateur"
-                name="user"
+                label="firstname"
+                name="firstname"
                 autoFocus
+                onChange={(e) =>
+                  setLogin({ ...login, firstname: e.target.value })
+                }
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="lastname"
+                label="lastname"
+                type="text"
+                id="lastname" 
+                onChange={(e) =>
+                  setLogin({ ...login, lastname: e.target.value })
+                }
+              />
+                <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="text"
+                label="Adresse"
+                type="text"
+                id="email" 
                 onChange={(e) =>
                   setLogin({ ...login, email: e.target.value })
                 }
               />
-              <TextField
+                <TextField
                 margin="normal"
                 required
                 fullWidth
@@ -181,6 +184,7 @@ window.location.href = '/';
                   setLogin({ ...login, password: e.target.value })
                 }
               />
+              
               <Button
                 type="submit"
                 fullWidth
@@ -190,12 +194,27 @@ window.location.href = '/';
               >
                 Login
               </Button>
-              <Link href="/loginUp">login Up</Link> 
-
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Grid>
+        <Grid
+          item
+          xs={false}
+          sm={4}
+          md={7}
+          sx={{
+            backgroundImage: "url(https://source.unsplash.com/random)",
+            backgroundRepeat: "no-repeat",
+            backgroundColor: (t) =>
+              t.palette.mode === "light"
+                ? t.palette.grey[50]
+                : t.palette.grey[900],
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}>
+            <img src={rmaImage} className={classes.image} alt="rma headquartures"></img>
+          </Grid>
       </Grid>
     </ThemeProvider>
   );
