@@ -101,6 +101,42 @@ function QuittanceAdd( ) {
 
         <Grid item xs={12} sm={4}>
             <TextField
+              id="RefInt"
+              name="RefInt "
+              label="RefInt  "
+              variant="outlined"
+              value={formData.ordre}
+              onChange={handleInputChange}
+              type="text"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+   </Grid>
+
+
+   <Grid item xs={12} sm={4}>
+            <TextField
+              id="Numeroquittance"
+              name="Numeroquittance"
+              label="Numero quittance "
+              variant="outlined"
+              value={formData.ordre}
+              onChange={handleInputChange}
+              type="text"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+   </Grid>
+
+
+
+
+        <Grid item xs={12} sm={4}>
+            <TextField
               id="exercice"
               name="exercice"
               label="exercice"
@@ -128,6 +164,8 @@ function QuittanceAdd( ) {
                 shrink: true,
               }}
             />
+
+
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
@@ -300,9 +338,61 @@ function QuittanceAdd( ) {
             />
           </Grid>
 
+
+
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              id="DateEmission "
+              name="DateEmission "
+              label="DateEmission "
+              variant="outlined"
+              value={formData.ordre}
+              onChange={handleInputChange}
+              type="Date"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />   </Grid>
+
+            <Grid item xs={12} sm={4}>
+            <TextField
+              id="Dateetat "
+              name="Date Etat "
+              label="Date Etat "
+              variant="outlined"
+              value={formData.ordre}
+              onChange={handleInputChange}
+              type="Date"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+   </Grid>
+
+
+
+
+
           <Divider orientation="vertical"  sx={{ my: 10 }}  variant="fullWidth" color="secondary"   /> 
 
- 
+          <Grid item xs={12} sm={4}>
+            <TextField
+              id="TPrimeNette"
+              name="TPrimeNette"
+              label="T.PrimeNette"
+              variant="outlined"
+              value={formData.tauxcommission}
+              onChange={handleInputChange}
+              type="number"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
        
 
           <Grid item xs={12} sm={4} >
@@ -337,6 +427,23 @@ function QuittanceAdd( ) {
             />
           </Grid>
 
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              id="TtaxeParafiscale"
+              name="ttaxeParafiscale"
+              label="T.taxeParafiscale"
+              variant="outlined"
+              value={formData.tauxcommission}
+              onChange={handleInputChange}
+              type="number"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+
          
 
           <Grid item xs={12} sm={4}>
@@ -356,6 +463,21 @@ function QuittanceAdd( ) {
           ))}
         </Select>
       </Grid>
+      <Grid item xs={12} sm={4}>
+            <TextField
+              id="PrimeGareEve"
+              name="PrimeGareEve"
+              label="PrimeGareEve"
+              variant="outlined"
+              value={formData.tauxcommission}
+              onChange={handleInputChange}
+              type="number"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
 
        
           <Grid item xs={12}>
