@@ -45,7 +45,7 @@ const Examples = () => {
     }>({});
     const [totalItems, setTotalItems] = useState(0);
     const [pagination, setPagination] = useState({
-        pageIndex: 1,
+        pageIndex: 0,
         pageSize: 5, //customize the default page size
     });
       const [searchCriteria, setSearchCriteria] = useState({
@@ -146,21 +146,13 @@ const Examples = () => {
                 enableSorting: false,
                 size: 80,
             },
-            {
-                accessorKey: 'intermediaireid',
-                header: '  intermediaireid', 
-                
-            },
+
             {
                 accessorKey: 'nomclient',
                 header: '  nomclient', 
                 
             },
-            {
-                accessorKey: 'qtcRemiseid',
-                header: 'qtcRemiseid',
-                
-            },
+
             {
                 accessorKey: 'dateEcheance',
                 header: 'dateEcheance: ',

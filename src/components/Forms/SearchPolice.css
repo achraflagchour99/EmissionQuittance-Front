@@ -2,15 +2,13 @@
 height: 17px;
 }
 .form-card{
-    margin-bottom: 5rem;
-    display: flex; 
-    align-content: center;
-    justify-content: center;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
 }
 #search-button{
-    height: 45px;
+    height: 34px;
     margin-left: 10px;
-    margin-top: 10px;
+    margin-top: 8px;
     background-color: #243075FF;
 }
 #add-button{
@@ -30,5 +28,11 @@ height: 17px;
     background-color: rgb(183, 83, 83);
 }
 
+.add-buttons{
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 2.4rem;
+    
+}
 
 

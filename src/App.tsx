@@ -32,8 +32,8 @@ function App() {
                         <Route index                         element={<Dashboard />} />
                      <Route path='test'      element={<Example />} /> 
                         <Route path='police-search'      element={<SearchPolice />} />
-                        <Route path='police-add'      element={<AddPolice />} />
                         <Route path="/quittance-add" element={<QuittanceAdd />} />
+                        <Route path="/police-add" element={<AddPolice />} />
                         <Route path="/consult-page/:codePolice" element={<ConsultPolicePage/>} />
                        <Route path="/quittance-search" element={<Examples/>} />  
                        
