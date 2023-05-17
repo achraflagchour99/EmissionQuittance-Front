@@ -300,14 +300,7 @@ function QuittanceAdd( ) {
             />
           </Grid>
 
-<<<<<<< HEAD
           <Divider orientation="vertical"  sx={{ my: 8 }}  variant="fullWidth" color="secondary"   />
-=======
-          <Divider orientation="vertical"  sx={{ my: 10 }}  variant="fullWidth" color="secondary"   /> 
-
- 
-       
->>>>>>> da052708479530850694d5ddaaf31bd67f347443
 
           <Grid item xs={12} sm={4} >
             <TextField
