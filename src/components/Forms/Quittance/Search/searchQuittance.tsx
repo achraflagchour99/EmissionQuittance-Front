@@ -21,8 +21,10 @@ import {
 } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import axios from "axios";
-import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-const ENDPOINT_URL = 'http://localhost:8081/quittances/search?';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch'; 
+import "../../SearchPolice.css"
+
+
 
 export type Person = {
     id: number;
@@ -60,27 +62,7 @@ const Examples = () => {
  
 
     const handleCreateNewRow = async (values: Person) => {
-        try {
-            // Make an API request to create a new person
-            const response = await fetch('http://localhost:8081/polices/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(values),
-            });
-
-            if (response.ok) {
-                // If the API request is successful, fetch the updated data from the API
-                const newData = await fetch('http://localhost:8081/polices/add').then((res) => res.json());
-                setTableData(newData);
-            } else {
-                // Handle error case
-                console.error('Failed to create a new person');
-            }
-        } catch (error) {
-            console.error('Failed to create a new person', error);
-        }
+    
     };
 
 
@@ -120,7 +102,7 @@ const Examples = () => {
 
     useEffect(() => {
         fetchTableData(pagination.pageIndex,pagination.pageSize);
-    }, [pagination.pageIndex,pagination.pageSize]);
+    }, [pagination.pageIndex,pagination.pageSize,searchCriteria]);
     const handleCancelRowEdits = () => {
         setValidationErrors({});
     };
@@ -179,7 +161,7 @@ const Examples = () => {
 
     return (
         <>
-<Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
+        <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                 <div className={"form-card"}>
             <form >
                 <TextField
@@ -220,8 +202,8 @@ const Examples = () => {
                 </Button>
             </form>
                 </div>
-            </Box>
-        
+          </Box>
+        <div className={"form-card"}>
             <MaterialReactTable
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
@@ -278,6 +260,7 @@ const Examples = () => {
                     </Button>
                 )}
             />
+            </div>
             <CreateNewAccountModal
                 columns={columns}
                 open={createModalOpen}
@@ -320,13 +303,7 @@ export const CreateNewAccountModal = ({
             <DialogTitle textAlign="center">Create New Account</DialogTitle>
             <DialogContent>
                 <form onSubmit={(e) => e.preventDefault()}>
-                    <Stack
-                        sx={{
-                            width: '100%',
-                            minWidth: { xs: '300px', sm: '360px', md: '400px' },
-                            gap: '1.5rem',
-                        }}
-                    >
+                    <Stack    >
                         {columns.map((column) => (
                             <TextField
                                 key={column.accessorKey}

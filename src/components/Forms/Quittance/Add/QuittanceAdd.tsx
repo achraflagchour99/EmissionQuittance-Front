@@ -1,15 +1,27 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import {  Grid, Box } from '@mui/material';
-import {   MenuItem, Select,Divider  } from '@mui/material';
-import axios from 'axios';
+import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
+import axios from 'axios';  
+
+interface MyState {
+    value: string;
+  }
+
+ 
+  
+
+ 
 
 
-function QuittanceAdd() {
+function QuittanceAdd( ) {  
 
+ 
+
+ 
 
     const [formData, setFormData] = useState({
         exercice: "",
@@ -60,13 +72,23 @@ function QuittanceAdd() {
 
       const options = [0, 10, 15, 20, 30];
 
+
+ 
+
  
 
 
+      
+
   return (
-    <>
-    <div>QuittanceAdd</div>
-     
+    <> 
+
+
+
+    
+    <Typography variant="h5" align="center" color="primary" gutterBottom>
+    Ajouter quittance
+    </Typography>
     <Box sx={{ padding: '1rem' }}>
       <form onSubmit={handleSubmit}>
 
@@ -278,7 +300,14 @@ function QuittanceAdd() {
             />
           </Grid>
 
+<<<<<<< HEAD
           <Divider orientation="vertical"  sx={{ my: 8 }}  variant="fullWidth" color="secondary"   />
+=======
+          <Divider orientation="vertical"  sx={{ my: 10 }}  variant="fullWidth" color="secondary"   /> 
+
+ 
+       
+>>>>>>> da052708479530850694d5ddaaf31bd67f347443
 
           <Grid item xs={12} sm={4} >
             <TextField
@@ -347,3 +376,7 @@ function QuittanceAdd() {
 }
 
 export default QuittanceAdd    
+
+function configureStore(arg0: { reducer: { value: any; }; }) {
+    throw new Error('Function not implemented.');
+}
