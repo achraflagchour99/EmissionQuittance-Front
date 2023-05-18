@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import MaterialReactTable, {
     type MaterialReactTableProps,
     type MRT_Cell,
@@ -8,6 +9,7 @@ import MaterialReactTable, {
 import {
     Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -22,46 +24,60 @@ import { Delete, Edit } from '@mui/icons-material';
 import axios from "axios";
 import "./SearchPolice.css"
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import {Link} from "react-router-dom";
 
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
-export type Person = {
-    id: number;
+export type Ville = {
+    libelle: string;
+}
+export type Versioncommerciale = {
+    nomcommercial: string;
+}
+
+export type Police = {
     codePolice: string;
-    numClient: string;
+    numClient: bigint;
     raisonSociale: string;
     adresse: string;
-    dateEffet: string;
+    dateEffet: Date;
+    primeNette: bigint;
+    taxe: bigint;
+    acce: bigint;
+    tauxComm: bigint;
+    dateTerme: Date;
+    dateEtat: Date;
+    ff: bigint;
+    mnt_taxe_eve: bigint;
+    mnt_taxe_parafiscale: bigint;
+    prdVersioncommerciale: Versioncommerciale;
+    refVille: Ville;
+    refPolice: bigint;
 };
 
 const Example = () => {
+    const [numClient, setNumeroClient] = useState('');
+    const [codePolice, setCodePolice] = useState('');
+    const [nomcommercial, setNomCommercial] = useState('');
+    const [ville, setVille] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [tableData, setTableData] = useState<Person[]>([]);
+    const [tableData, setTableData] = useState<Police[]>([]);
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
     }>({});
     const [totalItems, setTotalItems] = useState(0);
     const [pagination, setPagination] = useState({
         pageIndex: 0,
-        pageSize: 5, //customize the default page size
+        pageSize: 10, //customize the default page size
     });
-    const handleCreateNewRow = async (values: Person) => {
+    const handleCreateNewRow = async (values: Police) => {
         try {
-            // Make an API request to create a new person
-            const response = await fetch('http://localhost:8081/polices/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(values),
-            });
+            const response = await axios.post('http://localhost:8081/polices/add', values);
 
-            if (response.ok) {
-                // If the API request is successful, fetch the updated data from the API
-                const newData = await fetch('http://localhost:8081/polices/add').then((res) => res.json());
-                setTableData(newData);
+            if (response.status === 201) {
+                fetchTableData(pagination.pageIndex, pagination.pageSize);
             } else {
-                // Handle error case
                 console.error('Failed to create a new person');
             }
         } catch (error) {
@@ -70,7 +86,7 @@ const Example = () => {
     };
 
 
-    const handleSaveRowEdits: MaterialReactTableProps<Person>['onEditingRowSave'] =
+    const handleSaveRowEdits: MaterialReactTableProps<Police>['onEditingRowSave'] =
         async ({ exitEditingMode, row, values }) => {
             if (!Object.keys(validationErrors).length) {
                 tableData[row.index] = values;
@@ -80,28 +96,39 @@ const Example = () => {
             }
         };
     const fetchTableData = async (pageIndex: number, pageSize: number) => {
+        setIsLoading(true);
         try {
             const params: { [key: string]: string | number } = {
                 page: pageIndex,
                 size: pageSize,
             };
-            const response = await axios.get<Person[]>(ENDPOINT_URL, { params });
-            setTableData(response.data);
+            if (numClient) params.numClient = numClient;
+            if (codePolice) params.codePolice = codePolice;
+            if (nomcommercial) params.nomcommercial = nomcommercial;
+            if (ville) params.ville = ville;
+            const response = await axios.get<Police[]>(ENDPOINT_URL, { params });
+            setTableData(response.data)
             setTotalItems(parseInt(response.headers['x-total-count']));
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
-
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        fetchTableData(pagination.pageIndex, pagination.pageSize); // Fetch data using the current page number
+    };
     useEffect(() => {
         fetchTableData(pagination.pageIndex,pagination.pageSize);
-    }, [pagination]);
+    }, [pagination.pageIndex, pagination.pageSize]);
+    
     const handleCancelRowEdits = () => {
         setValidationErrors({});
     };
 
     const handleDeleteRow = useCallback(
-        (row: MRT_Row<Person>) => {
+        (row: MRT_Row<Police>) => {
             //send api delete request here, then refetch or update local table data for re-render
             tableData.splice(row.index, 1);
             setTableData([...tableData]);
@@ -111,8 +138,8 @@ const Example = () => {
 
     const getCommonEditTextFieldProps = useCallback(
         (
-            cell: MRT_Cell<Person>,
-        ): MRT_ColumnDef<Person>['muiTableBodyCellEditTextFieldProps'] => {
+            cell: MRT_Cell<Police>,
+        ): MRT_ColumnDef<Police>['muiTableBodyCellEditTextFieldProps'] => {
             return {
                 error: !!validationErrors[cell.id],
                 helperText: validationErrors[cell.id],
@@ -142,20 +169,12 @@ const Example = () => {
         [validationErrors],
     );
 
-    const columns = useMemo<MRT_ColumnDef<Person>[]>(
+    const columns = useMemo<MRT_ColumnDef<Police>[]>(
         () => [
-            {
-                accessorKey: 'id',
-                header: 'ID',
-                enableColumnOrdering: false,
-                enableEditing: false, //disable editing on this column
-                enableSorting: false,
-                size: 80,
-            },
             {
                 accessorKey: 'codePolice',
                 header: 'Code Police',
-                size: 140,
+                size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                     ...getCommonEditTextFieldProps(cell),
                 }),
@@ -163,7 +182,7 @@ const Example = () => {
             {
                 accessorKey: 'numClient',
                 header: 'Numero Client',
-                size: 140,
+                size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                     ...getCommonEditTextFieldProps(cell),
                 }),
@@ -171,6 +190,7 @@ const Example = () => {
             {
                 accessorKey: 'raisonSociale',
                 header: 'Raison sociale',
+                size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                     ...getCommonEditTextFieldProps(cell),
                     type: 'string',
@@ -179,19 +199,187 @@ const Example = () => {
             {
                 accessorKey: 'adresse',
                 header: 'Adresse',
-                size: 80,
+                size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                     ...getCommonEditTextFieldProps(cell),
                     type: 'string',
                 }),
             },
+            {
+                accessorKey: 'dateEffet',
+                header: 'Date Effet',
+                size: 100,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'primeNette',
+                header: 'Prime Nette',
+                size: 100,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'taxe',
+                header: 'Taxe',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'acce',
+                header: 'Accessoires',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'tauxComm',
+                header: 'Taux Commission',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'dateTerme',
+                header: 'Date Terme',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'dateEtat',
+                header: 'Date Etat',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'ff',
+                header: 'Fractionnement',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'mnt_taxe_eve',
+                header: 'Mnt Taxe Eve',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'mnt_taxe_parafiscale',
+                header: 'Mnt Taxe Paraf',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'prdVersioncommerciale.nomcommercial',
+                header: 'Produit VC',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'refVille.libelle',
+                header: 'Ville',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'refPolice',
+                header: 'Police',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+
         ],
         [getCommonEditTextFieldProps],
     );
 
     return (
         <>
-            <div className={"form-card"}>
+          <Box sx={{'& .MuiTextField-root': { m: 1, width: '20ch'},}}>
+                <div className='form-card'>
+                    <form onSubmit={handleSubmit}>
+                        <TextField
+                            id="outlined-basic"
+                            label="Numéro de client"
+                            variant="outlined"
+                            size='small'
+                            type="text"
+                            value={numClient}
+                            onChange={(event) => setNumeroClient(event.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                              }}
+                        />
+                        <TextField
+                            id="outlined-basic"
+                            label="Code Police"
+                            size='small'
+                            variant="outlined"
+                            type="text"
+                            value={codePolice}
+                            onChange={(event) => setCodePolice(event.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                              }}
+                        />
+                        <TextField
+                            id="outlined-basic"
+                            label="Nom commercial"
+                            variant="outlined"
+                            size='small'
+                            type="text"
+                            value={nomcommercial}
+                            onChange={(event) => setNomCommercial(event.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                              }}
+                        />
+                        <TextField
+                            id="outlined-basic"
+                            label="Ville"
+                            variant="outlined"
+                            type="text"
+                            size='small'
+                            value={ville}
+                            onChange={(event) => setVille(event.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                              }}
+                        />
+                        <Button  id={"search-button"} type="submit" variant="contained" startIcon={<ContentPasteSearchIcon />}>
+                            Rechercher
+                        </Button>
+                    </form>
+                </div>
+            </Box>
+            <div>
+            {isLoading ? (
+                // Show the loading animation if isLoading is true
+                <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                    <CircularProgress />
+                </div>
+            ) : (
             <MaterialReactTable
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
@@ -227,16 +415,18 @@ const Example = () => {
                     </Box>
                 )}
                 renderTopToolbarCustomActions={() => (
+                    <Link to={'/police-add'}>
                     <Button
                         id={"add-button"}
                         color="primary"
-                        onClick={() => setCreateModalOpen(true)}
                         variant="contained"
                     >
                         Nouvelle Police
                     </Button>
+                    </Link>
                 )}
             />
+            )}
             </div>
             <CreateNewAccountModal
                 columns={columns}
@@ -249,9 +439,9 @@ const Example = () => {
 };
 
 interface CreateModalProps {
-    columns: MRT_ColumnDef<Person>[];
+    columns: MRT_ColumnDef<Police>[];
     onClose: () => void;
-    onSubmit: (values: Person) => void;
+    onSubmit: (values: Police) => void;
     open: boolean;
 }
 

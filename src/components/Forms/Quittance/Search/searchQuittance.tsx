@@ -128,21 +128,13 @@ const Examples = () => {
                 enableSorting: false,
                 size: 80,
             },
-            {
-                accessorKey: 'intermediaireid',
-                header: '  intermediaireid', 
-                
-            },
+
             {
                 accessorKey: 'nomclient',
                 header: '  nomclient', 
                 
             },
-            {
-                accessorKey: 'qtcRemiseid',
-                header: 'qtcRemiseid',
-                
-            },
+
             {
                 accessorKey: 'dateEcheance',
                 header: 'dateEcheance: ',

@@ -7,16 +7,6 @@ import ListIcon from '@mui/icons-material/List';
 import { Link } from 'react-router-dom';
 export const mainListItems = (
   <div>
-    
-    <Link to="/police-add" style={{ textDecoration: 'none' , color: 'inherit' }} >
-    <ListItemButton>
-      <ListItemIcon>
-        <AddchartIcon style={{ color: 'white' }}/>
-      </ListItemIcon>
-      <ListItemText primary={"Ajouter Police"} />
-    </ListItemButton>
-    </Link>
-   
 
     <Link to="/police-search" style={{ textDecoration: 'none' , color: 'inherit' }} >
     <ListItemButton>
