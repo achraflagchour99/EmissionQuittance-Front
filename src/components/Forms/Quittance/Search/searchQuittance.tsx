@@ -189,7 +189,9 @@ const Examples = () => {
                     label="date Debut"
                     variant="outlined"
                     type="Date"
-
+                    InputLabelProps={{
+                      shrink: true,
+                  }}
                     onChange={(e) =>
                       setSearchCriteria({ ...searchCriteria, dateDebut: e.target.value })
                     }

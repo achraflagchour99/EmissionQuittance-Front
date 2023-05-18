@@ -3,46 +3,52 @@ import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import {  Grid, Box } from '@mui/material';
+import {  Grid, Box,Paper  } from '@mui/material';
 import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
 import axios from 'axios';  
 
-interface MyState {
-    value: string;
-  }
+import {
+    fetchIntermediaires,
+    fetchPolice,
+    fetchVersionsCommerciales,
+    fetchRefQuittances,
+  } from '../../../../api/service/provideData';
 
- 
+  import  { PolicePayload } from '../../../../api/interface/policePayload';
+  import  { VersionsCommerciales } from '../../../../api/interface/versionsCommercialesPayload';
+  import  { RefQuittancePayload } from '../../../../api/interface/refQuittancePayload';
+  import  { intermediarePayload } from '../../../../api/interface/intermediarePayload';
   
-
+ 
  
 
 
 function QuittanceAdd( ) {  
 
- 
+    const [intermediaires, setIntermediaires] = useState<intermediarePayload[] | null>(null); 
+    const [polices, setPolices] = useState<PolicePayload[] | null>(null);
+    const [versionsCommerciales, setVersionsCommerciales] = useState <VersionsCommerciales[] | null>(null);
+    const [refQuittances, setRefQuittances] = useState<RefQuittancePayload[] | null>(null);
+  
 
  
 
     const [formData, setFormData] = useState({
         exercice: "",
-        ordre: "",
-        villeclient: 2,
+        ordre: "", 
         intermediaireid: 8,
         refQuittanceid: 2,
         qtcRemiseid: 1,
         habUtilisateurid: 1,
-        policeid: 5,
-        dateEcheance: "",
-        dateTerme: "",
-        dateeffet: "",
-
-
+        policeid: 5,  
+        versioncommerciale:0,
         datedebut: "",
         datefin: "",
-
         tauxtaxe:0,
         montantaccessoire:0,
-        tauxcommission:25
+        tauxcommission:25,
+        dateetat:"",
+        villeclient:2        
       });
     
       const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
@@ -74,7 +80,23 @@ function QuittanceAdd( ) {
 
 
  
-
+      useEffect(() => {
+        const fetchData = async () => {
+          const intermediairesData = await fetchIntermediaires();
+          setIntermediaires(intermediairesData);
+    
+          const policesData = await fetchPolice();
+          setPolices(policesData);
+    
+          const versionsCommercialesData = await fetchVersionsCommerciales();
+          setVersionsCommerciales(versionsCommercialesData);
+    
+          const refQuittancesData = await fetchRefQuittances();
+          setRefQuittances(refQuittancesData);
+        };
+    
+        fetchData();
+      }, []);
  
 
 
@@ -97,23 +119,7 @@ function QuittanceAdd( ) {
 
 
         <Grid container spacing={2}>
-
-
-        <Grid item xs={12} sm={4}>
-            <TextField
-              id="RefInt"
-              name="RefInt "
-              label="RefInt  "
-              variant="outlined"
-              value={formData.ordre}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-   </Grid>
+ 
 
 
    <Grid item xs={12} sm={4}>
@@ -132,7 +138,45 @@ function QuittanceAdd( ) {
             />
    </Grid>
 
+        <Grid item xs={12} sm={4}>
+                <label>Numero police</label>
+        <Select 
+          id="policeid"
+          name="policeid" 
+          label="Numero police "
+          variant="outlined" 
+          value={formData.policeid}
+          onChange={handleInputChange}
+          fullWidth
+        >
+          {polices?.map((police: any) => (
+            <MenuItem key={police.id} value={police.id}>
+              {police.codePolice}
+            </MenuItem>
+          ))}
+        </Select>
+      </Grid>
+      
 
+    <Grid item xs={12} sm={4}>
+                <label> versioncommerciale</label>
+        <Select 
+          id="versioncommerciale"
+          name="versioncommerciale" 
+          label=" versioncommerciale "
+          variant="outlined" 
+          value={formData.versioncommerciale}
+          onChange={handleInputChange}
+          fullWidth
+        >
+             <MenuItem  >   </MenuItem>
+          {versionsCommerciales?.map((versionsCommerciale: any) => (
+            <MenuItem key={versionsCommerciale.id} value={versionsCommerciale.id}>
+              {versionsCommerciale.nomcommercial}
+            </MenuItem>
+          ))}
+        </Select>
+      </Grid>
 
 
         <Grid item xs={12} sm={4}>
@@ -167,51 +211,51 @@ function QuittanceAdd( ) {
 
 
           </Grid>
+           
+        
+          
           <Grid item xs={12} sm={4}>
-            <TextField
-              id="villeclient"
-              name="villeclient"
-              label="villeclient"
-              variant="outlined"
-              value={formData.villeclient}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
+                <label>Intermediaire</label>
+                <Select 
+                id="intermediaireid"
+                name="intermediaireid" 
+                label="Numero intermediaire "
+                variant="outlined" 
+                value={formData.intermediaireid}
+                onChange={handleInputChange}
+                fullWidth
+                >
+                {intermediaires?.map((intermediaire: any) => (
+                    <MenuItem key={intermediaire.id} value={intermediaire.id}>
+                    {intermediaire.nomCommercial}
+                    </MenuItem>
+                ))}
+                </Select>
+         </Grid>
+
+
+ 
+
           <Grid item xs={12} sm={4}>
-            <TextField
-              id="intermediaireid"
-              name="intermediaireid"
-              label="intermediaireid"
-              variant="outlined"
-              value={formData.intermediaireid}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="refQuittanceid"
-              name="refQuittanceid"
-              label="refQuittanceid"
-              variant="outlined"
-              value={formData.refQuittanceid}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
+                <label>Etat Quittance</label>
+        <Select 
+          id="refQuittanceid"
+          name="refQuittanceid" 
+          label=" Quittance Nature "
+          variant="outlined" 
+          value={formData.refQuittanceid}
+          onChange={handleInputChange}
+          fullWidth
+        >
+          {refQuittances?.map((refQuittance: any) => (
+            <MenuItem key={refQuittance.id} value={refQuittance.id}>
+              {refQuittance.etatQuittance}
+            </MenuItem>
+          ))}
+        </Select>
+      </Grid>
+ 
+
           <Grid item xs={12} sm={4}>
             <TextField
               id="qtcRemiseid"
@@ -241,102 +285,15 @@ function QuittanceAdd( ) {
                 shrink: true,
               }}
             />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="policeid"
-              name="policeid"
-              label="policeid"
-              variant="outlined"
-              value={formData.policeid}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
+          </Grid> 
 
 
 
 
-
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="dateEcheance"
-              name="dateEcheance"
-              label="Date d'échéance"
-              variant="outlined"
-              value={formData.dateEcheance}
-              onChange={handleInputChange}
-              type="date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="dateTerme"
-              name="dateTerme"
-              label="Date de terme"
-              variant="outlined"
-              value={formData.dateTerme}
-              onChange={handleInputChange}
-              type="date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="dateeffet"
-              name="dateeffet"
-              label="Date d'effet"
-              variant="outlined"
-              value={formData.dateeffet}
-              onChange={handleInputChange}
-              type="date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="datedebut"
-              name="datedebut"
-              label="datedebut"
-              variant="outlined"
-              value={formData.datedebut}
-              onChange={handleInputChange}
-              type="date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="datefin"
-              name="datefin"
-              label="datefin"
-              variant="outlined"
-              value={formData.datefin}
-              onChange={handleInputChange}
-              type="date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
+ 
+       
+          
+         
 
 
 
@@ -349,28 +306,61 @@ function QuittanceAdd( ) {
               variant="outlined"
               value={formData.ordre}
               onChange={handleInputChange}
-              type="Date"
+              type="date"
               fullWidth
               InputLabelProps={{
                 shrink: true,
               }}
             />   </Grid>
 
+          
             <Grid item xs={12} sm={4}>
-            <TextField
-              id="Dateetat "
-              name="Date Etat "
-              label="Date Etat "
-              variant="outlined"
-              value={formData.ordre}
-              onChange={handleInputChange}
-              type="Date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-   </Grid>
+                <TextField
+                id="Dateetat"
+                name="Dateetat"
+                label="Dateetat"
+                variant="outlined"
+                value={formData.dateetat}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                />
+            </Grid>
+          
+            <Grid item xs={12} sm={4}>
+                <TextField
+                id="datedebut"
+                name="datedebut"
+                label="datedebut"
+                variant="outlined"
+                value={formData.datedebut}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+                <TextField
+                id="datefin"
+                name="datefin"
+                label="datefin"
+                variant="outlined"
+                value={formData.datefin}
+                onChange={handleInputChange}
+                type="date"
+                fullWidth
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                />
+            </Grid>
+            
 
 
 
