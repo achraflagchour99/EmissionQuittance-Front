@@ -18,6 +18,7 @@ import {
   import  { VersionsCommerciales } from '../../../../api/interface/versionsCommercialesPayload';
   import  { RefQuittancePayload } from '../../../../api/interface/refQuittancePayload';
   import  { intermediarePayload } from '../../../../api/interface/intermediarePayload';
+import { ToastContainer, toast } from 'react-toastify';
   
  
  
@@ -36,19 +37,28 @@ function QuittanceAdd( ) {
     const [formData, setFormData] = useState({
         exercice: "",
         ordre: "", 
-        intermediaireid: 8,
-        refQuittanceid: 2,
+        intermediaireid: 1,
+        refQuittanceid: 1,
         qtcRemiseid: 1,
-        habUtilisateurid: 1,
-        policeid: 5,  
-        versioncommerciale:0,
+        habUtilisateurid: 5923310,
+         policeid: 21,  
+        versioncommerciale:9985338,
         datedebut: "",
         datefin: "",
         tauxtaxe:0,
         montantaccessoire:0,
         tauxcommission:25,
         dateetat:"",
-        villeclient:2        
+        villeclient:0   ,
+        primenette   :0  ,
+        montanttaxeparafiscale:0,
+        primeGareEve:0,
+        tauxprimenette:0,
+        dateemission:"",
+        numeroquittance:"",
+        idCodePolice:0
+
+      
       });
     
       const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
@@ -62,12 +72,14 @@ function QuittanceAdd( ) {
       const handleSubmit = (event: { preventDefault: () => void; }) => {
 
 
-        axios.post('http://localhost:8081/quittances/', formData)
+        axios.post('http://localhost:8081/quittances', formData)
         .then(response => {
           console.log(response.data);
+          toast.success('Quittance bien  enregistrer !', { position: toast.POSITION.TOP_RIGHT });
         })
         .catch(error => {
           console.log(error);
+          toast.error('Erreur lors de la requête !', { position: toast.POSITION.TOP_RIGHT });
         });
 
 
@@ -100,13 +112,39 @@ function QuittanceAdd( ) {
  
 
 
+      const handleBlur = () => {
+        const codePolice = formData.idCodePolice; 
+        const apiUrl = `http://localhost:8081/polices/search?codePolice=${codePolice}`;
       
+        fetch(apiUrl)
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error("Erreur lors de la recherche de la police");
+            }
+          })
+          .then(data => {
+           
+            if (data.length === 0) {
+              alert("Police non trouvée");
+            }  
+            else{
+              console.log(data[0].id);  
+              const updatedFormData = { ...formData, policeid: data[0].id };
+              setFormData(updatedFormData); 
+            }
+          })
+          .catch(error => {
+            alert(error.message);
+          });
+      };
 
   return (
     <> 
 
 
-
+<ToastContainer />
     
     <Typography variant="h5" align="center" color="primary" gutterBottom>
     Ajouter quittance
@@ -124,11 +162,12 @@ function QuittanceAdd( ) {
 
    <Grid item xs={12} sm={4}>
             <TextField
-              id="Numeroquittance"
-              name="Numeroquittance"
+              id="numeroquittance"
+              name="numeroquittance"
               label="Numero quittance "
               variant="outlined"
-              value={formData.ordre}
+              placeholder='9900202308905182'
+              value={formData.numeroquittance}
               onChange={handleInputChange}
               type="text"
               fullWidth
@@ -138,24 +177,25 @@ function QuittanceAdd( ) {
             />
    </Grid>
 
-        <Grid item xs={12} sm={4}>
-                <label>Numero police</label>
-        <Select 
-          id="policeid"
-          name="policeid" 
-          label="Numero police "
-          variant="outlined" 
-          value={formData.policeid}
-          onChange={handleInputChange}
-          fullWidth
-        >
-          {polices?.map((police: any) => (
-            <MenuItem key={police.id} value={police.id}>
-              {police.codePolice}
-            </MenuItem>
-          ))}
-        </Select>
-      </Grid>
+   <Grid item xs={12} sm={4}>
+            <TextField
+              id="idCodePolice"
+              name="idCodePolice"
+              label="Numero police "
+              variant="outlined" 
+              value={formData.idCodePolice}
+              onChange={handleInputChange}
+              type="text"
+              onBlur={handleBlur}  
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+   </Grid>
+
+
+     
       
 
     <Grid item xs={12} sm={4}>
@@ -300,11 +340,11 @@ function QuittanceAdd( ) {
 
           <Grid item xs={12} sm={4}>
             <TextField
-              id="DateEmission "
-              name="DateEmission "
-              label="DateEmission "
+              id="dateemission "
+              name="dateemission"
+              label="Date  Emission "
               variant="outlined"
-              value={formData.ordre}
+              value={formData.dateemission}
               onChange={handleInputChange}
               type="date"
               fullWidth
@@ -317,7 +357,7 @@ function QuittanceAdd( ) {
             <Grid item xs={12} sm={4}>
                 <TextField
                 id="Dateetat"
-                name="Dateetat"
+                name="dateetat"
                 label="Dateetat"
                 variant="outlined"
                 value={formData.dateetat}
@@ -368,23 +408,7 @@ function QuittanceAdd( ) {
 
           <Divider orientation="vertical"  sx={{ my: 10 }}  variant="fullWidth" color="secondary"   /> 
 
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="TPrimeNette"
-              name="TPrimeNette"
-              label="T.PrimeNette"
-              variant="outlined"
-              value={formData.tauxcommission}
-              onChange={handleInputChange}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-       
-
+      
           <Grid item xs={12} sm={4} >
             <TextField
               id="tauxtaxe"
@@ -400,6 +424,24 @@ function QuittanceAdd( ) {
               }}
             />
           </Grid>
+          <Grid item xs={12} sm={4} >
+            <TextField
+             id="tauxprimenette"
+             name="tauxprimenette"
+             label="Taux Prime Nette"
+              variant="outlined"
+              value={formData.tauxprimenette}
+              onChange={handleInputChange}
+              type="number"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+
+    
+      
 
           <Grid item xs={12} sm={4}>
             <TextField
@@ -421,10 +463,10 @@ function QuittanceAdd( ) {
           <Grid item xs={12} sm={4}>
             <TextField
               id="TtaxeParafiscale"
-              name="ttaxeParafiscale"
+              name="montanttaxeparafiscale"
               label="T.taxeParafiscale"
               variant="outlined"
-              value={formData.tauxcommission}
+              value={formData.montanttaxeparafiscale}
               onChange={handleInputChange}
               type="number"
               fullWidth
@@ -437,13 +479,14 @@ function QuittanceAdd( ) {
          
 
           <Grid item xs={12} sm={4}>
+            <label htmlFor="">Montant Accessoire</label>
         <Select
           id="montantaccessoire"
           name="montantaccessoire"
           label="montantaccessoire"
           variant="outlined"
           value={formData.montantaccessoire}
-          onChange={handleInputChange}
+          onChange={handleInputChange} 
           fullWidth
         >
           {options.map((option) => (
@@ -453,13 +496,14 @@ function QuittanceAdd( ) {
           ))}
         </Select>
       </Grid>
+      <label htmlFor=""> </label>
       <Grid item xs={12} sm={4}>
             <TextField
               id="PrimeGareEve"
-              name="PrimeGareEve"
+              name="primeGareEve"
               label="PrimeGareEve"
               variant="outlined"
-              value={formData.tauxcommission}
+              value={formData.primeGareEve}
               onChange={handleInputChange}
               type="number"
               fullWidth

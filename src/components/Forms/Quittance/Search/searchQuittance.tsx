@@ -13,8 +13,11 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    Grid,
     IconButton,
+    InputLabel,
     MenuItem,
+    Select,
     Stack,
     TextField,
     Tooltip,
@@ -23,7 +26,13 @@ import { Delete, Edit } from '@mui/icons-material';
 import axios from "axios";
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch'; 
 import "../../SearchPolice.css"
-
+import {
+  fetchIntermediaires,
+  fetchPolice,
+  fetchVersionsCommerciales,
+  fetchRefQuittances,
+} from '../../../../api/service/provideData';
+import { RefQuittancePayload } from '../../../../api/interface/refQuittancePayload';
 
 
 export type Person = {
@@ -37,6 +46,10 @@ export type Person = {
     dateeffet: '2022-05-04'
     nomclient: string
     ordre:string
+    exercice:string, 
+    police: {
+      codePolice: string;
+    };
 };
 
 const Examples = () => {
@@ -50,14 +63,25 @@ const Examples = () => {
         pageIndex: 0,
         pageSize: 5, //customize the default page size
     });
-      const [searchCriteria, setSearchCriteria] = useState({
-    refQuittanceid: '',
-    dateDebut: '',
-    dateFin: '',
-    codePolice: '',
-    pageNumber: '0',
-    pageSize: '4',
-  });
+    const [searchCriteria, setSearchCriteria] = useState<{
+      refQuittanceid: string;
+      dateDebut: string;
+      refNatureQuittance: string;
+      dateFin: string;
+      codePolice: string;
+      pageNumber: string;
+      pageSize: string ;
+      policecode :string;
+    }>({
+      refQuittanceid: '',
+      dateDebut: '',
+      refNatureQuittance: "",
+      dateFin: '',
+      codePolice: '',
+      pageNumber: '0',
+      pageSize: '4' ,
+      policecode :''
+    });
 
  
 
@@ -75,37 +99,59 @@ const Examples = () => {
                 exitEditingMode(); //required to exit editing mode and close modal
             }
         };
+        const [responseData, setResponseData] = useState<any>(null);
+       
     const fetchTableData = async (pageIndex: number, pageSize: number) => {
         try {
             const params: { [key: string]: string | number } = {
                 page: pageIndex,
                 size: pageSize,
             };
-          //   const response = await axios.get<Person[]>(ENDPOINT_URL, { params });
 
-          console.log('pageIndex '+pageIndex)
-          console.log('pageSize '+pageSize)
+
+            const response = await fetch(`http://localhost:8081/quittances/searchNew?`+'&pageNumber='+pagination.pageIndex+'&pageSize='+pagination.pageSize+'&codePolice='+searchCriteria.codePolice+'&dateDebut='+searchCriteria.dateDebut+'&dateFin='+searchCriteria.dateFin+'&refQuittanceId='+searchCriteria.refNatureQuittance);
+           
+            const responseData = await response.json();  
+            setResponseData(responseData.content); 
+         console.log(responseData.content)
+
+
        
-
-             const response = await fetch(`http://localhost:8081/quittances/search?`+'&pageNumber='+pagination.pageIndex+'&pageSize='+pagination.pageSize+'&codePolice='+searchCriteria.codePolice+'&dateDebut='+searchCriteria.dateDebut+'&dateFin='+searchCriteria.dateFin);
-            const responseData = await response.json();
-
-
-          console.log(responseData);
            
             setTableData(responseData.content);
-             setTotalItems(responseData.totalElements );
+            setTotalItems(responseData.totalElements );
         } catch (error) {
             console.error(error);
         }
     };
 
+
+    const handleSearchClick = () => {
+      // Appeler votre fonction fetchTableData ici
+      fetchTableData(pagination.pageIndex, pagination.pageSize);
+    };
+
     useEffect(() => {
+
+      const fetchData = async () => {
+     
+  
+        const refQuittancesData = await fetchRefQuittances();
+        setRefQuittances(refQuittancesData);
+      };
+      fetchData();
+
         fetchTableData(pagination.pageIndex,pagination.pageSize);
+        
     }, [pagination.pageIndex,pagination.pageSize,searchCriteria]);
+
+
+
     const handleCancelRowEdits = () => {
         setValidationErrors({});
     };
+
+    
 
     const handleDeleteRow = useCallback(
         (row: MRT_Row<Person>) => {
@@ -128,6 +174,22 @@ const Examples = () => {
                 enableSorting: false,
                 size: 80,
             },
+            {
+              accessorKey: 'exercice',
+              header: '  exercice', 
+              
+          },
+          {
+            accessorKey: 'ordre',
+            header: '  ordre', 
+            
+        },
+        {
+          accessorKey: 'police.codePolice',
+          header: '  Numero  de police', 
+          render: (rowData: Person) => rowData?.police?.codePolice || '',
+          
+        },
 
             {
                 accessorKey: 'nomclient',
@@ -156,55 +218,95 @@ const Examples = () => {
     const [isRefetching, setIsRefetching] = useState(false);
     const [rowCount, setRowCount] = useState(0);
     
+    const [refQuittances, setRefQuittances] = useState<RefQuittancePayload[] | null>(null);
 
 
+  function refQR(e: { target: { value: any; }; }): void{
+    setSearchCriteria({ ...searchCriteria, refNatureQuittance: e.target.value })
+  }
+
+    /*  onChange={(e) =>
+            setSearchCriteria({ ...searchCriteria, refNatureQuittance: e.target.value })
+          } */
+            
 
     return (
         <>
-        <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
-                <div className={"form-card"}>
-            <form >
-                <TextField
-                    id="outlined-basic"
-                    label="Numero  de  police"
-                    variant="outlined"
-                    type="text"
-                    placeholder="Numéro de client"
-                  
-
-                    onChange={(e) =>
-                      setSearchCriteria({ ...searchCriteria, codePolice: e.target.value })
-                    }
-                />
-                <TextField
-                    id="outlined-basic"
-                    label="date Debut"
-                    variant="outlined"
-                    type="Date"
-                    InputLabelProps={{
-                      shrink: true,
-                  }}
-                    onChange={(e) =>
-                      setSearchCriteria({ ...searchCriteria, dateDebut: e.target.value })
-                    }
-                     
-                />
-                <TextField
-                    id="outlined-basic"
-                    label="date Fin" 
-                    type="Date"
-                    placeholder="Nom commercial"    
-                    onChange={(e) =>
-                      setSearchCriteria({ ...searchCriteria, dateFin: e.target.value })
-                    }
-                    
-                /> 
-                <Button id={"search-button"} type="submit" variant="contained" startIcon={<ContentPasteSearchIcon />}>
-                Rechercher
-                </Button>
-            </form>
-                </div>
-          </Box>
+         <Box>
+      <div className="form-card" style={{ background: 'white', padding: '30px' }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="codePolice"
+              name="codePolice"
+              label="Numéro de police"
+              variant="outlined"
+              type="text"
+              placeholder="Numéro de police"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              onChange={(e) => setSearchCriteria({ ...searchCriteria, codePolice: e.target.value })}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <InputLabel id="refQuittanceid-label">Quittance Nature</InputLabel>
+            <Select
+              id="refQuittanceid"
+              name="refNatureQuittance"
+              label="Quittance Nature"
+              variant="outlined"
+              fullWidth
+              onChange={(e) =>
+                setSearchCriteria({ ...searchCriteria, refNatureQuittance: e.target.value })
+              }
+              value={searchCriteria.refNatureQuittance}
+              inputProps={{
+                shrink: true,
+              }}
+            >
+              <MenuItem value="">Sélectionner</MenuItem>
+              {/* Ajoutez ici les options du Select */}
+            </Select>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="dateDebut"
+              name="dateDebut"
+              label="Date de début"
+              variant="outlined"
+              type="date"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              onChange={(e) =>
+                setSearchCriteria({ ...searchCriteria, dateDebut: e.target.value })
+              }
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              id="dateFin"
+              name="dateFin"
+              label="Date de fin"
+              type="date"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              onChange={(e) => setSearchCriteria({ ...searchCriteria, dateFin: e.target.value })}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button onClick={handleSearchClick} variant="contained" color="primary">
+              Rechercher
+            </Button>
+          </Grid>
+        </Grid>
+      </div>
+    </Box>
         <div className={"form-card"}>
             <MaterialReactTable
                 displayColumnDefOptions={{
@@ -252,15 +354,7 @@ const Examples = () => {
                         </Tooltip>
                     </Box>
                 )}
-                renderTopToolbarCustomActions={() => (
-                    <Button
-                        color="secondary"
-                        onClick={() => setCreateModalOpen(true)}
-                        variant="contained"
-                    >
-                        Create New Account
-                    </Button>
-                )}
+        
             />
             </div>
             <CreateNewAccountModal
