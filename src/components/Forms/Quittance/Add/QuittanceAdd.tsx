@@ -3,9 +3,10 @@ import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import {  Grid, Box,Paper  } from '@mui/material';
+import {  Grid, Box,Paper, InputLabel, FormControl, NativeSelect  } from '@mui/material';
 import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
 import axios from 'axios';  
+import { SelectPicker } from 'rsuite';
 
 import {
     fetchIntermediaires,
@@ -19,6 +20,7 @@ import {
   import  { RefQuittancePayload } from '../../../../api/interface/refQuittancePayload';
   import  { intermediarePayload } from '../../../../api/interface/intermediarePayload';
 import { ToastContainer, toast } from 'react-toastify';
+import config from '../../../../config/config';
   
  
  
@@ -72,7 +74,7 @@ function QuittanceAdd( ) {
       const handleSubmit = (event: { preventDefault: () => void; }) => {
 
 
-        axios.post('http://localhost:8081/quittances', formData)
+        axios.post(`${config.apiUrl}/quittances`, formData)
         .then(response => {
           console.log(response.data);
           toast.success('Quittance bien  enregistrer !', { position: toast.POSITION.TOP_RIGHT });
@@ -114,7 +116,7 @@ function QuittanceAdd( ) {
 
       const handleBlur = () => {
         const codePolice = formData.idCodePolice; 
-        const apiUrl = `http://localhost:8081/polices/search?codePolice=${codePolice}`;
+        const apiUrl = `${config.apiUrl}/polices/search?codePolice=${codePolice}`;
       
         fetch(apiUrl)
           .then(response => {
@@ -146,308 +148,305 @@ function QuittanceAdd( ) {
 
 <ToastContainer />
     
-    <Typography variant="h5" align="center" color="primary" gutterBottom>
+  
+
+
+<Box sx={{ padding: '5rem', margin:'20px', backgroundColor: '#FFFFFF',justifyContent: 'center' }}  >
+  <Typography variant="h5" align="center" color="primary" gutterBottom>
     Ajouter quittance
-    </Typography>
-    <Box sx={{ padding: '1rem' }}>
-      <form onSubmit={handleSubmit}>
+  </Typography>
 
 
-      
 
+  <form onSubmit={handleSubmit}>
+   <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
+      <Grid item xs={12} sm={4}>
+        <TextField
+          id="numeroquittance"
+          name="numeroquittance"
+          label="Numero quittance"
+          variant="outlined"
+          placeholder="9900202308905182"
+          value={formData.numeroquittance}
+          onChange={handleInputChange}
+          type="text"
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </Grid>
 
-        <Grid container spacing={2}>
- 
-
-
-   <Grid item xs={12} sm={4}>
-            <TextField
-              id="numeroquittance"
-              name="numeroquittance"
-              label="Numero quittance "
-              variant="outlined"
-              placeholder='9900202308905182'
-              value={formData.numeroquittance}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-   </Grid>
-
-   <Grid item xs={12} sm={4}>
-            <TextField
-              id="idCodePolice"
-              name="idCodePolice"
-              label="Numero police "
-              variant="outlined" 
-              value={formData.idCodePolice}
-              onChange={handleInputChange}
-              type="text"
-              onBlur={handleBlur}  
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-   </Grid>
-
+      <Grid item xs={12} sm={4}>
+        <TextField
+          id="idCodePolice"
+          name="idCodePolice"
+          label="Numero police"
+          variant="outlined"
+          value={formData.idCodePolice}
+          onChange={handleInputChange}
+          type="text"
+          onBlur={handleBlur}
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </Grid>
 
      
-      
 
-    <Grid item xs={12} sm={4}>
-                <label> versioncommerciale</label>
-        <Select 
-          id="versioncommerciale"
-          name="versioncommerciale" 
-          label=" versioncommerciale "
-          variant="outlined" 
-          value={formData.versioncommerciale}
-          onChange={handleInputChange}
-          fullWidth
-        >
-             <MenuItem  >   </MenuItem>
-          {versionsCommerciales?.map((versionsCommerciale: any) => (
-            <MenuItem key={versionsCommerciale.id} value={versionsCommerciale.id}>
-              {versionsCommerciale.nomcommercial}
-            </MenuItem>
+
+      <Grid item xs={12} sm={4}>
+      <FormControl fullWidth>
+  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+  Version commerciale
+  </InputLabel>
+  <NativeSelect 
+       id="versioncommerciale"
+       name="versioncommerciale" 
+       variant="outlined"
+       value={formData.versioncommerciale}
+       onChange={handleInputChange} 
+  > 
+  <option  > Selectionner Version comm </option>
+   
+    {versionsCommerciales?.map((versionsCommerciale: any) => (
+      
+            <option key={versionsCommerciale.id} value={versionsCommerciale.id}>{versionsCommerciale.nomcommercial}</option>
           ))}
-        </Select>
+ 
+  </NativeSelect>
+</FormControl>
+</Grid>
+      <Grid item xs={12} sm={4}>
+        <TextField
+          id="exercice"
+          name="exercice"
+          label="Exercice"
+          variant="outlined"
+          value={formData.exercice}
+          onChange={handleInputChange}
+          type="text"
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
       </Grid>
 
+      <Grid item xs={12} sm={4}>
+        <TextField
+          id="ordre"
+          name="ordre"
+          label="Ordre"
+          variant="outlined"
+          value={formData.ordre}
+          onChange={handleInputChange}
+          type="text"
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </Grid>
 
-        <Grid item xs={12} sm={4}>
-            <TextField
-              id="exercice"
-              name="exercice"
-              label="exercice"
-              variant="outlined"
-              value={formData.exercice}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="ordre"
-              name="ordre"
-              label="ordre"
-              variant="outlined"
-              value={formData.ordre}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
+   
+
+      <Grid item xs={12} sm={4}>
+      <FormControl fullWidth>
+  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+  Intermediaire
+  </InputLabel>
+  <NativeSelect 
+       id="intermediaireid"
+       name="intermediaireid" 
+       variant="outlined"
+       value={formData.intermediaireid}
+       onChange={handleInputChange} 
+  > 
+  <option  > Selectionner Intermediaire </option>
+   
+    {intermediaires?.map((intermediaire: any) => (
+      
+            <option key={intermediaire.id} value={intermediaire.id}>{intermediaire.nomCommercial}</option>
+          ))}
+ 
+  </NativeSelect>
+</FormControl>
+</Grid>
+
+      
+
+      
+ 
 
 
-          </Grid>
-           
+
         
-          
-          <Grid item xs={12} sm={4}>
-                <label>Intermediaire</label>
-                <Select 
-                id="intermediaireid"
-                name="intermediaireid" 
-                label="Numero intermediaire "
-                variant="outlined" 
-                value={formData.intermediaireid}
-                onChange={handleInputChange}
-                fullWidth
-                >
-                {intermediaires?.map((intermediaire: any) => (
-                    <MenuItem key={intermediaire.id} value={intermediaire.id}>
-                    {intermediaire.nomCommercial}
-                    </MenuItem>
-                ))}
-                </Select>
-         </Grid>
 
 
- 
-
-          <Grid item xs={12} sm={4}>
-                <label>Etat Quittance</label>
-        <Select 
-          id="refQuittanceid"
-          name="refQuittanceid" 
-          label=" Quittance Nature "
-          variant="outlined" 
-          value={formData.refQuittanceid}
+      <Grid item xs={12} sm={4}>
+      <FormControl fullWidth>
+  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+  Etat Quittance
+  </InputLabel>
+  <NativeSelect 
+        id="refQuittanceid"
+        name="refQuittanceid" 
+       variant="outlined"
+       value={formData.refQuittanceid}
           onChange={handleInputChange}
-          fullWidth
-        >
-          {refQuittances?.map((refQuittance: any) => (
-            <MenuItem key={refQuittance.id} value={refQuittance.id}>
-              {refQuittance.etatQuittance}
-            </MenuItem>
-          ))}
-        </Select>
-      </Grid>
- 
-
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="qtcRemiseid"
-              name="qtcRemiseid"
-              label="qtcRemiseid"
-              variant="outlined"
-              value={formData.qtcRemiseid}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="habUtilisateurid"
-              name="habUtilisateurid"
-              label="habUtilisateurid"
-              variant="outlined"
-              value={formData.habUtilisateurid}
-              onChange={handleInputChange}
-              type="text"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid> 
-
-
-
-
- 
-       
-          
-         
-
-
-
-
-          <Grid item xs={12} sm={4}>
-            <TextField
-              id="dateemission "
-              name="dateemission"
-              label="Date  Emission "
-              variant="outlined"
-              value={formData.dateemission}
-              onChange={handleInputChange}
-              type="date"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />   </Grid>
-
-          
-            <Grid item xs={12} sm={4}>
-                <TextField
-                id="Dateetat"
-                name="dateetat"
-                label="Dateetat"
-                variant="outlined"
-                value={formData.dateetat}
-                onChange={handleInputChange}
-                type="date"
-                fullWidth
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                />
-            </Grid>
-          
-            <Grid item xs={12} sm={4}>
-                <TextField
-                id="datedebut"
-                name="datedebut"
-                label="datedebut"
-                variant="outlined"
-                value={formData.datedebut}
-                onChange={handleInputChange}
-                type="date"
-                fullWidth
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-                <TextField
-                id="datefin"
-                name="datefin"
-                label="datefin"
-                variant="outlined"
-                value={formData.datefin}
-                onChange={handleInputChange}
-                type="date"
-                fullWidth
-                InputLabelProps={{
-                    shrink: true,
-                }}
-                />
-            </Grid>
-            
-
-
-
-
-
-          <Divider orientation="vertical"  sx={{ my: 10 }}  variant="fullWidth" color="secondary"   /> 
-
+  > 
+  <option  > Selectionner Etat Quittance </option>
+   
+    {refQuittances?.map((refQuittance: any) => (
       
-          <Grid item xs={12} sm={4} >
-            <TextField
-              id="tauxtaxe"
-              name="tauxtaxe"
-              label="tauxtaxe"
-              variant="outlined"
-              value={formData.tauxtaxe}
-              onChange={handleInputChange}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4} >
-            <TextField
-             id="tauxprimenette"
-             name="tauxprimenette"
-             label="Taux Prime Nette"
-              variant="outlined"
-              value={formData.tauxprimenette}
-              onChange={handleInputChange}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
+            <option key={refQuittance.id} value={refQuittance.id}>{refQuittance.etatQuittance}</option>
+          ))}
+ 
+  </NativeSelect>
+</FormControl>
+</Grid>
 
+
+      <Grid item xs={12} sm={4}>
+    <TextField
+      id="qtcRemiseid"
+      name="qtcRemiseid"
+      label="qtcRemiseid"
+      variant="outlined"
+      value={formData.qtcRemiseid}
+      onChange={handleInputChange}
+      type="text"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="habUtilisateurid"
+      name="habUtilisateurid"
+      label="habUtilisateurid"
+      variant="outlined"
+      value={formData.habUtilisateurid}
+      onChange={handleInputChange}
+      type="text"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="dateemission"
+      name="dateemission"
+      label="Date Emission"
+      variant="outlined"
+      value={formData.dateemission}
+      onChange={handleInputChange}
+      type="date"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="dateetat"
+      name="dateetat"
+      label="Date Etat"
+      variant="outlined"
+      value={formData.dateetat}
+      onChange={handleInputChange}
+      type="date"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="datedebut"
+      name="datedebut"
+      label="Date Debut"
+      variant="outlined"
+      value={formData.datedebut}
+      onChange={handleInputChange}
+      type="date"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="datefin"
+      name="datefin"
+      label="Date Fin"
+      variant="outlined"
+      value={formData.datefin}
+      onChange={handleInputChange}
+      type="date"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Divider orientation="vertical" sx={{ my: 10 }} variant="fullWidth" color="secondary" />
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="tauxtaxe"
+      name="tauxtaxe"
+      label="Taux Taxe"
+      variant="outlined"
+      value={formData.tauxtaxe}
+      onChange={handleInputChange}
+      type="number"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={4}>
+    <TextField
+      id="tauxprimenette"
+      name="tauxprimenette"
+      label="Taux Prime Nette"
+      variant="outlined"
+      value={formData.tauxprimenette}
+      onChange={handleInputChange}
+      type="number"
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+    />
+  </Grid>
     
       
 
-          <Grid item xs={12} sm={4}>
+                    <Grid item xs={12} sm={4}>
             <TextField
               id="tauxcommission"
               name="tauxcommission"
-              label="tauxcommission"
+              label="Taux Commission"
               variant="outlined"
               value={formData.tauxcommission}
               onChange={handleInputChange}
@@ -458,13 +457,11 @@ function QuittanceAdd( ) {
               }}
             />
           </Grid>
-
-
           <Grid item xs={12} sm={4}>
             <TextField
-              id="TtaxeParafiscale"
+              id="montanttaxeparafiscale"
               name="montanttaxeparafiscale"
-              label="T.taxeParafiscale"
+              label="Montant Taxe Parafiscale"
               variant="outlined"
               value={formData.montanttaxeparafiscale}
               onChange={handleInputChange}
@@ -475,54 +472,60 @@ function QuittanceAdd( ) {
               }}
             />
           </Grid>
+          
 
-         
 
           <Grid item xs={12} sm={4}>
-            <label htmlFor="">Montant Accessoire</label>
-        <Select
-          id="montantaccessoire"
-          name="montantaccessoire"
-          label="montantaccessoire"
-          variant="outlined"
-          value={formData.montantaccessoire}
-          onChange={handleInputChange} 
-          fullWidth
-        >
-          {options.map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
+      <FormControl fullWidth>
+  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+  Montant Accessoire
+  </InputLabel>
+  <NativeSelect 
+        id="montantaccessoire"
+        name="montantaccessoire" 
+        variant="outlined"
+        value={formData.montantaccessoire}
+        onChange={handleInputChange}
+  > 
+  <option  > Selectionner Etat Quittance </option>
+   
+    {options?.map((option: any) => (
+      
+            <option key={option} value={option}>{option}</option>
           ))}
-        </Select>
-      </Grid>
-      <label htmlFor=""> </label>
-      <Grid item xs={12} sm={4}>
-            <TextField
-              id="PrimeGareEve"
-              name="primeGareEve"
-              label="PrimeGareEve"
-              variant="outlined"
-              value={formData.primeGareEve}
-              onChange={handleInputChange}
-              type="number"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
+ 
+  </NativeSelect>
+</FormControl>
+</Grid>
+
+
+
+          
+          <label htmlFor=""></label>
+          <Grid item xs={12} sm={4}>
+          <TextField
+          id="primeGareEve"
+          name="primeGareEve"
+          label="Prime Gare Eve"
+          variant="outlined"
+          value={formData.primeGareEve}
+          onChange={handleInputChange}
+          type="number"
+          fullWidth
+          InputLabelProps={{
+          shrink: true,
+          }}
+          />
           </Grid>
 
-       
-          <Grid item xs={12}>
-            <Button variant="contained" color="primary" type="submit">
-              Submit
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-    </Box>
-
+<Grid item xs={12}>
+  <Button variant="contained" color="primary" type="submit">
+    Submit
+  </Button>
+</Grid>
+</Grid>
+</form>
+</Box>
 </>
   )
 }

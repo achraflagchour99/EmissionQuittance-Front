@@ -18,6 +18,7 @@ import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import store from './Store';  
 import jwtDecode from 'jwt-decode';
+import config from '../../config/config';
 
 
 type State = {
@@ -71,10 +72,9 @@ export default function SignInSide(props: any) {
   const authentifier = (event: { preventDefault: () => void; }) => {
 
 
-    axios.post('http://localhost:8081/api/v1/auth/authenticate', login)
+    axios.post(`${config.apiUrl}/api/v1/auth/authenticate`, login)
     .then(response => {
-      
-      props.onDataReceived("Hello from Fille1 "+response.data);
+       
        
 
   
@@ -192,7 +192,7 @@ window.location.href = '/';
                 Sign In
               </Button>
              
-               <Link href="/loginUp"> <Button
+               <Link href="/SignUp"> <Button
                 type="submit"
                 fullWidth
                 variant="contained"

@@ -18,6 +18,7 @@ import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import store from './Store'; 
 import jwtDecode from 'jwt-decode';
+import config from '../../config/config';
 
 
 
@@ -64,7 +65,7 @@ export default function SignUpSide(props: any) {
   const authentifier = (event: { preventDefault: () => void; }) => {
 
 
-    axios.post('http://localhost:8081/api/v1/auth/register', login)
+    axios.post(`${config.apiUrl}/api/v1/auth/register`, login)
     .then(response => {
       
     
@@ -84,7 +85,7 @@ export default function SignUpSide(props: any) {
 
       localStorage.setItem('token', response.data.access_token);
       toast.success('Utilisateur bien enregistrer');
-window.location.href = '/SignIn';
+      window.location.href = '/SignIn';
     //  toast.success('Connexion réussie !');
     })
     .catch(error => {

@@ -9,6 +9,7 @@ import MaterialReactTable, {
 import {
     Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -33,7 +34,8 @@ import {
   fetchRefQuittances,
 } from '../../../../api/service/provideData';
 import { RefQuittancePayload } from '../../../../api/interface/refQuittancePayload';
-
+import config from '../../../../config/config';
+//import config from ''
 
 export type Person = {
     id: number;
@@ -83,8 +85,7 @@ const Examples = () => {
       policecode :''
     });
 
- 
-
+  
     const handleCreateNewRow = async (values: Person) => {
     
     };
@@ -102,6 +103,7 @@ const Examples = () => {
         const [responseData, setResponseData] = useState<any>(null);
        
     const fetchTableData = async (pageIndex: number, pageSize: number) => {
+      setIsLoading(true);
         try {
             const params: { [key: string]: string | number } = {
                 page: pageIndex,
@@ -109,7 +111,7 @@ const Examples = () => {
             };
 
 
-            const response = await fetch(`http://localhost:8081/quittances/searchNew?`+'&pageNumber='+pagination.pageIndex+'&pageSize='+pagination.pageSize+'&codePolice='+searchCriteria.codePolice+'&dateDebut='+searchCriteria.dateDebut+'&dateFin='+searchCriteria.dateFin+'&refQuittanceId='+searchCriteria.refNatureQuittance);
+            const response = await fetch(`${config.apiUrl}/quittances/searchNew?`+'&pageNumber='+pagination.pageIndex+'&pageSize='+pagination.pageSize+'&codePolice='+searchCriteria.codePolice+'&dateDebut='+searchCriteria.dateDebut+'&dateFin='+searchCriteria.dateFin+'&refQuittanceId='+searchCriteria.refNatureQuittance);
            
             const responseData = await response.json();  
             setResponseData(responseData.content); 
@@ -123,6 +125,9 @@ const Examples = () => {
         } catch (error) {
             console.error(error);
         }
+        finally {
+          setIsLoading(false);
+      }
     };
 
 
@@ -267,7 +272,11 @@ const Examples = () => {
               }}
             >
               <MenuItem value="">Sélectionner</MenuItem>
-              {/* Ajoutez ici les options du Select */}
+              {refQuittances?.map((refQuittance: any) => (
+            <MenuItem key={refQuittance.id} value={refQuittance.id}>
+              {refQuittance.etatQuittance}
+            </MenuItem>
+          ))}
             </Select>
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -308,6 +317,12 @@ const Examples = () => {
       </div>
     </Box>
         <div className={"form-card"}>
+        {isLoading ? (
+                // Show the loading animation if isLoading is true
+                <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                    <CircularProgress />
+                </div>
+            ) : (
             <MaterialReactTable
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
@@ -356,6 +371,7 @@ const Examples = () => {
                 )}
         
             />
+            )}
             </div>
             <CreateNewAccountModal
                 columns={columns}

@@ -36,17 +36,19 @@ function App() {
   };
 
   
-  // if (!localStorage.getItem('token')) {
-  //   return ( 
-  //             <BrowserRouter> 
-  //                 <Routes>
-  //                     <Route> 
-  //                         <Route path="/SignIn" element={<SignInSide/>} />
-  //                     </Route>
-  //                 </Routes>
-  //             </BrowserRouter> 
-  //       );
-  //     }else
+  if (!localStorage.getItem('token')) {
+    return ( 
+              <BrowserRouter> 
+                  <Routes>
+                    
+                      <Route> 
+                          <Route path="/SignIn" element={<SignInSide/>} /> 
+                          <Route path="/SignUp" element={<SignUpSide/>} /> 
+                      </Route>
+                  </Routes>
+              </BrowserRouter> 
+        );
+      }else
   {
   return (
 
@@ -54,9 +56,9 @@ function App() {
         <BrowserRouter> 
             <Routes>
                 <Route>
-                  {/* <Route path='/' element={<PrivateRoute><MainContent /> </PrivateRoute>}>  */}
+                    <Route path='/' element={<PrivateRoute><MainContent /> </PrivateRoute>}>   
                     
-                   <Route path='/' element={ <MainContent /> }> 
+               
 
 
                         <Route index  element={<Dashboard />} />
@@ -75,7 +77,7 @@ function App() {
                        
                     </Route>
                     <Route path="/loginUp" element={<SignUpSide/>} />
-                    <Route path="/SignIn" element={<SignInSide onDataReceived={handleDataReceived}/>} />
+                 //   <Route path="/SignIn" element={<SignInSide onDataReceived={handleDataReceived}/>} />
                 </Route>
             </Routes>
         </BrowserRouter> 

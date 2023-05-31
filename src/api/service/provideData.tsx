@@ -1,7 +1,8 @@
 import axios from 'axios';
+import config from '../../config/config';
 
 export const fetchIntermediaires = async () => {
-  const url = `http://localhost:8081/provider/intermediaires`;
+  const url = `${config.apiUrl}/provider/intermediaires`;
   try {
     const response = await axios.get(url);
     const data = response.data;
@@ -13,7 +14,7 @@ export const fetchIntermediaires = async () => {
 };
 
 export const fetchPolice = async () => {
-  const url = `http://localhost:8081/provider/polices`;
+  const url = `${config.apiUrl}/provider/polices`;
   try {
     const response = await axios.get(url);
     const data = response.data;
@@ -25,7 +26,7 @@ export const fetchPolice = async () => {
 };
 
 export const fetchVersionsCommerciales = async () => {
-  const url = `http://localhost:8081/provider/versions-commerciales`;
+  const url = `${config.apiUrl}/provider/versions-commerciales`;
   try {
     const response = await axios.get(url);
     const data = response.data;
@@ -37,7 +38,7 @@ export const fetchVersionsCommerciales = async () => {
 };
 
 export const fetchRefQuittances = async () => {
-  const url = `http://localhost:8081/provider/ref-quittances`;
+  const url = `${config.apiUrl}/provider/ref-quittances`;
   try {
     const response = await axios.get(url);
     const data = response.data;
