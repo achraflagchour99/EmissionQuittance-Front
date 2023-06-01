@@ -14,17 +14,18 @@ import classes from "./Login.module.css";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'  
-import { useDispatch, useSelector } from 'react-redux';
-import store from './Store';  
+import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'   
 import jwtDecode from 'jwt-decode';
 import config from '../../config/config';
-
+import { useNavigate } from 'react-router-dom';
+import { loginSuccess } from '../../routage/authActions';
+import { useDispatch } from 'react-redux';
+import { setTokenInStorage } from '../../routage/storageUtils';
 
 type State = {
   value: string;
   setValue: (value: string) => void;
-};
+};  
 
 function Copyright(props: any) {
 
@@ -56,7 +57,7 @@ interface MyState {
 
 export default function SignInSide(props: any) {
 
-
+let navigate=useNavigate()
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -66,7 +67,7 @@ export default function SignInSide(props: any) {
     });
   };
 
- 
+  const dispatch = useDispatch();
    
      
   const authentifier = (event: { preventDefault: () => void; }) => {
@@ -78,10 +79,12 @@ export default function SignInSide(props: any) {
        
 
   
-      
-    store.dispatch({ type: 'SET_VALUE', payload: 'value' }); 
+       
  
     const decodedToken = jwtDecode(response.data.access_token);
+
+    
+
     const nom = (decodedToken as { lastname: string }).lastname;
     const prenom = (decodedToken as { firstName: string }).firstName;
 
@@ -92,8 +95,13 @@ export default function SignInSide(props: any) {
  
 
       localStorage.setItem('token', response.data.access_token);
-window.location.href = '/';
-    //  toast.success('Connexion réussie !');
+      const isAuthenticated = !!response.data.access_token;
+
+
+       dispatch(loginSuccess(response.data.access_token));
+       setTokenInStorage(response.data.access_token);
+      
+      navigate('/') 
     })
     .catch(error => {
       console.log(login.email,login.password)
@@ -210,3 +218,5 @@ window.location.href = '/';
     </ThemeProvider>
   );
 }
+
+

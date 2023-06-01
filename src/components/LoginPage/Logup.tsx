@@ -14,9 +14,7 @@ import classes from "./Login.module.css";
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'  
-import { useDispatch, useSelector } from 'react-redux';
-import store from './Store'; 
+import { BrowserRouter, Routes, Route,HashRouter} from 'react-router-dom'   
 import jwtDecode from 'jwt-decode';
 import config from '../../config/config';
 

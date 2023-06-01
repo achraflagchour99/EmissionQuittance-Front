@@ -1,7 +1,5 @@
-import React from 'react'
-import { useSelector } from 'react-redux';
-import store from '../components/LoginPage/Store';
-
+import React from 'react'  
+import rma from './RMA_WANATNIYA.jpg';
 
 interface MyState {
   value: string;
@@ -9,15 +7,18 @@ interface MyState {
 
 const Dashboard = () => {
 
-
- // dispatch({ type: 'SET_VALUE', payload: "response.data" });
  
- 
-  console.log('local '+ localStorage.getItem('token')); 
+  
  
   
   return (
-    <div>Dashboadrd</div>
+    
+       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <img src={rma} alt="My Image" style={{ width: '70%' }} />
+    </div>
+ 
+
+    
   )
 }
 

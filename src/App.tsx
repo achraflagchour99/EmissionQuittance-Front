@@ -14,16 +14,20 @@ import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
 import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";
 import SignInSide from "./components/LoginPage/Login";
-import SignUpSide from "./components/LoginPage/Logup";
-
-import { Provider } from "react-redux"; 
+import SignUpSide from "./components/LoginPage/Logup";  
+import { combineReducers, createStore, applyMiddleware } from 'redux';
 import PrivateRoute from "./routage/PrivateRoute";
+ 
+import store from "./routage/store";
+import { Provider } from 'react-redux';
+ 
+
 
 const mdTheme = createTheme();
 
 function App() {
 
-  const [dataFromFille1, setDataFromFille1] = useState("");
+  const [, setDataFromFille1] = useState("");
 
   const handleDataReceived = (data: React.SetStateAction<string>) => {
     setDataFromFille1(data);
@@ -35,54 +39,35 @@ function App() {
     setOpen(!open);
   };
 
-  
-  if (!localStorage.getItem('token')) {
-    return ( 
-              <BrowserRouter> 
-                  <Routes>
-                    
-                      <Route> 
-                          <Route path="/SignIn" element={<SignInSide/>} /> 
-                          <Route path="/SignUp" element={<SignUpSide/>} /> 
-                      </Route>
-                  </Routes>
-              </BrowserRouter> 
-        );
-      }else
-  {
-  return (
-
  
-        <BrowserRouter> 
-            <Routes>
-                <Route>
-                    <Route path='/' element={<PrivateRoute><MainContent /> </PrivateRoute>}>   
-                    
-               
-
-
-                        <Route index  element={<Dashboard />} />
-                        <Route path='test'      element={<Example />} /> 
-                        <Route path='police-search'      element={<SearchPolice />} />
  
-                        <Route path="/quittance-add" element={<QuittanceAdd />} />
-                        <Route path="/police-add" element={<AddPolice />} />
- 
-                        <Route path='police-add'      element={<AddPolice />} />
-                        <Route path="/quittance-add" element={<QuittanceAdd  />} /> 
-                        <Route path="/consult-page/:codePolice" element={<ConsultPolicePage/>} />
-                       <Route path="/quittance-search" element={<Examples/>} />  
-                         
- 
-                       
-                    </Route>
-                    <Route path="/loginUp" element={<SignUpSide/>} />
-                 //   <Route path="/SignIn" element={<SignInSide onDataReceived={handleDataReceived}/>} />
-                </Route>
-            </Routes>
-        </BrowserRouter> 
 
-  );
-}}
+    return (
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <MainContent />
+                </PrivateRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="test" element={<Example />} />
+              <Route path="police-search" element={<SearchPolice />} />
+              <Route path="quittance-add" element={<QuittanceAdd />} />
+              <Route path="police-add" element={<AddPolice />} />
+              <Route path="consult-page/:codePolice" element={<ConsultPolicePage />} />
+              <Route path="quittance-search" element={<Examples />} />
+            </Route>
+            <Route path="/loginUp" element={<SignUpSide />} />
+            <Route path="/signIn" element={<SignInSide />} />
+          </Routes>
+        </BrowserRouter>
+      </Provider>
+    );
+  };
 
 export default App;
