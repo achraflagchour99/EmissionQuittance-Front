@@ -3,11 +3,11 @@ import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import {  Grid, Box,Paper, InputLabel, FormControl, NativeSelect  } from '@mui/material';
+import {  Grid, Box,Paper, InputLabel, FormControl, NativeSelect, TableBody, TableContainer, TableHead, TableRow  } from '@mui/material';
 import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
 import axios from 'axios';  
-import { SelectPicker } from 'rsuite';
-
+import { SelectPicker, Table } from 'rsuite';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import {
     fetchIntermediaires,
     fetchPolice,
@@ -21,12 +21,23 @@ import {
   import  { intermediarePayload } from '../../../../api/interface/intermediarePayload';
 import { ToastContainer, toast } from 'react-toastify';
 import config from '../../../../config/config';
+import QuittanceGarantie from './QuittanceGarantie';
+import TableExample from './QuittancetestGrnt';
   
  
  
 
 
 function QuittanceAdd( ) {  
+
+  const [tableData, setTableData] = useState([]);
+
+  const handleTableDataChange = (data: React.SetStateAction<never[]>) => {
+    setTableData(data);
+    // You can perform any additional operations with the updated data here
+  };
+
+
 
     const [intermediaires, setIntermediaires] = useState<intermediarePayload[] | null>(null); 
     const [polices, setPolices] = useState<PolicePayload[] | null>(null);
@@ -518,14 +529,20 @@ function QuittanceAdd( ) {
           />
           </Grid>
 
-<Grid item xs={12}>
-  <Button variant="contained" color="primary" type="submit">
-    Submit
-  </Button>
+          <QuittanceGarantie />
+
+        
+  <Grid item xs={12}>
+    <Button variant="contained" color="primary" type="submit">
+      Submit
+    </Button>
 </Grid>
 </Grid>
 </form>
+
 </Box>
+
+ 
 </>
   )
 }
@@ -535,3 +552,7 @@ export default QuittanceAdd
 function configureStore(arg0: { reducer: { value: any; }; }) {
     throw new Error('Function not implemented.');
 }
+function styled(TableCell: (props: import("@mui/material").TableCellProps) => JSX.Element) {
+  throw new Error('Function not implemented.');
+}
+
