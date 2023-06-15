@@ -77,9 +77,10 @@ function QuittanceAdd( ) {
       const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
         const { name, value } = event.target;
         setFormData((prevState) => ({
+         
           ...prevState,
           [name]: value,
-        }));
+        }) ); 
       };
     
       const handleSubmit = (event: { preventDefault: () => void; }) => {
@@ -102,7 +103,9 @@ function QuittanceAdd( ) {
       };
 
       const options = [0, 10, 15, 20, 30];
+    
 
+      const [CodePoliceAPI, setCodePoliceAPI] = useState(0);
 
  
       useEffect(() => {
@@ -118,10 +121,15 @@ function QuittanceAdd( ) {
     
           const refQuittancesData = await fetchRefQuittances();
           setRefQuittances(refQuittancesData);
+
+ console.log(formData.idCodePolice);
+
+            setCodePoliceAPI(formData.idCodePolice);
+            console.log('Hello 2 '+CodePoliceAPI)
         };
     
         fetchData();
-      }, []);
+      }, [formData.idCodePolice]);
  
 
 
@@ -529,7 +537,7 @@ function QuittanceAdd( ) {
           />
           </Grid>
 
-          <QuittanceGarantie />
+          <QuittanceGarantie  CodePolice={formData.idCodePolice}/>
 
         
   <Grid item xs={12}>
