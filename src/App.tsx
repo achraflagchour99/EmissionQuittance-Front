@@ -20,6 +20,8 @@ import PrivateRoute from "./routage/PrivateRoute";
  
 import store from "./routage/store";
 import { Provider } from 'react-redux';
+import StepperQuittanceAdd from "./components/Forms/Quittance/Add/stepperQuittanceAdd";
+import { RecoilRoot } from "recoil";
  
 
 
@@ -57,8 +59,11 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="test" element={<Example />} />
               <Route path="police-search" element={<SearchPolice />} />
-              <Route path="quittance-add" element={<QuittanceAdd />} />
-              <Route path="police-add" element={<AddPolice />} />
+              {/* <Route path="quittance-add" element={<QuittanceAdd />} /> */} 
+              
+              <Route path="quittance-add" element={<StepperQuittanceAdd />} />
+               
+               <Route path="police-add" element={<AddPolice />} />   
               <Route path="consult-page/:codePolice" element={<ConsultPolicePage />} />
               <Route path="quittance-search" element={<Examples />} />
             </Route>

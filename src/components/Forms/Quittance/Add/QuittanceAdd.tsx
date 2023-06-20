@@ -23,6 +23,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import config from '../../../../config/config';
 import QuittanceGarantie from './QuittanceGarantie';
 import TableExample from './QuittancetestGrnt';
+import { useRecoilState } from 'recoil';
+import { idCodePoliceState } from '../recoil/atoms';
   
  
  
@@ -31,6 +33,8 @@ import TableExample from './QuittancetestGrnt';
 function QuittanceAdd( ) {  
 
   const [tableData, setTableData] = useState([]);
+  const [idCodePolice, setIdCodePolice] = useRecoilState(idCodePoliceState);
+
 
   const handleTableDataChange = (data: React.SetStateAction<never[]>) => {
     setTableData(data);
@@ -151,7 +155,8 @@ function QuittanceAdd( ) {
               alert("Police non trouvée");
             }  
             else{
-              console.log(data[0].id);  
+              setIdCodePolice(codePolice.toString());
+              console.log('codePolice.toString() '+ codePolice.toString());  
               const updatedFormData = { ...formData, policeid: data[0].id };
               setFormData(updatedFormData); 
             }
@@ -461,7 +466,7 @@ function QuittanceAdd( ) {
     
       
 
-                    <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={4}>
             <TextField
               id="tauxcommission"
               name="tauxcommission"
@@ -537,9 +542,10 @@ function QuittanceAdd( ) {
           />
           </Grid>
 
-          <QuittanceGarantie  CodePolice={formData.idCodePolice}/>
+          {/* <QuittanceGarantie  CodePolice={formData.idCodePolice}/> */}
 
-        
+
+
   <Grid item xs={12}>
     <Button variant="contained" color="primary" type="submit">
       Submit

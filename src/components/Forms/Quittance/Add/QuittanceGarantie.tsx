@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableContainer, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 import '../style.css'; // Import your custom styles
+import { idCodePoliceState } from '../recoil/atoms';
+import { useRecoilValue } from 'recoil';
 
 type Post = {
   id: number;
@@ -15,33 +17,49 @@ type Post = {
   TauxParafiscale: number;
 };
 
-type QuittanceGarantieProps = {
-  CodePolice: number;
-};
 
 
-const QuittanceGarantie = (props: any) => { 
+const QuittanceGarantie = (props: any) => {
+
+  const idCodePolice = useRecoilValue(idCodePoliceState);
     
-  const { CodePolice } = props;
+  const attributFille = props.attributFille;
   const codPlc =props.CodePolice;
+ 
+  
   const fetchData = async (): Promise<Post[]> => {
     try {
-      const response = await fetch('http://localhost:8080/versioncom/garanties/' + codPlc);
+      const response = await fetch('http://localhost:8080/versioncom/garanties/' + idCodePolice);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
       const data = await response.json();
+  
       if (!Array.isArray(data)) {
         throw new Error('Invalid data format');
       }
-      // Rest of the code for data processing...
-      return data; // Return the fetched data
+  
+      // Assign a default value of 0 to each column
+      const posts = data.map((post: Post) => ({
+        ...post,
+        PrimeNette: 0,
+        Taxe: 0,
+        Accessoire: 0,
+        Tauxcommission: 0,
+        Commission: 0,
+        TauxprimeEVE: 0,
+        PrimeGarEve: 0,
+        TauxParafiscale: 0,
+      }));
+  
+      return posts;
     } catch (error) {
       console.error(error);
       return []; // or return an appropriate default value
     }
   };
-  const [codePoliceAPI, setCodePoliceAPI] = useState(CodePolice);
+  
+
     
  
   const [posts, setPosts] = useState<Post[]>([]);
@@ -61,11 +79,9 @@ const QuittanceGarantie = (props: any) => {
   useEffect(() => {
     const fetchTableData = async () => {
       const data = await fetchData();
-      setPosts(data);
-      setCodePoliceAPI(CodePolice);
+      setPosts(data); 
     };
-
-    console.log('Hello ' + codPlc);
+ 
     fetchTableData();
   }, [codPlc]);
 
@@ -84,7 +100,7 @@ const QuittanceGarantie = (props: any) => {
   const calculateSums = (data: Post[]) => {
     const initialSums: Post = {
       id: 0,
-      libelle: ' ',
+      libelle: 'Total',
       PrimeNette: 0,
       Taxe: 0,
       Accessoire: 0,
@@ -112,8 +128,8 @@ const QuittanceGarantie = (props: any) => {
 
   const logValues = () => {
     console.log('Values entered:');
-    posts?.forEach((post) => {
-      console.log('Title:', post.libelle);
+    posts.forEach((post) => {
+      console.log('Garantie:', post.libelle);
       console.log('PrimeNette:', post.PrimeNette);
       console.log('Taxe:', post.Taxe);
       console.log('Accessoire:', post.Accessoire);
@@ -136,8 +152,9 @@ const QuittanceGarantie = (props: any) => {
 
   return (
     <div>
-
- 
+          <div>
+      <p>  Code Police: {idCodePolice}</p>
+    </div>
       <TableContainer>
         <Table>
           <TableHead>
@@ -156,7 +173,7 @@ const QuittanceGarantie = (props: any) => {
           <TableBody>
             {posts.map((post, index) => (
               <TableRow key={post.id}>
-                <TableCell>{post.libelle}</TableCell>
+                <TableCell >{post.libelle}</TableCell>
                 <TableCell>
                   <input className="borderless" type="text" value={post.PrimeNette} onChange={(event) => handleChange(event, index, 'PrimeNette')} />
                 </TableCell>
@@ -183,8 +200,8 @@ const QuittanceGarantie = (props: any) => {
                 </TableCell>
               </TableRow>
             ))}
-            <TableRow>
-              <TableCell>{sums.libelle}</TableCell>
+            <TableRow style={{ backgroundColor: '#6868b2' }}>
+              <TableCell  >{sums.libelle}</TableCell>
               <TableCell>{sums.PrimeNette}</TableCell>
               <TableCell>{sums.Taxe}</TableCell>
               <TableCell>{sums.Accessoire}</TableCell>
