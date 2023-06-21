@@ -183,7 +183,7 @@ function QuittanceAdd( ) {
 
 
   <form onSubmit={handleSubmit}>
-   <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
+   <Grid container spacing={3} xs={12} sm={12}  sx={{  }} >
       <Grid item xs={12} sm={4}>
         <TextField
           id="numeroquittance"

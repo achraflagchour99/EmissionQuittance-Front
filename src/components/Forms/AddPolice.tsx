@@ -1,28 +1,40 @@
 import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
 import {TextField, Button, Box, Checkbox, FormControlLabel} from '@mui/material';
 import axios from 'axios';
-import {Link} from "react-router-dom";
-import Typography from "@mui/material/Typography";
-import ConsultPolicePage from "../../pages/ConsultPolicePage";
-import SearchPolice from "./SearchPolice";
 import Grid from "@mui/material/Grid";
 import "./SearchPolice.css"
 import {   MenuItem, Select,Divider  } from '@mui/material';
-import { Margin } from '@mui/icons-material';
-import { Label } from 'recharts';
-import { alignProperty } from '@mui/material/styles/cssUtils';
-import { set } from 'lodash';
 
 interface Ville {
     id: number;
     code: string;
     libelle: string;
 }
-
+interface VersionCom {
+    id: number;
+    nomcommercial: string;
+}
+interface Interm {
+    id: number;
+    nomCommercial: string;
+}
+interface Period {
+    id: number;
+    type_periodicite: string;
+}
+interface Interm {
+    id: number;
+    nomCommercial: string;
+}
+interface EtatPolice {
+    id: number;
+    libelle: string;
+}
 interface PoliceData {
     id: number;
     codePolice: string;
     numClient: string;
+    intermediaire: Interm;
     raisonSociale: string;
     adresse: string;
     dateEffet: Date;
@@ -32,14 +44,14 @@ interface PoliceData {
     tauxComm: number;
     dateTerme: Date;
     dateEtat: Date;
-    periodicite: String; 
-    ff: number;
+    periodicite: Period;
+    dateEcheance: Date;
     mnt_taxe_eve: number;
     mnt_taxe_parafiscale: number;
-    prdVersioncommerciale: string;
+    prdVersioncommerciale: VersionCom;
     refVille: Ville;
-    refPolice: string;
-    terme: boolean;
+    refPolice: EtatPolice;
+    terme: string;
 }
 
 const AddPolice: React.FC = () => {
@@ -47,6 +59,7 @@ const AddPolice: React.FC = () => {
         id: 0,
         codePolice: '',
         numClient: '',
+        intermediaire: {id:0, nomCommercial: ''},
         raisonSociale: '',
         adresse: '',
         dateEffet: new Date(),
@@ -56,23 +69,34 @@ const AddPolice: React.FC = () => {
         tauxComm:  0.0,
         dateTerme: new Date(),
         dateEtat: new Date(),
-        ff: 0.0,
+        dateEcheance: new Date(),
         mnt_taxe_eve: 0,
         mnt_taxe_parafiscale: 0,
-        prdVersioncommerciale: '',
+        prdVersioncommerciale: {id:0, nomcommercial: ''},
         refVille: {id: 0, code: '', libelle: ''},
-        refPolice: '',
-        terme: false,
-        periodicite: '',
+        refPolice: {id: 0, libelle: ''},
+        terme: 'O',
+        periodicite: {id: 0, type_periodicite: ''},
     });
     const [hasTerme, setHasTerme] = useState(false);
     const [createdPoliceCodePolice, setCreatedPoliceCodePolice] = useState<string | null>(null);
-    const [villesLibelle, setVillesLibelle] = useState<string[]>([]);
     const [villes, setVilles] = useState<Ville[]>([]);
+    const [versions, setVersions] = useState<VersionCom[]>([]);
+    const [intermediaires, setIntermediaires] = useState<Interm[]>([]);
+    const [periodicites, setPeriodicites] = useState<Period[]>([]);
+    const [Etats, setEtats] = useState<EtatPolice[]>([]);
     const [selectedVille, setSelectedVille] = useState<Ville | null>(null);
-
+    const [selectedVersion, setSelectedVersion] = useState<VersionCom | null>(null);
+    const [selectedInterm, setSelectedInterm] = useState<Interm | null>(null);
+    const [selectedPeriode, setSelectedPeriode] = useState<Period | null>(null);
+    const [selectedEtat, setSelectedEtat] = useState<EtatPolice | null>(null);
+    const [showEcheance, setShowEcheance] = useState(false);
     useEffect(() => {
       fetchVilles();
+      fetchVersions();
+      fetchInterm();
+      fetchPeriodes();
+      fetchEtats();
     }, []);
   
     const fetchVilles = async () => {
@@ -81,12 +105,50 @@ const AddPolice: React.FC = () => {
           const villesData: Ville[] = response.data;
           setVilles(villesData);
           const villes = villesData.map((ville) => ville.libelle);
-          setVillesLibelle(villes);
         } catch (error) {
           console.error(error);
         }
       };
-      
+    const fetchVersions = async () => {
+        try {
+            const response = await axios.get<any[]>('http://localhost:8081/versioncom/all');
+            const versionsData: VersionCom[] = response.data;
+            setVersions(versionsData)
+            const versionscomm = versionsData.map((ver) => ver.nomcommercial);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const fetchInterm = async () => {
+        try {
+            const response = await axios.get<any[]>('http://localhost:8081/intermediaires');
+            const intermData: Interm[] = response.data;
+            setIntermediaires(intermData)
+            const intermediaires = intermData.map((inter) => inter.nomCommercial);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const fetchPeriodes = async () => {
+        try {
+            const response = await axios.get<any[]>('http://localhost:8081/periodes');
+            const periodesData: Period[] = response.data;
+            setPeriodicites(periodesData)
+            const periodes = periodesData.map((p) => p.type_periodicite);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const fetchEtats = async () => {
+        try {
+            const response = await axios.get<any[]>('http://localhost:8081/polices/etats');
+            const etatsData: EtatPolice[] = response.data;
+            setEtats(etatsData)
+            const etats = etatsData.map((e) => e.libelle);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const {name, value} = event.target;
@@ -105,6 +167,27 @@ const AddPolice: React.FC = () => {
         const ville = villes.find((v) => v.libelle === selectedVilleLibelle);
         setSelectedVille(ville || null); 
       };
+    const handleVersionChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedVersion = event.target.value as string;
+        const nomcommercial = versions.find((v) => v.nomcommercial === selectedVersion);
+        setSelectedVersion(nomcommercial || null);
+    };
+    const handleIntermChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedInterm = event.target.value as string;
+        const intermediaire = intermediaires.find((i) => i.nomCommercial === selectedInterm);
+        setSelectedInterm(intermediaire || null);
+    };
+    const handlePeriodeChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedPeriode = event.target.value as string;
+        const periode = periodicites.find((p) => p.type_periodicite === selectedPeriode);
+        setSelectedPeriode(periode || null);
+        setShowEcheance(true);
+    };
+    const handleEtatChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedEtat = event.target.value as string;
+        const etat = Etats.find((e) => e.libelle === selectedEtat);
+        setSelectedEtat(etat || null);
+    };
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
         try {
@@ -113,6 +196,10 @@ const AddPolice: React.FC = () => {
                 {
                 ...policeData,
                 refVille: selectedVille,
+                refPolice: selectedEtat,
+                periodicite: selectedPeriode,
+                prdVersioncommerciale: selectedVersion,
+                intermediaire: selectedInterm,
                 }
                 );
             // Redirect to the PoliceDetails component with the codePolice as a parameter
@@ -123,9 +210,9 @@ const AddPolice: React.FC = () => {
     };
 
     return (
-        <Box sx={{padding: '2rem', width: '70rem', marginBottom:'2rem', height: '29rem', backgroundColor: 'white' ,boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2);', marginLeft:'2.5rem'}}>
+        <Box sx={{padding: '2rem', width: '70rem', marginBottom:'2rem', height: '35rem', backgroundColor: 'white' ,boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2);', marginLeft:'3.75rem'}}>
             <form onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
+                <Grid container spacing={3}>
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="codePolice"
@@ -141,12 +228,33 @@ const AddPolice: React.FC = () => {
                         <TextField
                             name="prdVersioncommerciale"
                             label="Version Commerciale"
-                            value={policeData.prdVersioncommerciale}
-                            onChange={handleChange}
+                            value={selectedVersion ? selectedVersion.nomcommercial : ''}
+                            onChange={handleVersionChange}
                             fullWidth
                             select
                             size="small"
-                        />
+                        > {versions.map((v) => (
+                        <MenuItem key={v.id} value={v.nomcommercial}>
+                            {v.nomcommercial}
+                        </MenuItem>
+                    ))}
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            name="intermediaire"
+                            label="Intermédiaire"
+                            value={selectedInterm ? selectedInterm.nomCommercial : ''}
+                            onChange={handleIntermChange}
+                            fullWidth
+                            select
+                            size="small"
+                        > {intermediaires.map((i) => (
+                        <MenuItem key={i.id} value={i.nomCommercial}>
+                            {i.nomCommercial}
+                        </MenuItem>
+                    ))}
+                        </TextField>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <TextField
@@ -199,13 +307,31 @@ const AddPolice: React.FC = () => {
                         <TextField
                             name="periodicite"
                             label="Periodicité"
-                            value={policeData.periodicite}
-                            onChange={handleChange}
+                            value={selectedPeriode ? selectedPeriode.type_periodicite : ''}
+                            onChange={handlePeriodeChange}
                             fullWidth
                             select
                             size="small"
+                            > {periodicites.map((p) => (
+                                <MenuItem key={p.id} value={p.type_periodicite}>
+                                    {p.type_periodicite}
+                                </MenuItem>
+                            ))}
+                                </TextField>
+                    </Grid>
+                    {showEcheance && (
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            name="dateEcheance"
+                            label="Date Prochaine Echéance"
+                            value={policeData.dateEcheance}
+                            onChange={handleChange}
+                            type="date"
+                            fullWidth
+                            size="small"
                         />
                     </Grid>
+                    )}
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="primeNette"
@@ -271,7 +397,6 @@ const AddPolice: React.FC = () => {
                             type="date"
                             fullWidth
                             size="small"
-                            required
                         />
                     </Grid>
                     )}
@@ -284,17 +409,6 @@ const AddPolice: React.FC = () => {
                             onChange={handleChange}
                             fullWidth
                             type="date"
-                            size="small"
-                            required
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            name="ff"
-                            label="FF"
-                            value={policeData.ff}
-                            onChange={handleChange}
-                            fullWidth
                             size="small"
                             required
                         />
@@ -342,13 +456,19 @@ const AddPolice: React.FC = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="refPolice"
-                            label="Etat Police"
-                            value={policeData.refPolice}
-                            onChange={handleChange}
+                            label="Etat De Police"
+                            value={selectedEtat ? selectedEtat.libelle : ''}
+                            onChange={handleEtatChange}
                             fullWidth
                             select
                             size="small"
-                        />
+                        >
+                             {Etats.map((e) => (
+                <MenuItem key={e.id} value={e.libelle}>
+                  {e.libelle}
+                </MenuItem>
+              ))}
+            </TextField> 
                     </Grid>
                 </Grid>
                 <div className='add-buttons'> 

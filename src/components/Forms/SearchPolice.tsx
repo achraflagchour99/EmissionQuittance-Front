@@ -26,6 +26,7 @@ import "./SearchPolice.css"
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {Link} from "react-router-dom";
 
+
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
 export type Ville = {
@@ -33,6 +34,9 @@ export type Ville = {
 }
 export type Versioncommerciale = {
     nomcommercial: string;
+}
+export type Etat = {
+    libelle: string;
 }
 
 export type Police = {
@@ -47,12 +51,11 @@ export type Police = {
     tauxComm: bigint;
     dateTerme: Date;
     dateEtat: Date;
-    ff: bigint;
     mnt_taxe_eve: bigint;
     mnt_taxe_parafiscale: bigint;
     prdVersioncommerciale: Versioncommerciale;
     refVille: Ville;
-    refPolice: bigint;
+    refPolice: Etat;
 };
 
 const Example = () => {
@@ -117,7 +120,7 @@ const Example = () => {
     };
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        fetchTableData(pagination.pageIndex, pagination.pageSize); // Fetch data using the current page number
+        fetchTableData(pagination.pageIndex, pagination.pageSize);
     };
     useEffect(() => {
         fetchTableData(pagination.pageIndex,pagination.pageSize);
@@ -262,14 +265,6 @@ const Example = () => {
                 }),
             },
             {
-                accessorKey: 'ff',
-                header: 'Fractionnement',
-                size: 140,
-                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
-            },
-            {
                 accessorKey: 'mnt_taxe_eve',
                 header: 'Mnt Taxe Eve',
                 size: 140,
@@ -302,8 +297,8 @@ const Example = () => {
                 }),
             },
             {
-                accessorKey: 'refPolice',
-                header: 'Police',
+                accessorKey: 'refPolice.libelle',
+                header: 'Etat de Police',
                 size: 140,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                     ...getCommonEditTextFieldProps(cell),
@@ -316,7 +311,7 @@ const Example = () => {
 
     return (
         <>
-          <Box sx={{'& .MuiTextField-root': { m: 1, width: '20ch'},}}>
+          <Box sx={{'& .MuiTextField-root': { m: 1, width: '20ch'}, marginLeft:'0.4rem'}}>
                 <div className='form-card'>
                     <form onSubmit={handleSubmit}>
                         <TextField
@@ -373,6 +368,7 @@ const Example = () => {
                     </form>
                 </div>
             </Box>
+            <Box  sx={{marginLeft:'2rem', marginRight:'2.5rem', marginBottom:'2rem'}}>
             <div>
             {isLoading ? (
                 // Show the loading animation if isLoading is true
@@ -384,9 +380,9 @@ const Example = () => {
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
                         muiTableHeadCellProps: {
-                            align: 'center',
+                            align: 'left',
                         },
-                        size: 120,
+                        size: 50,
                     },
                 }}
                 columns={columns}
@@ -428,6 +424,7 @@ const Example = () => {
             />
             )}
             </div>
+            </Box>
             <CreateNewAccountModal
                 columns={columns}
                 open={createModalOpen}
@@ -435,6 +432,7 @@ const Example = () => {
                 onSubmit={handleCreateNewRow}
             />
         </>
+        
     );
 };
 

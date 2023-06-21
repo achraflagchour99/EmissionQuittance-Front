@@ -29,7 +29,7 @@ const QuittanceGarantie = (props: any) => {
   
   const fetchData = async (): Promise<Post[]> => {
     try {
-      const response = await fetch('http://localhost:8080/versioncom/garanties/' + idCodePolice);
+      const response = await fetch('http://localhost:8081/versioncom/garanties/' + idCodePolice);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
