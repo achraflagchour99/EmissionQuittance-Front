@@ -4,6 +4,7 @@ import axios from 'axios';
 import Grid from "@mui/material/Grid";
 import "./SearchPolice.css"
 import {   MenuItem, Select,Divider  } from '@mui/material';
+import config from '../../config/config';
 
 interface Ville {
     id: number;
@@ -101,7 +102,7 @@ const AddPolice: React.FC = () => {
   
     const fetchVilles = async () => {
         try {
-          const response = await axios.get<any[]>('http://localhost:8081/villes');
+          const response = await axios.get<any[]>(`${config.apiUrl}/villes`);
           const villesData: Ville[] = response.data;
           setVilles(villesData);
           const villes = villesData.map((ville) => ville.libelle);
@@ -111,7 +112,7 @@ const AddPolice: React.FC = () => {
       };
     const fetchVersions = async () => {
         try {
-            const response = await axios.get<any[]>('http://localhost:8081/versioncom/all');
+            const response = await axios.get<any[]>(`${config.apiUrl}/versioncom/all`);
             const versionsData: VersionCom[] = response.data;
             setVersions(versionsData)
             const versionscomm = versionsData.map((ver) => ver.nomcommercial);
@@ -121,7 +122,7 @@ const AddPolice: React.FC = () => {
     };
     const fetchInterm = async () => {
         try {
-            const response = await axios.get<any[]>('http://localhost:8081/intermediaires');
+            const response = await axios.get<any[]>(`${config.apiUrl}/intermediaires`);
             const intermData: Interm[] = response.data;
             setIntermediaires(intermData)
             const intermediaires = intermData.map((inter) => inter.nomCommercial);
@@ -131,7 +132,7 @@ const AddPolice: React.FC = () => {
     };
     const fetchPeriodes = async () => {
         try {
-            const response = await axios.get<any[]>('http://localhost:8081/periodes');
+            const response = await axios.get<any[]>(`${config.apiUrl}/periodes`);
             const periodesData: Period[] = response.data;
             setPeriodicites(periodesData)
             const periodes = periodesData.map((p) => p.type_periodicite);
@@ -141,7 +142,7 @@ const AddPolice: React.FC = () => {
     };
     const fetchEtats = async () => {
         try {
-            const response = await axios.get<any[]>('http://localhost:8081/polices/etats');
+            const response = await axios.get<any[]>(`${config.apiUrl}/polices/etats`);
             const etatsData: EtatPolice[] = response.data;
             setEtats(etatsData)
             const etats = etatsData.map((e) => e.libelle);
@@ -192,7 +193,7 @@ const AddPolice: React.FC = () => {
         event.preventDefault();
         try {
             const response = await axios.post(
-                'http://localhost:8081/polices/add',
+                `${config.apiUrl}/polices/add`,
                 {
                 ...policeData,
                 refVille: selectedVille,

@@ -27,7 +27,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import {Link} from "react-router-dom";
 
 
-const ENDPOINT_URL = 'http://localhost:8081/polices/search';
+const ENDPOINT_URL = 'http://localhost:8080/polices/search';
 
 export type Ville = {
     libelle: string;
@@ -76,7 +76,7 @@ const Example = () => {
     });
     const handleCreateNewRow = async (values: Police) => {
         try {
-            const response = await axios.post('http://localhost:8081/polices/add', values);
+            const response = await axios.post('http://localhost:8080/polices/add', values);
 
             if (response.status === 201) {
                 fetchTableData(pagination.pageIndex, pagination.pageSize);

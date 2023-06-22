@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableContainer, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 import '../style.css'; // Import your custom styles
-import { idCodePoliceState } from '../recoil/atoms';
-import { useRecoilValue } from 'recoil';
+import { idCodePoliceState, jsonDataState } from '../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import config from '../../../../config/config';
 
 type Post = {
   id: number;
+  idGarantie:number;
   libelle: string;
   PrimeNette: number;
   Taxe: number;
@@ -21,7 +23,18 @@ type Post = {
 
 const QuittanceGarantie = (props: any) => {
 
+  const [jsonData, setJsonData] = useState<string[]>([]);   
+  const [jsonDataP, setJsonDataP] = useRecoilState(jsonDataState);
+
+  const saveJsonData = () => {
+    const json = JSON.stringify(jsonData);
+    setJsonDataP(json); // Update the state with the new JSON string
+    // Perform any desired action with the JSON data (e.g., send it to the backend)
+    
+  };
+ 
   const idCodePolice = useRecoilValue(idCodePoliceState);
+ 
     
   const attributFille = props.attributFille;
   const codPlc =props.CodePolice;
@@ -29,7 +42,7 @@ const QuittanceGarantie = (props: any) => {
   
   const fetchData = async (): Promise<Post[]> => {
     try {
-      const response = await fetch('http://localhost:8081/versioncom/garanties/' + idCodePolice);
+      const response = await fetch(`${config.apiUrl}/versioncom/garanties/` + idCodePolice);
       if (!response.ok) {
         throw new Error('Failed to fetch data');
       }
@@ -42,6 +55,7 @@ const QuittanceGarantie = (props: any) => {
       // Assign a default value of 0 to each column
       const posts = data.map((post: Post) => ({
         ...post,
+        
         PrimeNette: 0,
         Taxe: 0,
         Accessoire: 0,
@@ -65,6 +79,7 @@ const QuittanceGarantie = (props: any) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [sums, setSums] = useState<Post>({
     id: 0,
+    idGarantie:0,
     libelle: 'Total',
     PrimeNette: 0,
     Taxe: 0,
@@ -79,27 +94,37 @@ const QuittanceGarantie = (props: any) => {
   useEffect(() => {
     const fetchTableData = async () => {
       const data = await fetchData();
-      setPosts(data); 
+      setPosts(data);
     };
- 
+  
     fetchTableData();
   }, [codPlc]);
+  
+  useEffect(() => {
+    saveJsonData();
+  }, [jsonData]);
+  
+  
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>, index: number, columnName: keyof Post) => {
     const { value } = event.target;
     const updatedPosts = [...posts];
     updatedPosts[index][columnName] = Number(value) as never; // Use type assertion
-
+  
     setPosts(updatedPosts);
     calculateSums(updatedPosts);
-  };
-
-
   
-
+    const jsonLine = JSON.stringify(updatedPosts[index]); // Convert the line to JSON
+    const updatedJsonData = [...jsonData];
+    updatedJsonData[index] = jsonLine; // Update the JSON data array
+    setJsonData(updatedJsonData);
+  };
+  
+  
   const calculateSums = (data: Post[]) => {
     const initialSums: Post = {
       id: 0,
+      idGarantie:0,
       libelle: 'Total',
       PrimeNette: 0,
       Taxe: 0,
@@ -159,6 +184,7 @@ const QuittanceGarantie = (props: any) => {
         <Table>
           <TableHead>
             <TableRow>
+            <TableCell>Id</TableCell>
               <TableCell>Garantie</TableCell>
               <TableCell>PrimeNette</TableCell>
               <TableCell>Taxe</TableCell>
@@ -173,7 +199,8 @@ const QuittanceGarantie = (props: any) => {
           <TableBody>
             {posts.map((post, index) => (
               <TableRow key={post.id}>
-                <TableCell >{post.libelle}</TableCell>
+                  <TableCell >{post.id}</TableCell>
+                <TableCell>{post.libelle}</TableCell>
                 <TableCell>
                   <input className="borderless" type="text" value={post.PrimeNette} onChange={(event) => handleChange(event, index, 'PrimeNette')} />
                 </TableCell>
@@ -201,6 +228,7 @@ const QuittanceGarantie = (props: any) => {
               </TableRow>
             ))}
             <TableRow style={{ backgroundColor: '#6868b2' }}>
+            <TableCell  ></TableCell>
               <TableCell  >{sums.libelle}</TableCell>
               <TableCell>{sums.PrimeNette}</TableCell>
               <TableCell>{sums.Taxe}</TableCell>
@@ -214,7 +242,7 @@ const QuittanceGarantie = (props: any) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <button onClick={logValues}>Log Values</button>
+      <button onClick={saveJsonData}>Save JSON Data</button>
     </div>
   );
 };

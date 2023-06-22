@@ -13,6 +13,7 @@ import {
     fetchPolice,
     fetchVersionsCommerciales,
     fetchRefQuittances,
+    fetchRemise,
   } from '../../../../api/service/provideData';
 
   import  { PolicePayload } from '../../../../api/interface/policePayload';
@@ -73,8 +74,8 @@ function QuittanceAdd( ) {
         tauxprimenette:0,
         dateemission:"",
         numeroquittance:"",
-        idCodePolice:0
-
+        idCodePolice:0,
+        montontremise:0
       
       });
     
@@ -89,13 +90,14 @@ function QuittanceAdd( ) {
     
       const handleSubmit = (event: { preventDefault: () => void; }) => {
 
+   
 
         axios.post(`${config.apiUrl}/quittances`, formData)
         .then(response => {
           console.log(response.data);
           toast.success('Quittance bien  enregistrer !', { position: toast.POSITION.TOP_RIGHT });
         })
-        .catch(error => {
+        .catch(error => { 
           console.log(error);
           toast.error('Erreur lors de la requête !', { position: toast.POSITION.TOP_RIGHT });
         });
@@ -111,9 +113,27 @@ function QuittanceAdd( ) {
 
       const [CodePoliceAPI, setCodePoliceAPI] = useState(0);
 
+
+      const RemiseFunction = async () => {
+        try {  // Provide the ID of the remise you want to fetch
+          const data = await fetchRemise(formData.qtcRemiseid);
+          // Use the data returned by the API call
+          setFormData(prevFormData => ({
+            ...prevFormData,
+            montontremise: data.montantRemise
+          })); 
+           
+          console.log('voila '+formData.montontremise)
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+
  
       useEffect(() => {
         const fetchData = async () => {
+
           const intermediairesData = await fetchIntermediaires();
           setIntermediaires(intermediairesData);
     
@@ -126,14 +146,15 @@ function QuittanceAdd( ) {
           const refQuittancesData = await fetchRefQuittances();
           setRefQuittances(refQuittancesData);
 
- console.log(formData.idCodePolice);
+  
+            setCodePoliceAPI(formData.idCodePolice); 
 
-            setCodePoliceAPI(formData.idCodePolice);
-            console.log('Hello 2 '+CodePoliceAPI)
+
+            RemiseFunction();
         };
     
         fetchData();
-      }, [formData.idCodePolice]);
+      }, [formData.idCodePolice,formData.qtcRemiseid]);
  
 
 
@@ -183,7 +204,7 @@ function QuittanceAdd( ) {
 
 
   <form onSubmit={handleSubmit}>
-   <Grid container spacing={3} xs={12} sm={12}  sx={{  }} >
+   <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
       <Grid item xs={12} sm={4}>
         <TextField
           id="numeroquittance"
@@ -334,21 +355,42 @@ function QuittanceAdd( ) {
 </Grid>
 
 
-      <Grid item xs={12} sm={4}>
-    <TextField
-      id="qtcRemiseid"
-      name="qtcRemiseid"
-      label="qtcRemiseid"
-      variant="outlined"
-      value={formData.qtcRemiseid}
-      onChange={handleInputChange}
-      type="text"
-      fullWidth
-      InputLabelProps={{
-        shrink: true,
-      }}
-    />
-  </Grid>
+    <Grid item xs={12} sm={4}>
+      <TextField
+        id="qtcRemiseid"
+        name="qtcRemiseid"
+        label="qtcRemiseid"
+        variant="outlined"
+        value={formData.qtcRemiseid}
+        onChange={handleInputChange}
+        type="text"
+        fullWidth
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+    </Grid>
+
+    <Grid item xs={12} sm={4}>
+      <TextField
+        id="remise"
+        name="remise"
+        label="Remise"
+        variant="outlined"
+        value={formData.montontremise}
+         
+        onChange={handleInputChange}
+        type="text"
+        fullWidth
+        InputLabelProps={{
+          shrink: true,
+        }}
+        InputProps={{
+          readOnly: true,
+        }}
+      />
+    </Grid>
+
 
   <Grid item xs={12} sm={4}>
     <TextField

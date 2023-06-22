@@ -1,5 +1,7 @@
 import axios from 'axios';
 import config from '../../config/config';
+import Successful from '../../components/Forms/tools/successful';
+import Error from '../../components/Forms/tools/error';
 
 export const fetchIntermediaires = async () => {
   const url = `${config.apiUrl}/provider/intermediaires`;
@@ -48,3 +50,60 @@ export const fetchRefQuittances = async () => {
     return null;
   }
 };
+
+
+export const fetchRemise = async (idRemise: any) => {
+  const url = `${config.apiUrl}/remises/search?numRemise=${idRemise}`;
+  try {
+    const response = await axios.get(url);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}; 
+
+export const saveQuittanceGarantie = async (garanties: any) => { 
+ 
+
+  axios.post(`${config.apiUrl}/api/garantie-quittance/entities`, garanties, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => {
+    console.log(response);
+    <Successful />
+  })
+  .catch(error => {
+    
+    <Error />
+    console.log(error);
+  });
+ 
+}; 
+
+
+ 
+
+
+     
+
+ 
+
+  
+
+   
+  
+ 
+
+
+
+   
+
+    
+
+
+
+ 
