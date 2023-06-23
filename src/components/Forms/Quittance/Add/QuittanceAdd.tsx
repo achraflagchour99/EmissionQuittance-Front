@@ -14,6 +14,7 @@ import {
     fetchVersionsCommerciales,
     fetchRefQuittances,
     fetchRemise,
+    ExtractSaveQuittance,
   } from '../../../../api/service/provideData';
 
   import  { PolicePayload } from '../../../../api/interface/policePayload';
@@ -25,7 +26,7 @@ import config from '../../../../config/config';
 import QuittanceGarantie from './QuittanceGarantie';
 import TableExample from './QuittancetestGrnt';
 import { useRecoilState } from 'recoil';
-import { idCodePoliceState } from '../recoil/atoms';
+import { idCodePoliceState, jsonDataQuittance } from '../recoil/atoms';
   
  
  
@@ -35,13 +36,22 @@ function QuittanceAdd( ) {
 
   const [tableData, setTableData] = useState([]);
   const [idCodePolice, setIdCodePolice] = useRecoilState(idCodePoliceState);
-
+  const [jsonQuittances, setJsonQuittance] = useRecoilState(jsonDataQuittance);
+  
 
   const handleTableDataChange = (data: React.SetStateAction<never[]>) => {
     setTableData(data);
     // You can perform any additional operations with the updated data here
   };
 
+
+  const extractSaveQuittance = () => {
+ //   console.log(formData)
+     
+    const jsonData = JSON.stringify(formData);
+    setJsonQuittance(jsonData); 
+     ExtractSaveQuittance(jsonQuittances); 
+  }
 
 
     const [intermediaires, setIntermediaires] = useState<intermediarePayload[] | null>(null); 
@@ -80,12 +90,18 @@ function QuittanceAdd( ) {
       });
     
       const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
+      //  handleFormSubmit();
         const { name, value } = event.target;
         setFormData((prevState) => ({
          
           ...prevState,
           [name]: value,
-        }) ); 
+         
+        }),
+        ); 
+        console.log(formData)
+        //Update  the  data  from  the formData to  Json
+      //  handleFormSubmit();
       };
     
       const handleSubmit = (event: { preventDefault: () => void; }) => {
@@ -101,9 +117,7 @@ function QuittanceAdd( ) {
           console.log(error);
           toast.error('Erreur lors de la requête !', { position: toast.POSITION.TOP_RIGHT });
         });
-
-
-
+ 
         event.preventDefault();
         console.log(formData);
       };
@@ -121,14 +135,18 @@ function QuittanceAdd( ) {
           setFormData(prevFormData => ({
             ...prevFormData,
             montontremise: data.montantRemise
-          })); 
-           
-          console.log('voila '+formData.montontremise)
+          }));  
         } catch (error) {
           console.error(error);
         }
       };
 
+     
+      const handleFormSubmit = () => {
+        const jsonData = JSON.stringify(formData);
+        setJsonQuittance(jsonData);
+        console.log(jsonQuittances);
+      };
 
  
       useEffect(() => {
@@ -149,12 +167,13 @@ function QuittanceAdd( ) {
   
             setCodePoliceAPI(formData.idCodePolice); 
 
-
             RemiseFunction();
+             console.log("voyage")
+          console.log(jsonQuittances);
         };
     
         fetchData();
-      }, [formData.idCodePolice,formData.qtcRemiseid]);
+      }, [formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
  
 
 
@@ -203,7 +222,7 @@ function QuittanceAdd( ) {
 
 
 
-  <form onSubmit={handleSubmit}>
+  
    <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
       <Grid item xs={12} sm={4}>
         <TextField
@@ -589,12 +608,12 @@ function QuittanceAdd( ) {
 
 
   <Grid item xs={12}>
-    <Button variant="contained" color="primary" type="submit">
+    <Button variant="contained" color="primary" type="submit" onClick={extractSaveQuittance}>
       Submit
     </Button>
 </Grid>
 </Grid>
-</form>
+ 
 
 </Box>
 
