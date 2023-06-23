@@ -2,58 +2,10 @@ import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
 import {TextField, Button, Box, Checkbox, FormControlLabel} from '@mui/material';
 import axios from 'axios';
 import Grid from "@mui/material/Grid";
-import "./SearchPolice.css"
-import {   MenuItem, Select,Divider  } from '@mui/material';
-import config from '../../config/config';
-
-interface Ville {
-    id: number;
-    code: string;
-    libelle: string;
-}
-interface VersionCom {
-    id: number;
-    nomcommercial: string;
-}
-interface Interm {
-    id: number;
-    nomCommercial: string;
-}
-interface Period {
-    id: number;
-    type_periodicite: string;
-}
-interface Interm {
-    id: number;
-    nomCommercial: string;
-}
-interface EtatPolice {
-    id: number;
-    libelle: string;
-}
-interface PoliceData {
-    id: number;
-    codePolice: string;
-    numClient: string;
-    intermediaire: Interm;
-    raisonSociale: string;
-    adresse: string;
-    dateEffet: Date;
-    primeNette: bigint;
-    taxe: bigint;
-    acce: bigint;
-    tauxComm: number;
-    dateTerme: Date;
-    dateEtat: Date;
-    periodicite: Period;
-    dateEcheance: Date;
-    mnt_taxe_eve: number;
-    mnt_taxe_parafiscale: number;
-    prdVersioncommerciale: VersionCom;
-    refVille: Ville;
-    refPolice: EtatPolice;
-    terme: string;
-}
+import "../Search/SearchPolice.css"
+import {   MenuItem } from '@mui/material';
+import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData } from './Types/types';
+import { fetchVilles, fetchVersions, fetchInterm, fetchPeriodes, fetchEtats } from './Api/policeApi';
 
 const AddPolice: React.FC = () => {
     const [policeData, setPoliceData] = useState<PoliceData>({
@@ -80,7 +32,6 @@ const AddPolice: React.FC = () => {
         periodicite: {id: 0, type_periodicite: ''},
     });
     const [hasTerme, setHasTerme] = useState(false);
-    const [createdPoliceCodePolice, setCreatedPoliceCodePolice] = useState<string | null>(null);
     const [villes, setVilles] = useState<Ville[]>([]);
     const [versions, setVersions] = useState<VersionCom[]>([]);
     const [intermediaires, setIntermediaires] = useState<Interm[]>([]);
@@ -91,74 +42,35 @@ const AddPolice: React.FC = () => {
     const [selectedInterm, setSelectedInterm] = useState<Interm | null>(null);
     const [selectedPeriode, setSelectedPeriode] = useState<Period | null>(null);
     const [selectedEtat, setSelectedEtat] = useState<EtatPolice | null>(null);
-    const [showEcheance, setShowEcheance] = useState(false);
+    const [taxeError, setTaxeError] = useState(false);
+
     useEffect(() => {
-      fetchVilles();
-      fetchVersions();
-      fetchInterm();
-      fetchPeriodes();
-      fetchEtats();
+      fetchVilles(setVilles);
+      fetchVersions(setVersions);
+      fetchInterm(setIntermediaires);
+      fetchPeriodes(setPeriodicites);
+      fetchEtats(setEtats);
     }, []);
   
-    const fetchVilles = async () => {
-        try {
-          const response = await axios.get<any[]>(`${config.apiUrl}/villes`);
-          const villesData: Ville[] = response.data;
-          setVilles(villesData);
-          const villes = villesData.map((ville) => ville.libelle);
-        } catch (error) {
-          console.error(error);
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setPoliceData((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }));
+    
+        // Vérification de la contrainte de taxe et définir l'erreur si nécessaire
+        if (name === 'taxe') {
+          const taxe = Number(value);
+          const montantPrime = Number(policeData.primeNette);
+          if (taxe > 0.25 * montantPrime) {
+            setTaxeError(true);
+          } else {
+            setTaxeError(false);
+          }
         }
       };
-    const fetchVersions = async () => {
-        try {
-            const response = await axios.get<any[]>(`${config.apiUrl}/versioncom/all`);
-            const versionsData: VersionCom[] = response.data;
-            setVersions(versionsData)
-            const versionscomm = versionsData.map((ver) => ver.nomcommercial);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    const fetchInterm = async () => {
-        try {
-            const response = await axios.get<any[]>(`${config.apiUrl}/intermediaires`);
-            const intermData: Interm[] = response.data;
-            setIntermediaires(intermData)
-            const intermediaires = intermData.map((inter) => inter.nomCommercial);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    const fetchPeriodes = async () => {
-        try {
-            const response = await axios.get<any[]>(`${config.apiUrl}/periodes`);
-            const periodesData: Period[] = response.data;
-            setPeriodicites(periodesData)
-            const periodes = periodesData.map((p) => p.type_periodicite);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    const fetchEtats = async () => {
-        try {
-            const response = await axios.get<any[]>(`${config.apiUrl}/polices/etats`);
-            const etatsData: EtatPolice[] = response.data;
-            setEtats(etatsData)
-            const etats = etatsData.map((e) => e.libelle);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = event.target;
-        setPoliceData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
         setHasTerme(checked);
@@ -182,7 +94,6 @@ const AddPolice: React.FC = () => {
         const selectedPeriode = event.target.value as string;
         const periode = periodicites.find((p) => p.type_periodicite === selectedPeriode);
         setSelectedPeriode(periode || null);
-        setShowEcheance(true);
     };
     const handleEtatChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedEtat = event.target.value as string;
@@ -193,7 +104,7 @@ const AddPolice: React.FC = () => {
         event.preventDefault();
         try {
             const response = await axios.post(
-                `${config.apiUrl}/polices/add`,
+                'http://localhost:8081/polices/add',
                 {
                 ...policeData,
                 refVille: selectedVille,
@@ -211,7 +122,7 @@ const AddPolice: React.FC = () => {
     };
 
     return (
-        <Box sx={{padding: '2rem', width: '70rem', marginBottom:'2rem', height: '35rem', backgroundColor: 'white' ,boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2);', marginLeft:'3.75rem'}}>
+        <Box sx={{padding: '2rem', width: '70rem', marginBottom:'2rem',marginTop:'1rem', height: '35rem', backgroundColor: 'white' ,boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2);', marginLeft:'2.8rem'}}>
             <form onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={4}>
@@ -320,7 +231,6 @@ const AddPolice: React.FC = () => {
                             ))}
                                 </TextField>
                     </Grid>
-                    {showEcheance && (
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateEcheance"
@@ -332,7 +242,6 @@ const AddPolice: React.FC = () => {
                             size="small"
                         />
                     </Grid>
-                    )}
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="primeNette"
@@ -348,12 +257,14 @@ const AddPolice: React.FC = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="taxe"
-                            label="Taxe"
+                            label={taxeError ? 'La taxe dépasse 25% du montant de la prime.' : 'Taxe'}
                             value={policeData.taxe}
                             onChange={handleChange}
+                            error={taxeError}
                             fullWidth
                             size="small"
                             required
+                            className={taxeError ? 'input-field error' : 'input-field'}
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>

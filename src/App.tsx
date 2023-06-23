@@ -6,10 +6,10 @@ import React, { useState } from "react";
 import { MainContent } from "./layout/MainContent";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from "./pages/Dashboard";
-import SearchPolice from "./components/Forms/SearchPolice";
+import SearchPolice from "./components/Forms/Police/Search/SearchPolice";
 import Searchpolicepage from "./pages/Searchpolicepage";
 import ConsultPolicePage from "./pages/ConsultPolicePage";
-import AddPolice from "./components/Forms/AddPolice";
+import AddPolice from "./components/Forms/Police/Add/AddPolice";
 import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
 import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";

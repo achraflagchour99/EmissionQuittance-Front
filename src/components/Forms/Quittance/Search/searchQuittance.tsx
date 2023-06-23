@@ -24,9 +24,7 @@ import {
     Tooltip,
 } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
-import axios from "axios";
-import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch'; 
-import "../../SearchPolice.css"
+import "../../Police/Search/SearchPolice.css"
 import {
   fetchIntermediaires,
   fetchPolice,
