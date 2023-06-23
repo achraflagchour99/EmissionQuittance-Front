@@ -1,5 +1,7 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState, ChangeEvent} from 'react';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
+import { fetchVilles, fetchVersions} from '../Add/Api/policeApi';
+import { Ville, VersionCom} from '../Add/Types/types';
 import MaterialReactTable, {
     type MaterialReactTableProps,
     type MRT_Cell,
@@ -27,14 +29,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import {Link} from "react-router-dom";
 
 
-const ENDPOINT_URL = 'http://localhost:8080/polices/search';
+const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
-export type Ville = {
-    libelle: string;
-}
-export type Versioncommerciale = {
-    nomcommercial: string;
-}
 export type Etat = {
     libelle: string;
 }
@@ -53,7 +49,7 @@ export type Police = {
     dateEtat: Date;
     mnt_taxe_eve: bigint;
     mnt_taxe_parafiscale: bigint;
-    prdVersioncommerciale: Versioncommerciale;
+    prdVersioncommerciale: VersionCom;
     refVille: Ville;
     refPolice: Etat;
 };
@@ -63,6 +59,8 @@ const Example = () => {
     const [codePolice, setCodePolice] = useState('');
     const [nomcommercial, setNomCommercial] = useState('');
     const [ville, setVille] = useState('');
+    const [villes, setVilles] = useState<Ville[]>([]);
+    const [versions, setVersions] = useState<VersionCom[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [tableData, setTableData] = useState<Police[]>([]);
@@ -74,17 +72,20 @@ const Example = () => {
         pageIndex: 0,
         pageSize: 10, //customize the default page size
     });
+    const [selectedVille, setSelectedVille] = useState<Ville | null>(null);
+    const [selectedVersion, setSelectedVersion] = useState<VersionCom | null>(null);
+
     const handleCreateNewRow = async (values: Police) => {
         try {
-            const response = await axios.post('http://localhost:8080/polices/add', values);
+            const response = await axios.post('http://localhost:8081/polices/add', values);
 
             if (response.status === 201) {
                 fetchTableData(pagination.pageIndex, pagination.pageSize);
             } else {
-                console.error('Failed to create a new person');
+                console.error('Failed to create a new police');
             }
         } catch (error) {
-            console.error('Failed to create a new person', error);
+            console.error('Failed to create a new police', error);
         }
     };
 
@@ -105,10 +106,11 @@ const Example = () => {
                 page: pageIndex,
                 size: pageSize,
             };
+        
             if (numClient) params.numClient = numClient;
             if (codePolice) params.codePolice = codePolice;
-            if (nomcommercial) params.nomcommercial = nomcommercial;
-            if (ville) params.ville = ville;
+            if (selectedVersion) params.versioncommerciale = selectedVersion?.nomcommercial ?? '';
+            if (selectedVille) params.ville = selectedVille?.libelle ?? '';
             const response = await axios.get<Police[]>(ENDPOINT_URL, { params });
             setTableData(response.data)
             setTotalItems(parseInt(response.headers['x-total-count']));
@@ -123,6 +125,8 @@ const Example = () => {
         fetchTableData(pagination.pageIndex, pagination.pageSize);
     };
     useEffect(() => {
+        fetchVilles(setVilles);
+        fetchVersions(setVersions);
         fetchTableData(pagination.pageIndex,pagination.pageSize);
     }, [pagination.pageIndex, pagination.pageSize]);
     
@@ -138,6 +142,16 @@ const Example = () => {
         },
         [tableData],
     );
+    const handleVilleChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedVilleLibelle = event.target.value as string;
+        const ville = villes.find((v) => v.libelle === selectedVilleLibelle);
+        setSelectedVille(ville || null); 
+      };
+    const handleVersionChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedVersion = event.target.value as string;
+        const nomcommercial = versions.find((v) => v.nomcommercial === selectedVersion);
+        setSelectedVersion(nomcommercial || null);
+    };
 
     const getCommonEditTextFieldProps = useCallback(
         (
@@ -340,35 +354,49 @@ const Example = () => {
                         />
                         <TextField
                             id="outlined-basic"
-                            label="Nom commercial"
                             variant="outlined"
                             size='small'
-                            type="text"
-                            value={nomcommercial}
-                            onChange={(event) => setNomCommercial(event.target.value)}
+                            label="Version Commerciale"
+                            value={selectedVersion ? selectedVersion.nomcommercial : ''}
+                            onChange={handleVersionChange}
                             InputLabelProps={{
                                 shrink: true,
                               }}
-                        />
-                        <TextField
-                            id="outlined-basic"
-                            label="Ville"
-                            variant="outlined"
-                            type="text"
-                            size='small'
-                            value={ville}
-                            onChange={(event) => setVille(event.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                              }}
-                        />
+                            select
+                            >
+                            <MenuItem value="">Aucune option</MenuItem> {/* Option vide */}
+                            {versions.map((v) => (
+                              <MenuItem key={v.id} value={v.nomcommercial}>
+                                {v.nomcommercial}
+                              </MenuItem>
+                            ))}
+                          </TextField>
+                    <TextField
+              name="refVille"
+              label="Ville"
+              value={selectedVille ? selectedVille.libelle : ''}
+              onChange={handleVilleChange}
+              fullWidth
+              select
+              size="small"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            >
+              <MenuItem value="">Aucune option</MenuItem> {/* Option vide */}
+              {villes.map((ville) => (
+                <MenuItem key={ville.id} value={ville.libelle}>
+                  {ville.libelle}
+                </MenuItem>
+              ))}
+            </TextField>    
                         <Button  id={"search-button"} type="submit" variant="contained" startIcon={<ContentPasteSearchIcon />}>
                             Rechercher
                         </Button>
                     </form>
                 </div>
             </Box>
-            <Box  sx={{marginLeft:'2rem', marginRight:'2.5rem', marginBottom:'2rem'}}>
+            <Box  sx={{marginLeft:'1.8rem', marginRight:'2.5rem', marginBottom:'2rem'}}>
             <div>
             {isLoading ? (
                 // Show the loading animation if isLoading is true
@@ -380,7 +408,7 @@ const Example = () => {
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
                         muiTableHeadCellProps: {
-                            align: 'left',
+                            align: 'center',
                         },
                         size: 50,
                     },
