@@ -9,3 +9,7 @@ export const jsonDataState = atom<string>({
     key: 'jsonDataState',
     default: '',
   });
+export const jsonDataQuittance = atom<string>({
+    key: 'jsonDataQuittance',
+    default: '',
+  });
