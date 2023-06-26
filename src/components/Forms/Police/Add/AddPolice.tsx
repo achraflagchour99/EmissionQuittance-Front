@@ -1,11 +1,16 @@
 import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
-import {TextField, Button, Box, Checkbox, FormControlLabel} from '@mui/material';
+import {TextField, Button, Box, Checkbox, FormControlLabel, Typography} from '@mui/material';
 import axios from 'axios';
 import Grid from "@mui/material/Grid";
 import "../Search/SearchPolice.css"
 import {   MenuItem } from '@mui/material';
 import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData } from './Types/types';
 import { fetchVilles, fetchVersions, fetchInterm, fetchPeriodes, fetchEtats } from './Api/policeApi';
+import { Stepper, Step, StepLabel } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const AddPolice: React.FC = () => {
     const [policeData, setPoliceData] = useState<PoliceData>({
@@ -42,7 +47,9 @@ const AddPolice: React.FC = () => {
     const [selectedInterm, setSelectedInterm] = useState<Interm | null>(null);
     const [selectedPeriode, setSelectedPeriode] = useState<Period | null>(null);
     const [selectedEtat, setSelectedEtat] = useState<EtatPolice | null>(null);
-    const [taxeError, setTaxeError] = useState(false);
+    const [activeStep, setActiveStep] = useState(0);
+    const [taxe, setTaxe] = useState<string>('');
+    const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
 
     useEffect(() => {
       fetchVilles(setVilles);
@@ -51,7 +58,27 @@ const AddPolice: React.FC = () => {
       fetchPeriodes(setPeriodicites);
       fetchEtats(setEtats);
     }, []);
-  
+
+
+    const validationSchema = Yup.object({
+    taxe: Yup.number().positive().integer().nullable()
+    .required('La taxe est requise')
+    .test('taxe-sup', 'La taxe dépasse 15% de la prime', function (value) {
+      const montantPrime = Number(this.parent.primeNette);
+      return value <= 0.15 * montantPrime;
+    }),
+    dateEffet: Yup.date().required('La date d\'effet est requise'),
+    dateEcheance: Yup.date()
+      .min(Yup.ref('dateEffet'), 'La date d\'échéance doit être supérieure à la date d\'effet')
+      .required('La date d\'échéance est requise'),
+      acce: Yup.number()
+      .oneOf([0, 10, 15, 20, 30], 'La valeur de l\'accessoire doit être 0, 10, 15, 20 ou 30')
+      .required('L\'accessoire est requis'),
+});
+const isStepComplete = () => {
+    const { taxe, dateEffet, dateEcheance } = formik.values;
+    return !!taxe && !!dateEffet && !!dateEcheance /* et les autres conditions pour les autres champs */;
+  };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -59,18 +86,18 @@ const AddPolice: React.FC = () => {
           ...prevData,
           [name]: value,
         }));
-    
-        // Vérification de la contrainte de taxe et définir l'erreur si nécessaire
-        if (name === 'taxe') {
-          const taxe = Number(value);
-          const montantPrime = Number(policeData.primeNette);
-          if (taxe > 0.25 * montantPrime) {
-            setTaxeError(true);
-          } else {
-            setTaxeError(false);
-          }
-        }
       };
+      const handleNext = () => {
+        if (formik.isValid && isStepComplete()) {
+            setActiveStep((prevActiveStep) => prevActiveStep + 1);
+          }
+      };
+      const handleTaxeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const input = event.target.value;
+        const onlyNumbers = input.replace(/[^0-9]/g, ''); // Filtrer uniquement les chiffres
+        formik.setFieldValue('taxe', onlyNumbers);
+      };
+    
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
         setHasTerme(checked);
@@ -100,8 +127,7 @@ const AddPolice: React.FC = () => {
         const etat = Etats.find((e) => e.libelle === selectedEtat);
         setSelectedEtat(etat || null);
     };
-    const handleSubmit = async (event: FormEvent) => {
-        event.preventDefault();
+    const handleSubmit = async () => {
         try {
             const response = await axios.post(
                 'http://localhost:8081/polices/add',
@@ -120,11 +146,60 @@ const AddPolice: React.FC = () => {
             console.error(error);
         }
     };
-
+    const formik = useFormik<PoliceData>({
+        initialValues: {
+          id: 0,
+          codePolice: '',
+          numClient: '',
+          intermediaire: { id: 0, nomCommercial: '' },
+          raisonSociale: '',
+          adresse: '',
+          dateEffet: new Date(),
+          primeNette: BigInt(0),
+          taxe: BigInt(0),
+          acce: BigInt(0),
+          tauxComm: 0.0,
+          dateTerme: new Date(),
+          dateEtat: new Date(),
+          dateEcheance: new Date(),
+          mnt_taxe_eve: 0,
+          mnt_taxe_parafiscale: 0,
+          prdVersioncommerciale: { id: 0, nomcommercial: '' },
+          refVille: { id: 0, code: '', libelle: '' },
+          refPolice: { id: 0, libelle: '' },
+          terme: 'O',
+          periodicite: { id: 0, type_periodicite: '' },
+        },
+        validationSchema: validationSchema,
+        onSubmit: () => {
+            // No need to define an async function here
+            handleSubmit();
+          },
+        });
     return (
-        <Box sx={{padding: '2rem', width: '70rem', marginBottom:'2rem',marginTop:'1rem', height: '35rem', backgroundColor: 'white' ,boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2);', marginLeft:'2.8rem'}}>
-            <form onSubmit={handleSubmit}>
-                <Grid container spacing={3}>
+       <Box sx={{ padding: '2rem', marginBottom: '2rem', marginTop: '0.1rem', height: '38rem', backgroundColor: 'white', justifyContent: 'center', boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)', marginLeft: '2rem', marginRight: '2rem' }}>
+            <Typography marginBottom={"20px"} variant="h6" align="center" color="primary" gutterBottom>
+                    Nouvelle Police
+            </Typography>
+        <Stepper activeStep={activeStep} alternativeLabel>
+            {steps.map((label, index) => (
+                <Step key={index}>
+                     <StepLabel>{label}</StepLabel>
+                </Step>
+            ))}
+        </Stepper>
+  {activeStep === steps.length ? (
+    <div>
+      <Typography variant="h5" gutterBottom>
+        Étape terminée
+      </Typography>
+      <Button variant="contained" color="primary" onClick={() => setActiveStep(0)}>
+        Nouvelle police
+      </Button>
+    </div>
+  ) : (
+            <form onSubmit={formik.handleSubmit}>
+            <Grid container spacing={2} sx={{ margin: '0 auto', paddingRight:'2rem'}}>
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="codePolice"
@@ -206,9 +281,11 @@ const AddPolice: React.FC = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateEffet"
-                            label="Date Effet"
-                            value={policeData.dateEffet}
-                            onChange={handleChange}
+                            onChange={formik.handleChange}
+                            value={formik.values.dateEffet}
+                            onBlur={formik.handleBlur}
+                            label={formik.touched.dateEcheance && formik.errors.dateEcheance ? 'La date du prochaine échéance doit être supérieure à la date effet' : 'Date Effet'}
+                            error={formik.touched.dateEcheance && formik.errors.dateEcheance ? true : false}
                             type="date"
                             fullWidth
                             size="small"
@@ -234,9 +311,11 @@ const AddPolice: React.FC = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateEcheance"
-                            label="Date Prochaine Echéance"
-                            value={policeData.dateEcheance}
-                            onChange={handleChange}
+                            label={formik.touched.dateEcheance && formik.errors.dateEcheance ? 'La date du prochaine échéance doit être supérieure à la date effet' : 'Date prochaine échéance'}
+                            value={formik.values.dateEcheance}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.dateEcheance && formik.errors.dateEcheance ? true : false}
                             type="date"
                             fullWidth
                             size="small"
@@ -246,8 +325,9 @@ const AddPolice: React.FC = () => {
                         <TextField
                             name="primeNette"
                             label="Prime Nette"
-                            value={policeData.primeNette}
-                            onChange={handleChange}
+                            value={formik.values.primeNette}
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
                             fullWidth
                             size="small"
                             required
@@ -257,22 +337,24 @@ const AddPolice: React.FC = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="taxe"
-                            label={taxeError ? 'La taxe dépasse 25% du montant de la prime.' : 'Taxe'}
-                            value={policeData.taxe}
-                            onChange={handleChange}
-                            error={taxeError}
+                            label={formik.touched.taxe && formik.errors.taxe ? 'La taxe dépasse 15% du montant de la prime.' : 'Taxe'}
+                            value={formik.values.taxe}
+                            onChange={handleTaxeChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.taxe && formik.errors.taxe ? true : false}
                             fullWidth
                             size="small"
                             required
-                            className={taxeError ? 'input-field error' : 'input-field'}
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="acce"
-                            label="Accessoires"
-                            value={policeData.acce}
-                            onChange={handleChange}
+                            label={formik.touched.acce && formik.errors.acce ? 'La valeur des accessoires doit être 0, 10, 15, 20 ou 30' : 'Accessoires'}
+                            value={formik.values.acce}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.acce && formik.errors.acce ? true : false}
                             fullWidth
                             size="small"
                             required
@@ -281,9 +363,11 @@ const AddPolice: React.FC = () => {
                     <Grid item xs={10} sm={4}>
                         <TextField
                             name="tauxComm"
-                            label="Taux Commission"
-                            value={policeData.tauxComm}
-                            onChange={handleChange}
+                            label={formik.touched.tauxComm && formik.errors.tauxComm ? 'Le taux de commission ne doit pas dépasser 25%.' : 'Taux de commission'}
+                            value={formik.values.tauxComm}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.tauxComm && formik.errors.tauxComm ? true : false}
                             fullWidth
                             size="small"
                             required
@@ -291,12 +375,12 @@ const AddPolice: React.FC = () => {
                     </Grid>
                     <Grid item xs={2} sm={4}>
                     <FormControlLabel
-          value="start"
-          control={<Checkbox
-            checked={hasTerme}
-            onChange={handleTermeChange}  />}
-          label="Terme"
-          labelPlacement="start"
+                        value="start"
+                        control={<Checkbox
+                        checked={hasTerme}
+                        onChange={handleTermeChange}  />}
+                        label="Terme"
+                        labelPlacement="start"
         />
                     </Grid>
                     {hasTerme && (
@@ -383,16 +467,18 @@ const AddPolice: React.FC = () => {
             </TextField> 
                     </Grid>
                 </Grid>
-                <div className='add-buttons'> 
-                <Button  type="submit" variant="contained" color="success">
-                            Ajouter
-                        </Button>
-                        <Button variant="contained" color="primary">
-                            Liste de Polices
-                        </Button>
-                </div>
-            </form>
-
+                <div style={{ gap: '1.2rem', display: 'flex', justifyContent: 'flex-end' }}>
+        {activeStep !== 0 && (
+          <Button variant="contained" color="primary" onClick={() => setActiveStep((prevActiveStep) => prevActiveStep - 1)}>
+          <ArrowBackIcon /> Retour
+        </Button>
+        )}
+        <Button type="submit" variant="contained" color="success" onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
+  {activeStep === steps.length - 1 ? 'Ajouter' : 'Suivant'} <NavigateNextIcon />
+</Button>
+      </div>
+        </form>
+        )}
         </Box>
     );
 };
