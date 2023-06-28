@@ -177,7 +177,19 @@ const isStepComplete = () => {
           },
         });
     return (
-       <Box sx={{ padding: '2rem', marginBottom: '2rem', marginTop: '0.1rem', height: '38rem', backgroundColor: 'white', justifyContent: 'center', boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.2)', marginLeft: '2rem', marginRight: '2rem' }}>
+        <Box
+        sx={{
+          padding: '2rem',
+          marginBottom: '2rem',
+          marginTop: '0.1rem',
+          height: '38rem',
+          backgroundColor: 'white',
+          justifyContent: 'center',
+          marginLeft: '2rem',
+          marginRight: '2rem',
+          borderRadius: '10px', // Adjust the value as needed
+        }}
+      >
             <Typography marginBottom={"20px"} variant="h6" align="center" color="primary" gutterBottom>
                     Nouvelle Police
             </Typography>
@@ -473,7 +485,7 @@ const isStepComplete = () => {
           <ArrowBackIcon /> Retour
         </Button>
         )}
-        <Button type="submit" variant="contained" color="success" onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
+        <Button type="submit" variant="outlined" onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
   {activeStep === steps.length - 1 ? 'Ajouter' : 'Suivant'} <NavigateNextIcon />
 </Button>
       </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import { Box, Divider, IconButton, Stack, Typography } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -8,14 +8,11 @@ import MuiDrawer from "@mui/material/Drawer";
 import { closedMixin, openedMixin } from "../../styles/mixins";
 import { DRAWER_WIDTH } from "../../utils/constants";
 import RenderText from "../../utils/RenderText";
-import { mainListItems } from "./listitems";
+import ListItems from "./listitems";
 
 const StyledTypography = styled(Typography)({
-  //color: "#1d2442",
-  //color: "#3ba5df",
   fontSize: "25px",
   fontWeight: "bold",
-  //textAlign: "left",
   textTransform: "uppercase",
 });
 
@@ -33,6 +30,11 @@ const Drawer = styled(MuiDrawer, {
   ...(!open && {
     ...closedMixin(theme),
     "& .MuiDrawer-paper": closedMixin(theme),
+    visibility: "hidden", // Ajoutez cette ligne
+    transition: theme.transitions.create("visibility", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   }),
 }));
 
@@ -41,7 +43,6 @@ export const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -50,7 +51,7 @@ export const SidebarDivider = () => {
     <Divider
       sx={{
         mt: "12px",
-        bgcolor: "#fff", // "common.separationLine",
+        bgcolor: "#fff",
         opacity: 0.1,
         height: "1px",
       }}
@@ -79,6 +80,11 @@ const AppSidebar = ({
         sx: {
           backgroundColor: "#243075",
           color: "white",
+          visibility: open ? "visible" : "hidden", // Ajoutez cette ligne
+          transition: theme.transitions.create("visibility", {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
         },
       }}
     >
@@ -94,13 +100,12 @@ const AppSidebar = ({
             <Box>
               <Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <StyledTypography sx={{fontSize:15, marginTop:1}} >
+                  <StyledTypography sx={{ fontSize: 15, marginTop: 1 }}>
                     <RenderText value="EMISSION QUITTANCE" />
                   </StyledTypography>
-
                 </Stack>
                 <Divider
-                  sx={{ height: "2px", bgcolor: "#AF7F1F", mt: "4px" }}
+                  sx={{ height: "2px", bgcolor: "#AF7F1F", mt: "5px" }}
                 />
               </Stack>
             </Box>
@@ -113,26 +118,15 @@ const AppSidebar = ({
             </IconButton>
           </Stack>
         ) : (
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 0.5 }}
-          >
-            <MenuIcon />
+          <IconButton onClick={handleDrawerOpen}>
+            <MenuIcon sx={{ color: "#fff" }} />
           </IconButton>
         )}
       </DrawerHeader>
-      <Divider sx={{
-        mt: "12px",
-        bgcolor: "#fff", // "common.separationLine",
-        opacity: 0.1,
-        height: "1px",
-      }}/>
-      {mainListItems}
+      <div style={{ margin: '7px 0' }}></div>
+      <ListItems />
     </Drawer>
   );
 };
 
-export default AppSidebar;
+export default AppSidebar

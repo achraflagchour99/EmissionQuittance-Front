@@ -1,5 +1,6 @@
 
 import { DrawerHeader } from "../components/Sidebar";
+import { DRAWER_WIDTH } from "../utils/constants";
 import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import "../App.css";
 import React from "react";
@@ -29,25 +30,28 @@ export const MainContent = () => {
         handleDrawerOpen={toggleDrawer}
       />
 
-    <Box
-      component="main"
-      sx={{
-        backgroundColor: (theme) => 
-          theme.palette.mode === "light"
-            ? theme.palette.grey[100]
-            : theme.palette.grey[900],
-        flexGrow: 1,
-        height: "100vh",
-        overflow: "auto",
-      }}
-    >
-      <DrawerHeader />
-      <Box sx={{ pt: 4 }}>
+<Box
+  component="main"
+  sx={{
+    backgroundColor: (theme) =>
+      theme.palette.mode === "light"
+        ? theme.palette.grey[100]
+        : theme.palette.grey[900],
+    flexGrow: 1,
+    height: "100vh",
+    overflow: "auto",
+    marginLeft: open ? 0 : `-${DRAWER_WIDTH}px`,
+    paddingLeft: open ? 0 : `185px`,
+    transition: "margin-left 0.1s ease-in-out",
+    width: open ? `calc(100% - ${DRAWER_WIDTH}px)` : "100%",
+  }}
+>
+  <DrawerHeader />
+  <Box sx={{ pt: 4 }}>
+    <Outlet />
+  </Box>
+</Box>
 
-      <Outlet />
-  
-      </Box>
-    </Box>
 
     </Box>
     </ThemeProvider>
