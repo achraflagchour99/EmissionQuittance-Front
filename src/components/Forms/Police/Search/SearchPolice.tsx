@@ -27,7 +27,7 @@ import axios from "axios";
 import "./SearchPolice.css"
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {Link} from "react-router-dom";
-
+import SearchIcon from '@mui/icons-material/Search';
 
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
@@ -325,78 +325,99 @@ const Example = () => {
 
     return (
         <>
-          <Box sx={{'& .MuiTextField-root': { m: 1, width: '20ch'}, marginLeft:'0.4rem'}}>
-                <div className='form-card'>
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            id="outlined-basic"
-                            label="Numéro de client"
-                            variant="outlined"
-                            size='small'
-                            type="text"
-                            value={numClient}
-                            onChange={(event) => setNumeroClient(event.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                              }}
-                        />
-                        <TextField
-                            id="outlined-basic"
-                            label="Code Police"
-                            size='small'
-                            variant="outlined"
-                            type="text"
-                            value={codePolice}
-                            onChange={(event) => setCodePolice(event.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                              }}
-                        />
-                        <TextField
-                            id="outlined-basic"
-                            variant="outlined"
-                            size='small'
-                            label="Version Commerciale"
-                            value={selectedVersion ? selectedVersion.nomcommercial : ''}
-                            onChange={handleVersionChange}
-                            InputLabelProps={{
-                                shrink: true,
-                              }}
-                            select
-                            >
-                            <MenuItem value="">Aucune option</MenuItem> {/* Option vide */}
-                            {versions.map((v) => (
-                              <MenuItem key={v.id} value={v.nomcommercial}>
-                                {v.nomcommercial}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                    <TextField
-              name="refVille"
-              label="Ville"
-              value={selectedVille ? selectedVille.libelle : ''}
-              onChange={handleVilleChange}
-              fullWidth
-              select
-              size="small"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            >
-              <MenuItem value="">Aucune option</MenuItem> {/* Option vide */}
-              {villes.map((ville) => (
-                <MenuItem key={ville.id} value={ville.libelle}>
-                  {ville.libelle}
-                </MenuItem>
-              ))}
-            </TextField>    
-                        <Button  id={"search-button"} type="submit" variant="contained" startIcon={<ContentPasteSearchIcon />}>
-                            Rechercher
-                        </Button>
-                    </form>
-                </div>
-            </Box>
-            <Box  sx={{marginLeft:'1.8rem', marginRight:'2.5rem', marginBottom:'2rem'}}>
+<Box
+  sx={{
+    '& .MuiTextField-root': {
+      m: 1,
+      width: '25ch',
+    },
+    marginLeft: '0.4rem',
+  }}
+>
+<Box sx={{ marginBottom: '2rem', marginLeft: '1rem' }}>
+  <form onSubmit={handleSubmit}>
+    <TextField
+      id="outlined-basic"
+      label="Numéro de client"
+      variant="outlined"
+      size="small"
+      type="text"
+      value={numClient}
+      onChange={(event) => setNumeroClient(event.target.value)}
+      InputLabelProps={{
+        shrink: true,
+      }}
+      className="customTextField"
+    />
+        <TextField
+    id="outlined-basic"
+    label="Code Police"
+    variant="outlined"
+    type="text"
+    value={codePolice}
+    onChange={(event) => setCodePolice(event.target.value)}
+    InputLabelProps={{
+        shrink: true,
+    }}
+    className="customTextField"
+/>
+
+    <TextField
+      id="outlined-basic"
+      variant="outlined"
+      size="small"
+      label="Version Commerciale"
+      value={selectedVersion ? selectedVersion.nomcommercial : ''}
+      onChange={handleVersionChange}
+      InputLabelProps={{
+        shrink: true,
+      }}
+      select
+      sx={{
+        height: '0.5rem', // Adjust the height as needed
+      }}
+    >
+      <MenuItem value="">Aucune option</MenuItem> {/* Option vide */}
+      {versions.map((v) => (
+        <MenuItem key={v.id} value={v.nomcommercial}>
+          {v.nomcommercial}
+        </MenuItem>
+      ))}
+    </TextField>
+    <TextField
+      name="refVille"
+      label="Ville"
+      value={selectedVille ? selectedVille.libelle : ''}
+      onChange={handleVilleChange}
+      fullWidth
+      select
+      size="small"
+      InputLabelProps={{
+        shrink: true,
+      }}
+      sx={{
+        height: '2.5rem', // Adjust the height as needed
+      }}
+    >
+      <MenuItem value="">Aucune option</MenuItem> {/* Option vide */}
+      {villes.map((ville) => (
+        <MenuItem key={ville.id} value={ville.libelle}>
+          {ville.libelle}
+        </MenuItem>
+      ))}
+    </TextField>
+    <Button id="search-button" type="submit" variant="contained" startIcon={<SearchIcon />}>
+      Rechercher
+    </Button>
+  </form>
+</Box>
+</Box>
+            <Box  sx={{marginLeft:'1.8rem',
+                       marginRight:'2.5rem', 
+                       marginBottom:'2rem', 
+                       borderRadius: '5px',
+                       boxShadow: '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12)',
+                       }}>
             <div>
             {isLoading ? (
                 // Show the loading animation if isLoading is true

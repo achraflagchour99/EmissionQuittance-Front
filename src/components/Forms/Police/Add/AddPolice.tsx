@@ -178,18 +178,18 @@ const isStepComplete = () => {
         });
     return (
         <Box
-        sx={{
-          padding: '2rem',
-          marginBottom: '2rem',
-          marginTop: '0.1rem',
-          height: '38rem',
-          backgroundColor: 'white',
-          justifyContent: 'center',
-          marginLeft: '2rem',
-          marginRight: '2rem',
-          borderRadius: '10px', // Adjust the value as needed
-        }}
-      >
+  sx={{
+    padding: '2rem',
+    marginTop: '0.2rem',
+    height: '38rem',
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    marginLeft: '2rem',
+    marginRight: '2rem',
+    borderRadius: '5px',
+    boxShadow: '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12)',
+  }}
+>
             <Typography marginBottom={"20px"} variant="h6" align="center" color="primary" gutterBottom>
                     Nouvelle Police
             </Typography>

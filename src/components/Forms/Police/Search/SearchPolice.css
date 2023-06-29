@@ -6,7 +6,7 @@ height: 15px;
     margin-left: 1rem;
 }
 #search-button{
-    height: 34px;
+    height: 40px;
     margin-left: 10px;
     margin-top: 8px;
     background-color: #243075FF;
@@ -34,3 +34,6 @@ height: 15px;
     margin-top: 2rem;
     margin-left: 57rem;
 }
+.customTextField .MuiInputBase-root {
+    height: 2.5rem; /* Adjust the height as needed */
+  }
