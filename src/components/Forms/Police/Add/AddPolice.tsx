@@ -153,7 +153,7 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8081/polices/add', requestData);
+          const response = await axios.post('http://localhost:8080/polices/add', requestData);
       
           window.location.href = `/consult-page/${response.data.codePolice}`;
         } catch (error) {
