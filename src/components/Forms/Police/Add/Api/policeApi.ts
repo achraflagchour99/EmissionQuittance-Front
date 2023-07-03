@@ -1,7 +1,7 @@
 
 import axios from 'axios';
-import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
-import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData } from '../Types/types';
+import React from 'react';
+import { Ville, VersionCom, Interm, Period, EtatPolice, TypeTerme } from '../Types/types';
 import config from '../../../../../config/config';
 
 export const fetchVilles = async (setVilles: React.Dispatch<React.SetStateAction<Ville[]>>) => {
@@ -54,3 +54,13 @@ export const fetchVilles = async (setVilles: React.Dispatch<React.SetStateAction
           console.error(error);
       }
   };
+  export const fetchTypesTermes = async (setTypesTerme: React.Dispatch<React.SetStateAction<TypeTerme[]>>) => {
+    try {
+        const response = await axios.get<any[]>('http://localhost:8081/termes');
+        const typesData: TypeTerme[] = response.data;
+        setTypesTerme(typesData)
+        const etats = typesData.map((e) => e.terme);
+    } catch (error) {
+        console.error(error);
+    }
+};

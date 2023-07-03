@@ -4,8 +4,8 @@ import axios from 'axios';
 import Grid from "@mui/material/Grid";
 import "../Search/SearchPolice.css"
 import {   MenuItem } from '@mui/material';
-import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData } from './Types/types';
-import { fetchVilles, fetchVersions, fetchInterm, fetchPeriodes, fetchEtats } from './Api/policeApi';
+import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData, TypeTerme } from './Types/types';
+import { fetchVilles, fetchVersions, fetchInterm, fetchPeriodes, fetchEtats, fetchTypesTermes } from './Api/policeApi';
 import { Stepper, Step, StepLabel } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -21,9 +21,9 @@ const AddPolice: React.FC = () => {
         raisonSociale: '',
         adresse: '',
         dateEffet: new Date(),
-        primeNette: BigInt(0),
-        taxe:  BigInt(0),
-        acce:  BigInt(0),
+        primeNette: 0.0,
+        taxe: 0.0,
+        acce: 0.0,
         tauxComm:  0.0,
         dateTerme: new Date(),
         dateEtat: new Date(),
@@ -35,20 +35,22 @@ const AddPolice: React.FC = () => {
         refPolice: {id: 0, libelle: ''},
         terme: 'O',
         periodicite: {id: 0, type_periodicite: ''},
+        typeTerme: {id: 0, terme: ''},
     });
     const [hasTerme, setHasTerme] = useState(false);
     const [villes, setVilles] = useState<Ville[]>([]);
     const [versions, setVersions] = useState<VersionCom[]>([]);
     const [intermediaires, setIntermediaires] = useState<Interm[]>([]);
     const [periodicites, setPeriodicites] = useState<Period[]>([]);
-    const [Etats, setEtats] = useState<EtatPolice[]>([]);
+    const [Etats, setEtats] = useState<EtatPolice[]>([]);   
+    const [TypesTerme, setTypesTerme] = useState<TypeTerme[]>([]);
+    const [selectedType, setSelectedType] = useState<TypeTerme | null>(null);
     const [selectedVille, setSelectedVille] = useState<Ville | null>(null);
     const [selectedVersion, setSelectedVersion] = useState<VersionCom | null>(null);
     const [selectedInterm, setSelectedInterm] = useState<Interm | null>(null);
     const [selectedPeriode, setSelectedPeriode] = useState<Period | null>(null);
     const [selectedEtat, setSelectedEtat] = useState<EtatPolice | null>(null);
     const [activeStep, setActiveStep] = useState(0);
-    const [taxe, setTaxe] = useState<string>('');
     const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
 
     useEffect(() => {
@@ -57,6 +59,7 @@ const AddPolice: React.FC = () => {
       fetchInterm(setIntermediaires);
       fetchPeriodes(setPeriodicites);
       fetchEtats(setEtats);
+      fetchTypesTermes(setTypesTerme);
     }, []);
 
 
@@ -101,6 +104,7 @@ const isStepComplete = () => {
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
         setHasTerme(checked);
+        formik.values.terme='N';
     };
     const handleVilleChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedVilleLibelle = event.target.value as string;
@@ -127,25 +131,36 @@ const isStepComplete = () => {
         const etat = Etats.find((e) => e.libelle === selectedEtat);
         setSelectedEtat(etat || null);
     };
+    const handleTypeChange = (event: ChangeEvent<{ value: unknown }>) => {
+        const selectedType = event.target.value as string;
+        const type = TypesTerme.find((e) => e.terme === selectedType);
+        setSelectedType(type || null);
+    };
     const handleSubmit = async () => {
         try {
-            const response = await axios.post(
-                'http://localhost:8081/polices/add',
-                {
-                ...policeData,
-                refVille: selectedVille,
-                refPolice: selectedEtat,
-                periodicite: selectedPeriode,
-                prdVersioncommerciale: selectedVersion,
-                intermediaire: selectedInterm,
-                }
-                );
-            // Redirect to the PoliceDetails component with the codePolice as a parameter
-            window.location.href = `/consult-page/${response.data.codePolice}`;
+          const requestData = {
+            ...formik.values,
+            refVille: selectedVille,
+            refPolice: selectedEtat,
+            periodicite: selectedPeriode,
+            prdVersioncommerciale: selectedVersion,
+            intermediaire: selectedInterm,
+            typeTerme: selectedType,
+          };
+      
+          if (!hasTerme) {
+            requestData.dateTerme = undefined;
+            requestData.typeTerme = null;
+          }
+      
+          const response = await axios.post('http://localhost:8081/polices/add', requestData);
+      
+          window.location.href = `/consult-page/${response.data.codePolice}`;
         } catch (error) {
-            console.error(error);
+          console.error(error);
         }
-    };
+      };
+      
     const formik = useFormik<PoliceData>({
         initialValues: {
           id: 0,
@@ -155,9 +170,9 @@ const isStepComplete = () => {
           raisonSociale: '',
           adresse: '',
           dateEffet: new Date(),
-          primeNette: BigInt(0),
-          taxe: BigInt(0),
-          acce: BigInt(0),
+          primeNette: 0.0,
+          taxe: 0.0,
+          acce: 0.0,
           tauxComm: 0.0,
           dateTerme: new Date(),
           dateEtat: new Date(),
@@ -169,6 +184,7 @@ const isStepComplete = () => {
           refPolice: { id: 0, libelle: '' },
           terme: 'O',
           periodicite: { id: 0, type_periodicite: '' },
+          typeTerme: { id: 0, terme: '' },
         },
         validationSchema: validationSchema,
         onSubmit: () => {
@@ -180,7 +196,8 @@ const isStepComplete = () => {
         <Box
   sx={{
     padding: '2rem',
-    marginTop: '0.2rem',
+    marginTop: '0.5rem',
+    marginBottom: '2rem',
     height: '38rem',
     backgroundColor: 'white',
     justifyContent: 'center',
@@ -215,9 +232,10 @@ const isStepComplete = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="codePolice"
-                            label="Code Police"
-                            value={policeData.codePolice}
-                            onChange={handleChange}
+                            label="Numéro de Police"
+                            value={formik.values.codePolice}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
                             required
@@ -226,7 +244,7 @@ const isStepComplete = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="prdVersioncommerciale"
-                            label="Version Commerciale"
+                            label="Produit"
                             value={selectedVersion ? selectedVersion.nomcommercial : ''}
                             onChange={handleVersionChange}
                             fullWidth
@@ -258,9 +276,10 @@ const isStepComplete = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="numClient"
-                            label="Num Client"
-                            value={policeData.numClient}
-                            onChange={handleChange}
+                            label="Numéro de Client"
+                            value={formik.values.numClient}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
                             required
@@ -270,8 +289,9 @@ const isStepComplete = () => {
                         <TextField
                             name="raisonSociale"
                             label="Raison Sociale"
-                            value={policeData.raisonSociale}
-                            onChange={handleChange}
+                            value={formik.values.raisonSociale}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
                             required
@@ -283,8 +303,9 @@ const isStepComplete = () => {
                             name="adresse"
                             variant="outlined"
                             label="Adresse"
-                            value={policeData.adresse}
-                            onChange={handleChange}
+                            value={formik.values.adresse}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
                             required
@@ -343,6 +364,7 @@ const isStepComplete = () => {
                             fullWidth
                             size="small"
                             required
+                            type='number'
                         />
                     </Grid>
                 
@@ -357,6 +379,7 @@ const isStepComplete = () => {
                             fullWidth
                             size="small"
                             required
+                            type='number'
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -370,6 +393,7 @@ const isStepComplete = () => {
                             fullWidth
                             size="small"
                             required
+                            type='number'
                         />
                     </Grid>
                     <Grid item xs={10} sm={4}>
@@ -383,6 +407,10 @@ const isStepComplete = () => {
                             fullWidth
                             size="small"
                             required
+                            type='number'
+                            inputProps={{
+                                min: 0,
+                              }}
                         />
                     </Grid>
                     <Grid item xs={2} sm={4}>
@@ -395,26 +423,49 @@ const isStepComplete = () => {
                         labelPlacement="start"
         />
                     </Grid>
+                    
                     {hasTerme && (
-                    <Grid item xs={12} sm={4}>
+                    <>
+                        <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateTerme"
                             label="Date Terme"
-                            value={policeData.dateTerme}
-                            onChange={handleChange}
+                            value={formik.values.dateTerme}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             type="date"
                             fullWidth
                             size="small"
                         />
-                    </Grid>
-                    )}
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                         <TextField
+                        name="typeTerme"
+                        label="Type Terme"
+                        value={selectedType ? selectedType.terme : ''}
+                        onChange={handleTypeChange}
+                        fullWidth
+                        select
+                        size="small"
+                        required
+                        >
+                        {TypesTerme.map((t) => (
+                            <MenuItem key={t.id} value={t.terme}>
+                            {t.terme}
+                            </MenuItem>
+                        ))}
+                        </TextField>    
+                                </Grid>
+                                </>
+                                )}
                     
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateEtat"
                             label="Date Etat"
-                            value={policeData.dateEtat}
-                            onChange={handleChange}
+                            value={formik.values.dateEtat}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             type="date"
                             size="small"
@@ -424,23 +475,27 @@ const isStepComplete = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="mnt_taxe_eve"
-                            label="Taxe EVE"
-                            value={policeData.mnt_taxe_eve}
-                            onChange={handleChange}
+                            label="Taxe événementielle"
+                            value={formik.values.mnt_taxe_eve}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
                             required
+                            type='number'
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="mnt_taxe_parafiscale"
                             label="Taxe Parafiscale"
-                            value={policeData.mnt_taxe_parafiscale}
-                            onChange={handleChange}
+                            value={formik.values.mnt_taxe_parafiscale}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
                             required
+                            type='number'
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -479,7 +534,7 @@ const isStepComplete = () => {
             </TextField> 
                     </Grid>
                 </Grid>
-                <div style={{ gap: '1.2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ marginTop:'1rem', gap: '1.2rem', display: 'flex', justifyContent: 'flex-end' }}>
         {activeStep !== 0 && (
           <Button variant="contained" color="primary" onClick={() => setActiveStep((prevActiveStep) => prevActiveStep - 1)}>
           <ArrowBackIcon /> Retour

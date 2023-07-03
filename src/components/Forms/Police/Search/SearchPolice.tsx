@@ -332,6 +332,10 @@ const Example = () => {
       width: '25ch',
     },
     marginLeft: '0.4rem',
+    height: '5rem',
+    display: 'flex',
+    justifyContent:'center',
+    alignItems:'center'
   }}
 >
 <Box sx={{ marginBottom: '2rem', marginLeft: '1rem' }}>
@@ -366,7 +370,7 @@ const Example = () => {
       id="outlined-basic"
       variant="outlined"
       size="small"
-      label="Version Commerciale"
+      label="Produit"
       value={selectedVersion ? selectedVersion.nomcommercial : ''}
       onChange={handleVersionChange}
       InputLabelProps={{
