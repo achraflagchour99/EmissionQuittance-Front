@@ -64,20 +64,28 @@ export const fetchRemise = async (idRemise: any) => {
   }
 }; 
 
-export const saveQuittanceGarantie = async (garanties: any) => { 
-  axios.post(`${config.apiUrl}/api/garantie-quittance/saveQuittanceGarantie`, garanties, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  .then(response => {
-    console.log(response); 
-  })
-  .catch(error => { 
-    console.log(error);
-  });
- 
-}; 
+export const saveQuittanceGarantie = async (garanties: any, quittance: any) => {
+  const requestData = {
+    Quittance: quittance,
+    jsonData: garanties,
+  };
+
+  console.log("Accepte " + garanties);
+  axios
+    .post(`${config.apiUrl}/api/garantie-quittance/saveQuittanceGarantie2`, requestData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      console.log(response);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};
+
+
 
 
 export const ExtractSaveQuittance = async (quittance: any) => { 

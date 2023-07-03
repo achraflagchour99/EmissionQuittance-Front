@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { jsonDataState } from '../recoil/atoms';
+import { jsonDataQuittance, jsonDataState } from '../recoil/atoms';
 import { saveQuittanceGarantie } from '../../../../api/service/provideData';
 import axios from 'axios';
 import Successful from '../../tools/successful';
@@ -10,12 +10,14 @@ import { Grid } from 'rsuite';
 
 function SuccessMessage() {
     const [jsonDataP, setJsonDataP] = useRecoilState(jsonDataState);
+    const [jsonQuittances, setJsonQuittance] = useRecoilState(jsonDataQuittance);
+
     const [saveStatus, setSaveStatus] = useState('');
     
     const handleClick = () => {
         // Function to handle the click event
 
-        saveQuittanceGarantie(jsonDataP)
+        saveQuittanceGarantie(jsonDataP,jsonQuittances)
         .then(() => {
             setSaveStatus('successful');
           })

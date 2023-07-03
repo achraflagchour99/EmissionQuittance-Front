@@ -50,7 +50,7 @@ function QuittanceAdd( ) {
      
     const jsonData = JSON.stringify(formData);
     setJsonQuittance(jsonData); 
-     ExtractSaveQuittance(jsonQuittances); 
+   //  ExtractSaveQuittance(jsonQuittances); 
   }
 
 
@@ -609,7 +609,7 @@ function QuittanceAdd( ) {
 
   <Grid item xs={12}>
     <Button variant="contained" color="primary" type="submit" onClick={extractSaveQuittance}>
-      Submit
+      Veuillez  Ajouter  la  quittance
     </Button>
 </Grid>
 </Grid>
