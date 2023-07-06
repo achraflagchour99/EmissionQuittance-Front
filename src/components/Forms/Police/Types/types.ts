@@ -27,6 +27,13 @@ export interface Ville {
     id: number;
     terme: string;
   }
+  export interface garantie {
+    id: number;
+    libelle: string;
+    taux: number;
+    datedebut: String;
+    datefin: String;
+  }
   export interface PoliceData {
     id: number;
     codePolice: string;

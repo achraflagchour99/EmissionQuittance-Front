@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState, ChangeEvent} from 'react';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-import { fetchVilles, fetchVersions} from '../Add/Api/policeApi';
-import { Ville, VersionCom} from '../Add/Types/types';
+import { fetchVilles, fetchVersions} from '../Api/policeApi';
+import { Ville, VersionCom} from '../Types/types';
 import MaterialReactTable, {
     type MaterialReactTableProps,
     type MRT_Cell,
@@ -335,7 +335,7 @@ const Example = () => {
     height: '5rem',
     display: 'flex',
     justifyContent:'center',
-    alignItems:'center'
+    alignItems:'center',
   }}
 >
 <Box sx={{ marginBottom: '2rem', marginLeft: '1rem' }}>
@@ -363,6 +363,7 @@ const Example = () => {
     InputLabelProps={{
         shrink: true,
     }}
+    inputProps={{ maxLength: 15 }}
     className="customTextField"
 />
 
@@ -420,8 +421,11 @@ const Example = () => {
                        marginRight:'2.5rem', 
                        marginBottom:'2rem', 
                        borderRadius: '5px',
-                       boxShadow: '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12)',
-                       }}>
+                       border: 2,
+                       borderColor: '#a7bcb9',
+                       boxShadow:
+                       '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
+                     }}>
             <div>
             {isLoading ? (
                 // Show the loading animation if isLoading is true

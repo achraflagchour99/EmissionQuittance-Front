@@ -14,8 +14,11 @@ import * as Yup from 'yup';
 import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import { useParams } from 'react-router-dom';
 
-const AddPolice: React.FC = () => {
+
+const UpdatePolice: React.FC = () => {
+    const { codePolice } = useParams();
     const [policeData, setPoliceData] = useState<PoliceData>({
         id: 0,
         codePolice: '',
@@ -56,7 +59,26 @@ const AddPolice: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
     const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
 
+    const fetchUpdateData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8081/polices/consult/${codePolice}`);
+          const fetchedPoliceData = response.data;
+          formik.setValues(fetchedPoliceData);
+          setPoliceData(fetchedPoliceData);
+          setSelectedVille(fetchedPoliceData.refVille || null);
+          setSelectedInterm(fetchedPoliceData.intermediaire || null);
+          setSelectedPeriode(fetchedPoliceData.periodicite || null);
+          setSelectedType(fetchedPoliceData.typeTerme || null);
+          setSelectedEtat(fetchedPoliceData.refPolice || null);
+          setSelectedVersion(fetchedPoliceData.prdVersioncommerciale || null)
+          console.log(formik.values);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+  
     useEffect(() => {
+    fetchUpdateData();
       fetchVilles(setVilles);
       fetchVersions(setVersions);
       fetchInterm(setIntermediaires);
@@ -583,5 +605,4 @@ const isStepComplete = () => {
     );
 };
 
-export default AddPolice;
-
+export default UpdatePolice;

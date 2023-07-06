@@ -22,6 +22,7 @@ import store from "./routage/store";
 import { Provider } from 'react-redux';
 import StepperQuittanceAdd from "./components/Forms/Quittance/Add/stepperQuittanceAdd";
 import { RecoilRoot } from "recoil";
+import UpdatePolice from "./components/Forms/Police/Update/UpdatePolice";
  
 
 
@@ -65,6 +66,7 @@ function App() {
                
                <Route path="police-add" element={<AddPolice />} />   
               <Route path="consult-page/:codePolice" element={<ConsultPolicePage />} />
+              <Route path="police-update/:codePolice" element={<UpdatePolice />} />
               <Route path="quittance-search" element={<Examples />} />
             </Route>
             <Route path="/loginUp" element={<SignUpSide />} />

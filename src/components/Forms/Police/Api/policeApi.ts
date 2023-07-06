@@ -1,8 +1,9 @@
 
 import axios from 'axios';
 import React from 'react';
-import { Ville, VersionCom, Interm, Period, EtatPolice, TypeTerme } from '../Types/types';
-import config from '../../../../../config/config';
+import { Ville, VersionCom, Interm, Period, EtatPolice, TypeTerme, PoliceData } from '../Types/types';
+import config from '../../../../config/config';
+
 
 export const fetchVilles = async (setVilles: React.Dispatch<React.SetStateAction<Ville[]>>) => {
     try {
