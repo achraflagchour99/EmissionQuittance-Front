@@ -63,7 +63,7 @@ function App() {
               {/* <Route path="quittance-add" element={<QuittanceAdd />} /> */} 
               
               <Route path="quittance-add" element={<StepperQuittanceAdd />} />
-              <Route path="quittance-update" element={<QuittanceUpdate />} />
+              <Route path="quittance-update/:codequittance" element={<QuittanceUpdate />} />
                <Route path="police-add" element={<AddPolice />} />   
               <Route path="consult-page/:codePolice" element={<ConsultPolicePage />} />
               <Route path="quittance-search" element={<Examples />} />

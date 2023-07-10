@@ -103,7 +103,17 @@ export const ExtractSaveQuittance = async (quittance: any) => {
  
 }; 
 
- 
+export const fetchQuittance = async (idQuittance: any) => {
+  const url = `${config.apiUrl}/quittances/qtc/${idQuittance}`;
+  try {
+    const response = await axios.get(url);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}; 
 
 
      

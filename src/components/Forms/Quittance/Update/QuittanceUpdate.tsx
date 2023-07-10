@@ -1,4 +1,5 @@
 import React, { useEffect,useState } from 'react' 
+import { useParams } from 'react-router-dom'
 import {
     Box,
     Button,
@@ -20,13 +21,16 @@ import {
     Tooltip,
 } from '@mui/material';
 import { Form  } from 'rsuite';
+import { Container } from 'react-bootstrap/lib/Tab';
+import { fetchQuittance } from '../../../../api/service/provideData';
+import QuittancePayload from '../Add/QuittancePayload';
 
 
  
 function QuittanceUpdate () {
 
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState ({
         exercice: "",
         ordre: "", 
         intermediaireid: 1,
@@ -35,7 +39,7 @@ function QuittanceUpdate () {
         habUtilisateurid: 5923310,
          policeid: 21,  
         versioncommerciale:9985338,
-        datedebut: "",
+        datedebut: "2023-06-08",
         datefin: "",
         tauxtaxe:0,
         montantaccessoire:0,
@@ -49,25 +53,49 @@ function QuittanceUpdate () {
         dateemission:"",
         numeroquittance:"",
         idCodePolice:0,
-        montontremise:0
+        montontremise:0,
+        police :{ codePolice: "" }
       
       });
+      const { codequittance } = useParams()
 
+
+      function provideDateQuittance(){
+       return fetchQuittance(codequittance);
+      }
+      const [quittance, setquittance] = useState<QuittancePayload[] | null>(null); 
+ 
+      useEffect(() => {
+        const fetchData = async () => {
+
+          const quittanceData = await fetchQuittance(codequittance);
+          setquittance(quittanceData);
+          setFormData(quittanceData)
+          
+        };
+    
+        fetchData();
+      }, [codequittance] );
+ 
+    
+     console.log(quittance ) 
+       
     return (
       <>
+     
      <Box>
-     <Form  >
-  
-  <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
+     <Form  > 
+  <Grid  container spacing={2} xs={12} sm={12}  sx={{  }} >
+    
+
      <Grid item xs={12} sm={4}>
        <TextField
          id="numeroquittance"
          name="numeroquittance"
          label="Numero quittance"
          variant="outlined"
-         placeholder="9900202308905182"
-         value={formData.numeroquittance}
-        
+         placeholder="9900202308905182" 
+        value={formData.numeroquittance}
          type="text"
          fullWidth
          InputLabelProps={{
@@ -82,7 +110,7 @@ function QuittanceUpdate () {
          name="idCodePolice"
          label="Numero police"
          variant="outlined"
-         value={formData.idCodePolice} 
+         value={formData.police.codePolice} 
          type="text" 
          fullWidth
          InputLabelProps={{
@@ -437,15 +465,14 @@ function QuittanceUpdate () {
 
 
  <Grid item xs={12}>
-   {/* <Button variant="contained" color="primary" type="submit" onClick={extractSaveQuittance}>
-     Veuillez  Ajouter  la  quittance
-   </Button> */}
+  
 
 <input color="primary" type="submit" value="Veuillez  Ajouter  la  quittance" />
 
 
 </Grid>
 </Grid>
+ 
 </Form>
     </Box>
  </>

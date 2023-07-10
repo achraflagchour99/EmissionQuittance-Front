@@ -1,4 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import { Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import MaterialReactTable, {
   MRT_ColumnFiltersState,
     type MaterialReactTableProps,
@@ -53,6 +55,7 @@ export type Person = {
 };
 
 const Examples = () => {
+  let navigate=useNavigate()
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [tableData, setTableData] = useState<Person[]>([]);
     const [validationErrors, setValidationErrors] = useState<{
@@ -345,7 +348,7 @@ const Examples = () => {
                 renderRowActions={({ row, table }) => (
                     <Box sx={{ display: 'flex', gap: '1rem' }}>
                         <Tooltip arrow placement="left" title="Edit">
-                            <IconButton onClick={() =>  alert(row.original.id)}>
+                            <IconButton onClick={() =>   navigate('/quittance-update/'+row.original.id)  }>
                                 <Edit />
                             </IconButton>
                         </Tooltip> 
