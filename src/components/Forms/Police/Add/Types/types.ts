@@ -32,9 +32,9 @@ export interface Ville {
     raisonSociale: string;
     adresse: string;
     dateEffet: Date;
-    primeNette: bigint;
-    taxe: bigint;
-    acce: bigint;
+    primeNette: number;
+    taxe: number;
+    acce: number; 
     tauxComm: number;
     dateTerme: Date;
     dateEtat: Date;

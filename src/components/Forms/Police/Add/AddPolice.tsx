@@ -1,5 +1,5 @@
 import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
-import {TextField, Button, Box, Checkbox, FormControlLabel, Typography} from '@mui/material';
+import {TextField, Button, Box, Checkbox, FormControlLabel, Typography, InputAdornment} from '@mui/material';
 import axios from 'axios';
 import Grid from "@mui/material/Grid";
 import "../Search/SearchPolice.css"
@@ -21,9 +21,9 @@ const AddPolice: React.FC = () => {
         raisonSociale: '',
         adresse: '',
         dateEffet: new Date(),
-        primeNette: BigInt(0),
-        taxe:  BigInt(0),
-        acce:  BigInt(0),
+        primeNette: 0.0,
+        taxe:  0,
+        acce:  0,
         tauxComm:  0.0,
         dateTerme: new Date(),
         dateEtat: new Date(),
@@ -92,11 +92,6 @@ const isStepComplete = () => {
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
           }
       };
-      const handleTaxeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const input = event.target.value;
-        const onlyNumbers = input.replace(/[^0-9]/g, ''); // Filtrer uniquement les chiffres
-        formik.setFieldValue('taxe', onlyNumbers);
-      };
     
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
@@ -155,9 +150,9 @@ const isStepComplete = () => {
           raisonSociale: '',
           adresse: '',
           dateEffet: new Date(),
-          primeNette: BigInt(0),
-          taxe: BigInt(0),
-          acce: BigInt(0),
+          primeNette: 0.00,
+          taxe: 0.00,
+          acce: 0.00,
           tauxComm: 0.0,
           dateTerme: new Date(),
           dateEtat: new Date(),
@@ -343,6 +338,10 @@ const isStepComplete = () => {
                             fullWidth
                             size="small"
                             required
+                            type='number'
+                            inputProps={{
+                                pattern: "\\d+(\\.\\d{0,2})?", // Pattern pour permettre uniquement des valeurs décimales avec au maximum deux chiffres après le point
+                              }}
                         />
                     </Grid>
                 
@@ -350,11 +349,12 @@ const isStepComplete = () => {
                         <TextField
                             name="taxe"
                             label={formik.touched.taxe && formik.errors.taxe ? 'La taxe dépasse 15% du montant de la prime.' : 'Taxe'}
-                            value={formik.values.taxe}
-                            onChange={handleTaxeChange}
+                            value={formik.values.taxe   }
+                            onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.taxe && formik.errors.taxe ? true : false}
                             fullWidth
+                            type='number'
                             size="small"
                             required
                         />
@@ -368,6 +368,7 @@ const isStepComplete = () => {
                             onBlur={formik.handleBlur}
                             error={formik.touched.acce && formik.errors.acce ? true : false}
                             fullWidth
+                            type='number'
                             size="small"
                             required
                         />
@@ -381,8 +382,15 @@ const isStepComplete = () => {
                             onBlur={formik.handleBlur}
                             error={formik.touched.tauxComm && formik.errors.tauxComm ? true : false}
                             fullWidth
+                            type='number'
                             size="small"
                             required
+                            inputProps={{
+                                min: "0",
+                              }}
+                            InputProps={{
+                                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              }}
                         />
                     </Grid>
                     <Grid item xs={2} sm={4}>
@@ -425,9 +433,11 @@ const isStepComplete = () => {
                         <TextField
                             name="mnt_taxe_eve"
                             label="Taxe EVE"
-                            value={policeData.mnt_taxe_eve}
-                            onChange={handleChange}
+                            value={formik.values.mnt_taxe_eve}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
+                            type='number'
                             size="small"
                             required
                         />
@@ -436,9 +446,11 @@ const isStepComplete = () => {
                         <TextField
                             name="mnt_taxe_parafiscale"
                             label="Taxe Parafiscale"
-                            value={policeData.mnt_taxe_parafiscale}
-                            onChange={handleChange}
+                            value={formik.values.mnt_taxe_parafiscale}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
+                            type='number'
                             size="small"
                             required
                         />
