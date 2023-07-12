@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState, ChangeEvent} from 'react';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-import { fetchVilles, fetchVersions} from '../Add/Api/policeApi';
-import { Ville, VersionCom} from '../Add/Types/types';
+import { fetchVilles, fetchVersions} from '../Api/policeApi';
+import { Ville, VersionCom} from '../Types/types';
 import MaterialReactTable, {
     type MaterialReactTableProps,
     type MRT_Cell,
@@ -28,6 +28,8 @@ import "./SearchPolice.css"
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {Link} from "react-router-dom";
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
+
 
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
 
@@ -54,11 +56,9 @@ export type Police = {
     refPolice: Etat;
 };
 
-const Example = () => {
+const SearchPolice = () => {
     const [numClient, setNumeroClient] = useState('');
     const [codePolice, setCodePolice] = useState('');
-    const [nomcommercial, setNomCommercial] = useState('');
-    const [ville, setVille] = useState('');
     const [villes, setVilles] = useState<Ville[]>([]);
     const [versions, setVersions] = useState<VersionCom[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +99,14 @@ const Example = () => {
                 exitEditingMode(); //required to exit editing mode and close modal
             }
         };
+        const navigate = useNavigate();
+
+        const handleSetEditingRow = (row: any) => {
+          const codePolice = row.original.codePolice;
+          // Redirect to the update component with the codePolice as a URL parameter
+          navigate(`/police-update/${codePolice}`);
+        };
+          
     const fetchTableData = async (pageIndex: number, pageSize: number) => {
         setIsLoading(true);
         try {
@@ -332,6 +340,10 @@ const Example = () => {
       width: '25ch',
     },
     marginLeft: '0.4rem',
+    height: '5rem',
+    display: 'flex',
+    justifyContent:'center',
+    alignItems:'center',
   }}
 >
 <Box sx={{ marginBottom: '2rem', marginLeft: '1rem' }}>
@@ -359,6 +371,7 @@ const Example = () => {
     InputLabelProps={{
         shrink: true,
     }}
+    inputProps={{ maxLength: 15 }}
     className="customTextField"
 />
 
@@ -366,7 +379,7 @@ const Example = () => {
       id="outlined-basic"
       variant="outlined"
       size="small"
-      label="Version Commerciale"
+      label="Produit"
       value={selectedVersion ? selectedVersion.nomcommercial : ''}
       onChange={handleVersionChange}
       InputLabelProps={{
@@ -416,9 +429,12 @@ const Example = () => {
                        marginRight:'2.5rem', 
                        marginBottom:'2rem', 
                        borderRadius: '5px',
-                       boxShadow: '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12)',
-                       }}>
-            <div>
+                       border: 2,
+                       borderColor: '#a7bcb9',
+                       boxShadow:
+                       '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
+                     }}>
+            <Box>
             {isLoading ? (
                 // Show the loading animation if isLoading is true
                 <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
@@ -448,7 +464,7 @@ const Example = () => {
                 renderRowActions={({ row, table }) => (
                     <Box sx={{ display: 'flex', gap: '1rem' }}>
                         <Tooltip arrow placement="left" title="Modifier">
-                            <IconButton onClick={() => table.setEditingRow(row)}>
+                            <IconButton onClick={() => handleSetEditingRow(row)}>
                                 <Edit />
                             </IconButton>
                         </Tooltip>
@@ -472,7 +488,7 @@ const Example = () => {
                 )}
             />
             )}
-            </div>
+            </Box>
             </Box>
             <CreateNewAccountModal
                 columns={columns}
@@ -557,4 +573,4 @@ const validateEmail = (email: string) =>
         );
 const validateAge = (age: number) => age >= 18 && age <= 50;
 
-export default Example;
+export default SearchPolice;

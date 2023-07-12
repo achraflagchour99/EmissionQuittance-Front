@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from "./pages/Dashboard";
 import SearchPolice from "./components/Forms/Police/Search/SearchPolice";
 import Searchpolicepage from "./pages/Searchpolicepage";
-import ConsultPolicePage from "./pages/ConsultPolicePage";
+import ConsultPolicePage from "./components/Forms/Police/Consult/Consult";
 import AddPolice from "./components/Forms/Police/Add/AddPolice";
 import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
@@ -62,9 +62,10 @@ function App() {
               {/* <Route path="quittance-add" element={<QuittanceAdd />} /> */} 
               
               <Route path="quittance-add" element={<StepperQuittanceAdd />} />
-               
+              <Route path="quittance-update/:codequittance" element={<QuittanceUpdate />} />
                <Route path="police-add" element={<AddPolice />} />   
               <Route path="consult-page/:codePolice" element={<ConsultPolicePage />} />
+              <Route path="police-update/:codePolice" element={<UpdatePolice />} />
               <Route path="quittance-search" element={<Examples />} />
             </Route>
             <Route path="/loginUp" element={<SignUpSide />} />

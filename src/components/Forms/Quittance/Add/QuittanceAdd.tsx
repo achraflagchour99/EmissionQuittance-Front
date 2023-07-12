@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import {  Grid, Box,Paper, InputLabel, FormControl, NativeSelect, TableBody, TableContainer, TableHead, TableRow  } from '@mui/material';
 import {  Typography, MenuItem, Select,Divider  } from '@mui/material';
 import axios from 'axios';  
-import { SelectPicker, Table } from 'rsuite';
+import { Form, SelectPicker, Table } from 'rsuite';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import {
     fetchIntermediaires,
@@ -45,12 +45,23 @@ function QuittanceAdd( ) {
   };
 
 
-  const extractSaveQuittance = () => {
- //   console.log(formData)
-     
-    const jsonData = JSON.stringify(formData);
-    setJsonQuittance(jsonData); 
-     ExtractSaveQuittance(jsonQuittances); 
+  const extractSaveQuittance = () => { 
+    
+    try{
+      const dateDebut = new Date(formData.datedebut);
+      const dateFin = new Date(formData.datefin);
+  
+    if(dateDebut < dateFin){
+      const jsonData = JSON.stringify(formData);
+      setJsonQuittance(jsonData);  
+    }else{
+      toast.error('Date date debut ne  doit pas etre  inferrieur au  date  fin !', { position: toast.POSITION.TOP_RIGHT });
+    }}
+    catch(error)   { 
+      console.log(error);
+      toast.error('Erreur lors de la requête !', { position: toast.POSITION.TOP_RIGHT });
+    };
+    
   }
 
 
@@ -221,7 +232,7 @@ function QuittanceAdd( ) {
   </Typography>
 
 
-
+<Form  onSubmit={extractSaveQuittance}>
   
    <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
       <Grid item xs={12} sm={4}>
@@ -603,17 +614,20 @@ function QuittanceAdd( ) {
           />
           </Grid>
 
-          {/* <QuittanceGarantie  CodePolice={formData.idCodePolice}/> */}
-
+         
 
 
   <Grid item xs={12}>
-    <Button variant="contained" color="primary" type="submit" onClick={extractSaveQuittance}>
-      Submit
-    </Button>
+    {/* <Button variant="contained" color="primary" type="submit" onClick={extractSaveQuittance}>
+      Veuillez  Ajouter  la  quittance
+    </Button> */}
+
+<input color="primary" type="submit" value="Veuillez  Ajouter  la  quittance" />
+
+
 </Grid>
 </Grid>
- 
+</Form>
 
 </Box>
 

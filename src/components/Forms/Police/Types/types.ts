@@ -23,7 +23,17 @@ export interface Ville {
     id: number;
     libelle: string;
   }
-  
+  export interface TypeTerme {
+    id: number;
+    terme: string;
+  }
+  export interface garantie {
+    id: number;
+    libelle: string;
+    taux: number;
+    datedebut: String;
+    datefin: String;
+  }
   export interface PoliceData {
     id: number;
     codePolice: string;
@@ -34,9 +44,9 @@ export interface Ville {
     dateEffet: Date;
     primeNette: number;
     taxe: number;
-    acce: number; 
+    acce: number;
     tauxComm: number;
-    dateTerme: Date;
+    dateTerme?: Date;
     dateEtat: Date;
     periodicite: Period;
     dateEcheance: Date;
@@ -46,5 +56,6 @@ export interface Ville {
     refVille: Ville;
     refPolice: EtatPolice;
     terme: string;
+    typeTerme?: TypeTerme; 
   }
   

@@ -18,7 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateIcon from '@mui/icons-material/Update';
 import ManageSearchRoundedIcon from '@mui/icons-material/ManageSearchRounded';
 import IconButton from "@mui/material/IconButton";
-import ConsultPolicePage from "../../pages/ConsultPolicePage";
+import ConsultPolicePage from "./Police/Consult/Consult";
 import {Link} from "react-router-dom";
 
 
