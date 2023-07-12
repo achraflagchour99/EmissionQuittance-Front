@@ -1,4 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import { Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import MaterialReactTable, {
   MRT_ColumnFiltersState,
     type MaterialReactTableProps,
@@ -53,6 +55,7 @@ export type Person = {
 };
 
 const Examples = () => {
+  let navigate=useNavigate()
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [tableData, setTableData] = useState<Person[]>([]);
     const [validationErrors, setValidationErrors] = useState<{
@@ -89,15 +92,7 @@ const Examples = () => {
     };
 
 
-    const handleSaveRowEdits: MaterialReactTableProps<Person>['onEditingRowSave'] =
-        async ({ exitEditingMode, row, values }) => {
-            if (!Object.keys(validationErrors).length) {
-                tableData[row.index] = values;
-                //send/receive api updates here, then refetch or update local table data for re-render
-                setTableData([...tableData]);
-                exitEditingMode(); //required to exit editing mode and close modal
-            }
-        };
+   
         const [responseData, setResponseData] = useState<any>(null);
        
     const fetchTableData = async (pageIndex: number, pageSize: number) => {
@@ -150,9 +145,7 @@ const Examples = () => {
 
 
 
-    const handleCancelRowEdits = () => {
-        setValidationErrors({});
-    };
+    
 
     
 
@@ -206,6 +199,7 @@ const Examples = () => {
                 size: 80,
                 
             },
+                
         ],
         [],
     );
@@ -308,7 +302,7 @@ const Examples = () => {
           </Grid>
           <Grid item xs={12}>
             <Button onClick={handleSearchClick} variant="contained" color="primary">
-              Rechercher
+              Rechercher  
             </Button>
           </Grid>
         </Grid>
@@ -350,21 +344,14 @@ const Examples = () => {
 
                 editingMode="modal" //default
                 enableColumnOrdering
-                enableEditing
-                onEditingRowSave={handleSaveRowEdits}
-                onEditingRowCancel={handleCancelRowEdits}
+                enableEditing  
                 renderRowActions={({ row, table }) => (
                     <Box sx={{ display: 'flex', gap: '1rem' }}>
                         <Tooltip arrow placement="left" title="Edit">
-                            <IconButton onClick={() => table.setEditingRow(row)}>
+                            <IconButton onClick={() =>   navigate('/quittance-update/'+row.original.id)  }>
                                 <Edit />
                             </IconButton>
-                        </Tooltip>
-                        <Tooltip arrow placement="right" title="Delete">
-                            <IconButton color="error" onClick={() => handleDeleteRow(row)}>
-                                <Delete />
-                            </IconButton>
-                        </Tooltip>
+                        </Tooltip> 
                     </Box>
                 )}
         

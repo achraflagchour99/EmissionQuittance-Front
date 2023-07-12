@@ -241,8 +241,7 @@ const QuittanceGarantie = (props: any) => {
             </TableRow>
           </TableBody>
         </Table>
-      </TableContainer>
-      <button onClick={saveJsonData}>Save JSON Data</button>
+      </TableContainer> 
     </div>
   );
 };
