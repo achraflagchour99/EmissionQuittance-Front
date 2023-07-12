@@ -1,5 +1,5 @@
 import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
-import {TextField, Button, Box, Checkbox, FormControlLabel, Typography, Divider} from '@mui/material';
+import {TextField, Button, Box, Checkbox, FormControlLabel, Typography, Divider, CircularProgress} from '@mui/material';
 import axios from 'axios';
 import Grid from "@mui/material/Grid";
 import "../Search/SearchPolice.css"
@@ -15,6 +15,7 @@ import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import { useParams } from 'react-router-dom';
+import { format, parseISO } from 'date-fns';
 
 
 const UpdatePolice: React.FC = () => {
@@ -43,48 +44,56 @@ const UpdatePolice: React.FC = () => {
         periodicite: {id: 0, type_periodicite: ''},
         typeTerme: {id: 0, terme: ''},
     });
-    const [hasTerme, setHasTerme] = useState(false);
+    const [hasTerme, setHasTerme] = useState(policeData.terme === 'O');
     const [villes, setVilles] = useState<Ville[]>([]);
     const [versions, setVersions] = useState<VersionCom[]>([]);
     const [intermediaires, setIntermediaires] = useState<Interm[]>([]);
     const [periodicites, setPeriodicites] = useState<Period[]>([]);
     const [Etats, setEtats] = useState<EtatPolice[]>([]);   
     const [TypesTerme, setTypesTerme] = useState<TypeTerme[]>([]);
-    const [selectedType, setSelectedType] = useState<TypeTerme | null>(null);
     const [selectedVille, setSelectedVille] = useState<Ville | null>(null);
     const [selectedVersion, setSelectedVersion] = useState<VersionCom | null>(null);
     const [selectedInterm, setSelectedInterm] = useState<Interm | null>(null);
     const [selectedPeriode, setSelectedPeriode] = useState<Period | null>(null);
     const [selectedEtat, setSelectedEtat] = useState<EtatPolice | null>(null);
+    const [selectedType, setSelectedType] = useState<TypeTerme | null>(null);
     const [activeStep, setActiveStep] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
     const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
 
     const fetchUpdateData = async () => {
         try {
+          setIsLoading(true);
           const response = await axios.get(`http://localhost:8081/polices/consult/${codePolice}`);
           const fetchedPoliceData = response.data;
+          setSelectedVille(fetchedPoliceData.refVille);
+          setSelectedInterm(fetchedPoliceData.intermediaire);
+          setSelectedPeriode(fetchedPoliceData.periodicite);
+          setSelectedType(fetchedPoliceData.typeTerme);
+          setSelectedEtat(fetchedPoliceData.refPolice);
+          setSelectedVersion(fetchedPoliceData.prdVersioncommerciale);
+          fetchedPoliceData.dateEffet = format(new Date(fetchedPoliceData.dateEffet), 'yyyy-MM-dd');
+          fetchedPoliceData.dateTerme = format(new Date(fetchedPoliceData.dateTerme), 'yyyy-MM-dd');
+          fetchedPoliceData.dateEtat = format(new Date(fetchedPoliceData.dateEtat), 'yyyy-MM-dd');
+          fetchedPoliceData.dateEcheance = format(new Date(fetchedPoliceData.dateEcheance), 'yyyy-MM-dd');
           formik.setValues(fetchedPoliceData);
-          setPoliceData(fetchedPoliceData);
-          setSelectedVille(fetchedPoliceData.refVille || null);
-          setSelectedInterm(fetchedPoliceData.intermediaire || null);
-          setSelectedPeriode(fetchedPoliceData.periodicite || null);
-          setSelectedType(fetchedPoliceData.typeTerme || null);
-          setSelectedEtat(fetchedPoliceData.refPolice || null);
-          setSelectedVersion(fetchedPoliceData.prdVersioncommerciale || null)
-          console.log(formik.values);
         } catch (error) {
           console.error(error);
-        }
+        } finally {
+          setIsLoading(false);
+      }
+
       };
   
     useEffect(() => {
-    fetchUpdateData();
+      
       fetchVilles(setVilles);
       fetchVersions(setVersions);
       fetchInterm(setIntermediaires);
       fetchPeriodes(setPeriodicites);
       fetchEtats(setEtats);
       fetchTypesTermes(setTypesTerme);
+      fetchUpdateData();
     }, []);
 
 
@@ -129,7 +138,7 @@ const isStepComplete = () => {
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
         setHasTerme(checked);
-        formik.values.terme='N';
+        formik.setFieldValue('terme', checked ? 'O' : 'N');
     };
     const handleVilleChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedVilleLibelle = event.target.value as string;
@@ -162,29 +171,29 @@ const isStepComplete = () => {
         setSelectedType(type || null);
     };
     const handleSubmit = async () => {
-        try {
-          const requestData = {
-            ...formik.values,
-            refVille: selectedVille,
-            refPolice: selectedEtat,
-            periodicite: selectedPeriode,
-            prdVersioncommerciale: selectedVersion,
-            intermediaire: selectedInterm,
-            typeTerme: selectedType,
-          };
-      
-          if (!hasTerme) {
-            requestData.dateTerme = undefined;
-            requestData.typeTerme = null;
-          }
-      
-          const response = await axios.post('http://localhost:8081/polices/add', requestData);
-      
-          window.location.href = `/consult-page/${response.data.codePolice}`;
-        } catch (error) {
-          console.error(error);
-        }
-      };
+  try {
+    const requestData = {
+      ...formik.values,
+      refVille: selectedVille,
+      refPolice: selectedEtat,
+      periodicite: selectedPeriode,
+      prdVersioncommerciale: selectedVersion,
+      intermediaire: selectedInterm,
+      typeTerme: selectedType,
+    };
+
+    if (!hasTerme) {
+      requestData.dateTerme = undefined;
+      requestData.typeTerme = null;
+    }
+
+    await axios.put(`http://localhost:8081/polices/${codePolice}`, requestData);
+
+    window.location.href = `/consult-page/${requestData.codePolice}`;
+  } catch (error) {
+    console.error(error);
+  }
+};
       
     const formik = useFormik<PoliceData>({
         initialValues: {
@@ -218,6 +227,13 @@ const isStepComplete = () => {
           },
         });
     return (
+      <Box>
+            {isLoading ? (
+                // Show the loading animation if isLoading is true
+                <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                    <CircularProgress />
+                </div>
+            ) : (        
         <Box
         sx={{
           padding: '2rem',
@@ -265,7 +281,7 @@ const isStepComplete = () => {
                         <TextField
                             name="codePolice"
                             label="Numéro de Police"
-                            value={formik.values.codePolice}
+                            value={formik.values?.codePolice}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -276,33 +292,35 @@ const isStepComplete = () => {
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <TextField
-                            name="prdVersioncommerciale"
-                            label="Produit"
-                            value={selectedVersion ? selectedVersion.nomcommercial : ''}
-                            onChange={handleVersionChange}
-                            fullWidth
-                            select
-                            size="small"
-                        > {versions.map((v) => (
+                     <TextField
+                      name="prdVersioncommerciale"
+                      label="Produit"
+                      value={selectedVersion ? selectedVersion.nomcommercial : ''}
+                      onChange={handleVersionChange}
+                      fullWidth
+                      select
+                      size="small"
+                    >
+                      {versions.map((v) => (
                         <MenuItem key={v.id} value={v.nomcommercial}>
-                            {v.nomcommercial}
+                          {v.nomcommercial}
                         </MenuItem>
-                    ))}
-                        </TextField>
+                      ))}
+                    </TextField>
+
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="intermediaire"
                             label="Intermédiaire"
-                            value={selectedInterm ? selectedInterm.nomCommercial : ''}
+                            value={selectedInterm ? selectedInterm?.nomCommercial : ''}
                             onChange={handleIntermChange}
                             fullWidth
                             select
                             size="small"
-                        > {intermediaires.map((i) => (
-                        <MenuItem key={i.id} value={i.nomCommercial}>
-                            {i.nomCommercial}
+                        > {intermediaires.map((i?) => (
+                        <MenuItem key={i?.id} value={i?.nomCommercial}>
+                            {i?.nomCommercial}
                         </MenuItem>
                     ))}
                         </TextField>
@@ -311,7 +329,7 @@ const isStepComplete = () => {
                         <TextField
                             name="numClient"
                             label="Code Client"
-                            value={formik.values.numClient}
+                            value={formik.values?.numClient}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -323,7 +341,7 @@ const isStepComplete = () => {
                         <TextField
                             name="raisonSociale"
                             label="Raison Sociale"
-                            value={formik.values.raisonSociale}
+                            value={formik.values?.raisonSociale}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -337,7 +355,7 @@ const isStepComplete = () => {
                             name="adresse"
                             variant="outlined"
                             label="Adresse"
-                            value={formik.values.adresse}
+                            value={formik.values?.adresse}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -349,16 +367,17 @@ const isStepComplete = () => {
                          <TextField
               name="refVille"
               label="Ville"
-              value={selectedVille ? selectedVille.libelle : ''}
+              value={selectedVille ? selectedVille?.libelle : ''}
               onChange={handleVilleChange}
               fullWidth
               select
               size="small"
               required
             >
-              {villes.map((ville) => (
-                <MenuItem key={ville.id} value={ville.libelle}>
-                  {ville.libelle}
+              {villes.length > 0 && 
+              villes.map((ville?) => (
+                <MenuItem key={ville?.id} value={ville?.libelle}>
+                  {ville?.libelle}
                 </MenuItem>
               ))}
             </TextField>    
@@ -367,7 +386,7 @@ const isStepComplete = () => {
                         <TextField
                             name="dateEffet"
                             onChange={formik.handleChange}
-                            value={formik.values.dateEffet}
+                            value={formik.values?.dateEffet}
                             onBlur={formik.handleBlur}
                             label={formik.touched.dateEcheance && formik.errors.dateEcheance ? 'La date du prochaine échéance doit être supérieure à la date effet' : 'Date Effet'}
                             error={formik.touched.dateEcheance && formik.errors.dateEcheance ? true : false}
@@ -381,14 +400,15 @@ const isStepComplete = () => {
                         <TextField
                             name="periodicite"
                             label="Periodicité"
-                            value={selectedPeriode ? selectedPeriode.type_periodicite : ''}
+                            value={selectedPeriode ? selectedPeriode?.type_periodicite : ''}
                             onChange={handlePeriodeChange}
                             fullWidth
                             select
                             size="small"
-                            > {periodicites.map((p) => (
-                                <MenuItem key={p.id} value={p.type_periodicite}>
-                                    {p.type_periodicite}
+                            > { periodicites.length > 0 && 
+                              periodicites.map((p) => (
+                                <MenuItem key={p?.id} value={p?.type_periodicite}>
+                                    {p?.type_periodicite}
                                 </MenuItem>
                             ))}
                                 </TextField>
@@ -397,7 +417,7 @@ const isStepComplete = () => {
                         <TextField
                             name="dateEcheance"
                             label={formik.touched.dateEcheance && formik.errors.dateEcheance ? 'La date du prochaine échéance doit être supérieure à la date effet' : 'Date prochaine échéance'}
-                            value={formik.values.dateEcheance}
+                            value={formik.values?.dateEcheance}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.dateEcheance && formik.errors.dateEcheance ? true : false}
@@ -423,7 +443,7 @@ const isStepComplete = () => {
                         <TextField
                             name="dateTerme"
                             label="Date Terme"
-                            value={formik.values.dateTerme}
+                            value={formik.values?.dateTerme}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             type="date"
@@ -435,16 +455,17 @@ const isStepComplete = () => {
                          <TextField
                         name="typeTerme"
                         label="Type Terme"
-                        value={selectedType ? selectedType.terme : ''}
+                        value={selectedType?.terme || ''}
                         onChange={handleTypeChange}
                         fullWidth
                         select
                         size="small"
                         required
                         >
-                        {TypesTerme.map((t) => (
-                            <MenuItem key={t.id} value={t.terme}>
-                            {t.terme}
+                        {versions.length > 0 && 
+                        TypesTerme.map((t) => (
+                            <MenuItem key={t?.id} value={t?.terme}>
+                            {t?.terme}
                             </MenuItem>
                         ))}
                         </TextField>    
@@ -457,7 +478,7 @@ const isStepComplete = () => {
                         <TextField
                             name="primeNette"
                             label="Prime Nette"
-                            value={formik.values.primeNette}
+                            value={formik.values?.primeNette}
                             onBlur={formik.handleBlur}
                             onChange={formik.handleChange}
                             fullWidth
@@ -471,7 +492,7 @@ const isStepComplete = () => {
                         <TextField
                             name="taxe"
                             label={formik.touched.taxe && formik.errors.taxe ? 'La taxe dépasse 15% du montant de la prime.' : 'Taxe'}
-                            value={formik.values.taxe}
+                            value={formik.values?.taxe}
                             onChange={handleTaxeChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.taxe && formik.errors.taxe ? true : false}
@@ -485,7 +506,7 @@ const isStepComplete = () => {
                         <TextField
                             name="acce"
                             label={formik.touched.acce && formik.errors.acce ? 'La valeur des accessoires doit être 0, 10, 15, 20 ou 30' : 'Accessoires'}
-                            value={formik.values.acce}
+                            value={formik.values?.acce}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.acce && formik.errors.acce ? true : false}
@@ -499,7 +520,7 @@ const isStepComplete = () => {
                         <TextField
                             name="tauxComm"
                             label={formik.touched.tauxComm && formik.errors.tauxComm ? 'Le taux de commission ne doit pas dépasser 25%.' : 'Taux de commission'}
-                            value={formik.values.tauxComm}
+                            value={formik.values?.tauxComm}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.tauxComm && formik.errors.tauxComm ? true : false}
@@ -516,7 +537,7 @@ const isStepComplete = () => {
                         <TextField
                             name="mnt_taxe_eve"
                             label="Taxe événementielle"
-                            value={formik.values.mnt_taxe_eve}
+                            value={formik.values?.mnt_taxe_eve}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -529,7 +550,7 @@ const isStepComplete = () => {
                         <TextField
                             name="mnt_taxe_parafiscale"
                             label="Taxe Parafiscale"
-                            value={formik.values.mnt_taxe_parafiscale}
+                            value={formik.values?.mnt_taxe_parafiscale}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -544,14 +565,14 @@ const isStepComplete = () => {
                         <TextField
                             name="refPolice"
                             label="Etat de Police"
-                            value={selectedEtat ? selectedEtat.libelle : ''}
+                            value={selectedEtat ? selectedEtat?.libelle : ''}
                             onChange={handleEtatChange}
                             fullWidth
                             select
                             size="small"
                         >
                              {Etats.map((e) => (
-                <MenuItem key={e.id} value={e.libelle}>
+                <MenuItem key={e?.id} value={e?.libelle}>
                   {e.libelle}
                 </MenuItem>
               ))}
@@ -561,7 +582,7 @@ const isStepComplete = () => {
                         <TextField
                             name="dateEtat"
                             label="Date Etat"
-                            value={formik.values.dateEtat}
+                            value={formik.values?.dateEtat}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             fullWidth
@@ -598,9 +619,11 @@ const isStepComplete = () => {
         type="submit"
         onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
       >
-        {activeStep === steps.length - 1 ? 'Ajouter' : 'Suivant'} <KeyboardArrowRight />
+        {activeStep === steps.length - 1 ? 'Enregistrer' : 'Suivant'} <KeyboardArrowRight />
       </Button>
     </div>
+        </Box>
+        )}
         </Box>
     );
 };

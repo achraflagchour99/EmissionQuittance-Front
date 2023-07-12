@@ -94,9 +94,9 @@ const isStepComplete = () => {
         }));
       };
       const handleNext = () => {
-        //if (formik.isValid && isStepComplete()) {
+        if (formik.isValid && isStepComplete()) {
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
-          //}
+        }
       };
       const handleTaxeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const input = event.target.value;

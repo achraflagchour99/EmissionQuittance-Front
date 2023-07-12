@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from "./pages/Dashboard";
 import SearchPolice from "./components/Forms/Police/Search/SearchPolice";
 import Searchpolicepage from "./pages/Searchpolicepage";
-import ConsultPolicePage from "./pages/ConsultPolicePage";
+import ConsultPolicePage from "./components/Forms/Police/Consult/Consult";
 import AddPolice from "./components/Forms/Police/Add/AddPolice";
 import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
