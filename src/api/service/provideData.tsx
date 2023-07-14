@@ -116,6 +116,19 @@ export const fetchQuittance = async (idQuittance: any) => {
 }; 
 
 
+export const fetchGarantieToEachQuittance = async (idQuittance: any) => {
+  const url = `${config.apiUrl}/api/garantie-quittance/quittance/${idQuittance}/garantie`;
+  try {
+    const response = await axios.get(url);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+
      
 
  
