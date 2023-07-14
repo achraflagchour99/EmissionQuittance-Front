@@ -1,5 +1,6 @@
 import React, { useEffect,useState } from 'react' 
 import { useParams } from 'react-router-dom'
+import  PrintIcon from '@mui/icons-material/Print';
 import {
     Box,
     Button,
@@ -22,9 +23,16 @@ import {
 } from '@mui/material';
 import { Form  } from 'rsuite';
 import { Container } from 'react-bootstrap/lib/Tab';
-import { fetchQuittance } from '../../../../api/service/provideData';
+import { fetchGarantieToEachQuittance, fetchQuittance } from '../../../../api/service/provideData';
 import QuittancePayload from '../Add/QuittancePayload';
-
+import { QuittanceDetailGarantiePayload } from '../../../../api/interface/QuittanceDetailGarantiePayload';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
  
 function QuittanceUpdate () {
@@ -54,7 +62,8 @@ function QuittanceUpdate () {
         numeroquittance:"",
         idCodePolice:0,
         montontremise:0,
-        police :{ codePolice: "" }
+        etatquittance:"",
+        police :{ codePolice: "" ,intermediaire:{nomCommercial:""},prdVersioncommerciale:{nomcommercial:""}}
       
       });
       const { codequittance } = useParams()
@@ -64,27 +73,48 @@ function QuittanceUpdate () {
        return fetchQuittance(codequittance);
       }
       const [quittance, setquittance] = useState<QuittancePayload[] | null>(null); 
+      const [quittanceGarantie, setquittancegarantie] = useState<QuittanceDetailGarantiePayload[]   >( ); 
+       
  
       useEffect(() => {
         const fetchData = async () => {
 
           const quittanceData = await fetchQuittance(codequittance);
           setquittance(quittanceData);
-          setFormData(quittanceData)
+          setFormData(quittanceData);
+          const quittanceGarantieData = await fetchGarantieToEachQuittance(codequittance);
+          setquittancegarantie(quittanceGarantieData);
           
         };
     
         fetchData();
       }, [codequittance] );
  
-    
-     console.log(quittance ) 
+    console.log("test")
+     console.log(quittance) 
+     const handlePrint = () => {
+        const printableContent = document.getElementById('printable-content');
+        if (printableContent) {
+          const originalContent = document.body.innerHTML;
+          document.body.innerHTML = printableContent.innerHTML;
+          window.print();
+          document.body.innerHTML = originalContent;
+        } else {
+          console.error('Printable content not found');
+        }
+      };
+      
+      
+
        
     return (
       <>
      
-     <Box>
-     <Form  > 
+     <Box  sx={{ margin: '2rem', padding: '1rem', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
+     <Form  id="printable-content" > 
+     <Grid item xs={12} sm={4}>
+        <h1>Quittance</h1>
+        </Grid>
   <Grid  container spacing={2} xs={12} sm={12}  sx={{  }} >
     
 
@@ -110,7 +140,7 @@ function QuittanceUpdate () {
          name="idCodePolice"
          label="Numero police"
          variant="outlined"
-         value={formData.police.codePolice} 
+         value={formData?.police.codePolice} 
          type="text" 
          fullWidth
          InputLabelProps={{
@@ -123,25 +153,18 @@ function QuittanceUpdate () {
 
 
      <Grid item xs={12} sm={4}>
-     <FormControl fullWidth>
- <InputLabel variant="standard" htmlFor="uncontrolled-native">
- Version commerciale
- </InputLabel>
- {/* <NativeSelect 
-      id="versioncommerciale"
-      name="versioncommerciale" 
-      variant="outlined"
-      value={formData.versioncommerciale} 
- > 
- <option  > Selectionner Version comm </option>
-  
-   {versionsCommerciales?.map((versionsCommerciale: any) => (
-     
-           <option key={versionsCommerciale.id} value={versionsCommerciale.id}>{versionsCommerciale.nomcommercial}</option>
-         ))}
-
- </NativeSelect> */}
-</FormControl>
+     <TextField
+         id="prdVersioncommerciale"
+         name="prdVersioncommerciale"
+         label="nomcommercial"
+         variant="outlined"
+         value={formData?.police.prdVersioncommerciale?.nomcommercial} 
+         type="text"
+         fullWidth
+         InputLabelProps={{
+           shrink: true,
+         }}
+       />
 </Grid>
      <Grid item xs={12} sm={4}>
        <TextField
@@ -177,26 +200,19 @@ function QuittanceUpdate () {
   
 
      <Grid item xs={12} sm={4}>
-     <FormControl fullWidth>
- <InputLabel variant="standard" htmlFor="uncontrolled-native">
- Intermediaire
- </InputLabel>
- <NativeSelect 
-      id="intermediaireid"
-      name="intermediaireid" 
-      variant="outlined"
-      value={formData.intermediaireid}
-     
- > 
- {/* <option  > Selectionner Intermediaire </option>
-  
-   {intermediaires?.map((intermediaire: any) => (
-     
-           <option key={intermediaire.id} value={intermediaire.id}>{intermediaire.nomCommercial}</option>
-         ))} */}
-
- </NativeSelect>
-</FormControl>
+     <TextField
+         id="intermediaire"
+         name="intermediaire"
+         label="intermediaire"
+         variant="outlined"
+         value={formData.police.intermediaire.nomCommercial}
+         
+         type="text"
+         fullWidth
+         InputLabelProps={{
+           shrink: true,
+         }}
+       />
 </Grid>
 
      
@@ -210,26 +226,19 @@ function QuittanceUpdate () {
 
 
      <Grid item xs={12} sm={4}>
-     <FormControl fullWidth>
- <InputLabel variant="standard" htmlFor="uncontrolled-native">
- Etat Quittance
- </InputLabel>
- <NativeSelect 
-       id="refQuittanceid"
-       name="refQuittanceid" 
-      variant="outlined"
-      value={formData.refQuittanceid}
-         
- > 
- {/* <option  > Selectionner Etat Quittance </option>
-  
-   {refQuittances?.map((refQuittance: any) => (
-     
-           <option key={refQuittance.id} value={refQuittance.id}>{refQuittance.etatQuittance}</option>
-         ))} */}
-
- </NativeSelect>
-</FormControl>
+     <TextField
+       id="etatquittance"
+       name="etatquittance"
+       label="etatquittance"
+       variant="outlined"
+       value={formData.etatquittance} 
+       type="text"
+       fullWidth
+       InputLabelProps={{
+         shrink: true,
+       }}
+     />
+ 
 </Grid>
 
 
@@ -286,19 +295,19 @@ function QuittanceUpdate () {
  </Grid>
 
  <Grid item xs={12} sm={4}>
-   <TextField
-     id="dateemission"
-     name="dateemission"
-     label="Date Emission"
-     variant="outlined"
-     value={formData.dateemission}
+ <TextField
+    id="dateemission"
+    name="dateemission"
+    label="Date Emission"
+    variant="outlined"
+    value={new Date(formData.dateemission).toLocaleDateString()}
     // onChange={handleInputChange}
-     type="date"
-     fullWidth
-     InputLabelProps={{
-       shrink: true,
-     }}
-   />
+    type="text"
+    fullWidth
+    InputLabelProps={{
+      shrink: true,
+    }}
+  />
  </Grid>
 
  <Grid item xs={12} sm={4}>
@@ -309,7 +318,7 @@ function QuittanceUpdate () {
      variant="outlined"
      value={formData.dateetat}
    //  onChange={handleInputChange}
-     type="date"
+     type="text"
      fullWidth
      InputLabelProps={{
        shrink: true,
@@ -323,9 +332,9 @@ function QuittanceUpdate () {
      name="datedebut"
      label="Date Debut"
      variant="outlined"
-     value={formData.datedebut}
+     value={formData.datedebut} 
    //  onChange={handleInputChange}
-     type="date"
+     type="text"
      fullWidth
      InputLabelProps={{
        shrink: true,
@@ -341,7 +350,7 @@ function QuittanceUpdate () {
      variant="outlined"
      value={formData.datefin}
  //    onChange={handleInputChange}
-     type="date"
+     type="text"
      fullWidth
      InputLabelProps={{
        shrink: true,
@@ -467,13 +476,74 @@ function QuittanceUpdate () {
  <Grid item xs={12}>
   
 
-<input color="primary" type="submit" value="Veuillez  Ajouter  la  quittance" />
+
+
+
 
 
 </Grid>
 </Grid>
  
 </Form>
+
+ 
+<Grid item xs={12}>
+            <Button  variant="contained" color="primary">
+              Valider  
+            </Button>
+          </Grid>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Garantie</TableCell>
+            <TableCell align="right">montantcommission</TableCell>
+            <TableCell align="right">qtcQuittance</TableCell>
+            <TableCell align="right">Montantaccessoire</TableCell>
+            <TableCell align="right">primenette</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {quittanceGarantie?.map((row ) => (
+            <TableRow
+              key={row.idgarantie}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                Garantie PVE
+              </TableCell> 
+              <TableCell align="right">{row.montantcommission}</TableCell>
+              <TableCell align="right">{row.qtcQuittance}</TableCell>
+              <TableCell align="right">{row.Montantaccessoire}</TableCell>
+              <TableCell align="right">{row.primenette}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+
+    <Grid item xs={12}>
+          <Button startIcon={<PrintIcon/> } variant="contained" color="primary" onClick={handlePrint}>
+             Imprimer
+          </Button>
+        </Grid>
+
     </Box>
  </>
     );
