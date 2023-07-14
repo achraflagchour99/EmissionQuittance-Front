@@ -1,5 +1,5 @@
-import React, {useState, ChangeEvent, FormEvent, useEffect} from 'react';
-import {TextField, Button, Box, Checkbox, FormControlLabel, Typography, Divider, CircularProgress} from '@mui/material';
+import React, {useState, ChangeEvent, useEffect} from 'react';
+import {TextField, Button, Box, Checkbox, FormControlLabel, Typography, CircularProgress} from '@mui/material';
 import axios from 'axios';
 import Grid from "@mui/material/Grid";
 import "../Search/SearchPolice.css"
@@ -7,8 +7,6 @@ import {   MenuItem } from '@mui/material';
 import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData, TypeTerme } from '../Types/types';
 import { fetchVilles, fetchVersions, fetchInterm, fetchPeriodes, fetchEtats, fetchTypesTermes } from '../Api/policeApi';
 import { Stepper, Step, StepLabel } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Garanties from '../Garanties/garanties';
@@ -16,9 +14,11 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import { useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
-
+import AlertDialog from '../../../AlertDialog';
+import { useNavigate } from 'react-router-dom';
 
 const UpdatePolice: React.FC = () => {
+  const navigate = useNavigate();
     const { codePolice } = useParams();
     const [policeData, setPoliceData] = useState<PoliceData>({
         id: 0,
@@ -60,10 +60,11 @@ const UpdatePolice: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
+    const [showPopup, setShowPopup] = useState(false);
 
     const fetchUpdateData = async () => {
+      setIsLoading(true);
         try {
-          setIsLoading(true);
           const response = await axios.get(`http://localhost:8081/polices/consult/${codePolice}`);
           const fetchedPoliceData = response.data;
           setSelectedVille(fetchedPoliceData.refVille);
@@ -188,13 +189,19 @@ const isStepComplete = () => {
     }
 
     await axios.put(`http://localhost:8081/polices/${codePolice}`, requestData);
-
-    window.location.href = `/consult-page/${requestData.codePolice}`;
+    policeData.codePolice = requestData.codePolice;
+     setShowPopup(true);
   } catch (error) {
     console.error(error);
   }
 };
-      
+const handleDetails = () => {
+  const codePolice = policeData.codePolice;
+  navigate(`/police-details/${codePolice}`);
+};
+const handleList = () => {
+  navigate(`/police-search`);
+};
     const formik = useFormik<PoliceData>({
         initialValues: {
           id: 0,
@@ -239,7 +246,7 @@ const isStepComplete = () => {
           padding: '2rem',
           marginTop: '0.5rem',
           marginBottom:'3rem',
-          height: 'auto', // Utilisation de 'auto' pour la hauteur
+          height: 'auto', 
           backgroundColor: 'white',
           border: 2,
           borderColor: '#a7bcb9',
@@ -559,8 +566,8 @@ const isStepComplete = () => {
                             type='number'
                         />
                     </Grid>
-                    <Grid item xs={12} />
-                     <Grid item xs={12} />
+                      <Grid item xs={12} />
+                      <Grid item xs={12} />
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="refPolice"
@@ -624,6 +631,17 @@ const isStepComplete = () => {
     </div>
         </Box>
         )}
+        {showPopup && (
+        <AlertDialog
+          message="La Police a été bien créée !"
+          buttonText1="Détails"
+          buttonText2="Liste des Polices"
+          fullWidth={true}
+          handleDetails={handleDetails}
+          handleList={handleList}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
         </Box>
     );
 };
