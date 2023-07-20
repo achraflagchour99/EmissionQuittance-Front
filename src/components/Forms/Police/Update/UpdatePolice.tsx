@@ -66,16 +66,16 @@ const UpdatePolice: React.FC = () => {
           setIsLoading(true);
           const response = await axios.get(`http://localhost:8081/polices/consult/${codePolice}`);
           const fetchedPoliceData = response.data;
-          setSelectedVille(fetchedPoliceData.refVille);
-          setSelectedInterm(fetchedPoliceData.intermediaire);
-          setSelectedPeriode(fetchedPoliceData.periodicite);
-          setSelectedType(fetchedPoliceData.typeTerme);
-          setSelectedEtat(fetchedPoliceData.refPolice);
+          setSelectedVille(fetchedPoliceData?.refVille);
+          setSelectedInterm(fetchedPoliceData?.intermediaire);
+          setSelectedPeriode(fetchedPoliceData?.periodicite);
+          setSelectedType(fetchedPoliceData?.typeTerme);
+          setSelectedEtat(fetchedPoliceData?.refPolice);
           setSelectedVersion(fetchedPoliceData.prdVersioncommerciale);
-          fetchedPoliceData.dateEffet = format(new Date(fetchedPoliceData.dateEffet), 'yyyy-MM-dd');
-          fetchedPoliceData.dateTerme = format(new Date(fetchedPoliceData.dateTerme), 'yyyy-MM-dd');
-          fetchedPoliceData.dateEtat = format(new Date(fetchedPoliceData.dateEtat), 'yyyy-MM-dd');
-          fetchedPoliceData.dateEcheance = format(new Date(fetchedPoliceData.dateEcheance), 'yyyy-MM-dd');
+          fetchedPoliceData.dateEffet = format(new Date(fetchedPoliceData?.dateEffet), 'yyyy-MM-dd');
+          fetchedPoliceData.dateTerme = format(new Date(fetchedPoliceData?.dateTerme), 'yyyy-MM-dd');
+          fetchedPoliceData.dateEtat = format(new Date(fetchedPoliceData?.dateEtat), 'yyyy-MM-dd');
+          fetchedPoliceData.dateEcheance = format(new Date(fetchedPoliceData?.dateEcheance), 'yyyy-MM-dd');
           formik.setValues(fetchedPoliceData);
         } catch (error) {
           console.error(error);
@@ -295,7 +295,7 @@ const isStepComplete = () => {
                      <TextField
                       name="prdVersioncommerciale"
                       label="Produit"
-                      value={selectedVersion ? selectedVersion.nomcommercial : ''}
+                      value={selectedVersion ? selectedVersion?.nomcommercial : ''}
                       onChange={handleVersionChange}
                       fullWidth
                       select

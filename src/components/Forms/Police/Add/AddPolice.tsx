@@ -14,6 +14,7 @@ import * as Yup from 'yup';
 import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import config from '../../../../config/config';
 
 const AddPolice: React.FC = () => {
     const [policeData, setPoliceData] = useState<PoliceData>({
@@ -156,7 +157,7 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8080/polices/add', requestData);
+          const response = await axios.post(`${config.apiUrl}/polices/add`, requestData);
       
           window.location.href = `/consult-page/${response.data.codePolice}`;
         } catch (error) {

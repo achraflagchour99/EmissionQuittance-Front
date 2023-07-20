@@ -7,12 +7,10 @@ import { MainContent } from "./layout/MainContent";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from "./pages/Dashboard";
 import SearchPolice from "./components/Forms/Police/Search/SearchPolice";
-import Searchpolicepage from "./pages/Searchpolicepage";
 import ConsultPolicePage from "./components/Forms/Police/Consult/Consult";
 import AddPolice from "./components/Forms/Police/Add/AddPolice";
 import Example from "./components/Forms/TS";
 import Examples from "./components/Forms/Quittance/Search/searchQuittance";
-import QuittanceAdd from "./components/Forms/Quittance/Add/QuittanceAdd";
 import SignInSide from "./components/LoginPage/Login";
 import SignUpSide from "./components/LoginPage/Logup";  
 import { combineReducers, createStore, applyMiddleware } from 'redux';
@@ -22,6 +20,8 @@ import store from "./routage/store";
 import { Provider } from 'react-redux';
 import StepperQuittanceAdd from "./components/Forms/Quittance/Add/stepperQuittanceAdd";
 import { RecoilRoot } from "recoil";
+import UpdatePolice from "./components/Forms/Police/Update/UpdatePolice";
+import QuittanceUpdate from "./components/Forms/Quittance/Update/QuittanceUpdate";
  
 
 
