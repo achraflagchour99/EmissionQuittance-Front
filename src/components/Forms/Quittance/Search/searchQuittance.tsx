@@ -16,10 +16,12 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControl,
     Grid,
     IconButton,
     InputLabel,
     MenuItem,
+    NativeSelect,
     Select,
     Stack,
     TextField,
@@ -104,11 +106,11 @@ const Examples = () => {
             };
 
 
-            const response = await fetch(`${config.apiUrl}/quittances/searchNew?`+'&pageNumber='+pagination.pageIndex+'&pageSize='+pagination.pageSize+'&codePolice='+searchCriteria.codePolice+'&dateDebut='+searchCriteria.dateDebut+'&dateFin='+searchCriteria.dateFin+'&refQuittanceId='+searchCriteria.refNatureQuittance);
+            const response = await fetch(`${config.apiUrl}/quittances/searchNew?`+'&pageNumber='+pagination.pageIndex+'&pageSize='+pagination.pageSize+'&codePolice='+searchCriteria?.codePolice+'&dateDebut='+searchCriteria?.dateDebut+'&dateFin='+searchCriteria?.dateFin+'&refQuittanceId='+searchCriteria?.refNatureQuittance);
            
             const responseData = await response.json();  
             setResponseData(responseData.content); 
-         console.log(responseData.content)
+         console.log("responseData.content "+ responseData.content)
 
 
        
@@ -229,7 +231,8 @@ const Examples = () => {
 
     return (
         <>
-         <Box>
+        <div style={{ background: 'white', padding: '30px', marginLeft: '20px', marginRight: '20px' }}>
+         <Box >
       <div className="form-card" style={{ background: 'white', padding: '30px' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
@@ -247,30 +250,40 @@ const Examples = () => {
               fullWidth
             />
           </Grid>
+          
+
+
+
           <Grid item xs={12} sm={6}>
-            <InputLabel id="refQuittanceid-label">Quittance Nature</InputLabel>
-            <Select
-              id="refQuittanceid"
-              name="refNatureQuittance"
-              label="Quittance Nature"
-              variant="outlined"
-              fullWidth
-              onChange={(e) =>
-                setSearchCriteria({ ...searchCriteria, refNatureQuittance: e.target.value })
-              }
-              value={searchCriteria.refNatureQuittance}
-              inputProps={{
-                shrink: true,
-              }}
-            >
-              <MenuItem value="">Sélectionner</MenuItem>
-              {refQuittances?.map((refQuittance: any) => (
-            <MenuItem key={refQuittance.id} value={refQuittance.id}>
-              {refQuittance.etatQuittance}
-            </MenuItem>
+      <FormControl fullWidth>
+  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+  Type de  quittance
+  </InputLabel>
+  <NativeSelect 
+        id="montantaccessoire"
+        name="montantaccessoire" 
+        variant="outlined"
+        value={searchCriteria.refNatureQuittance}
+        onChange={(e) =>
+          setSearchCriteria({ ...searchCriteria, refNatureQuittance: e.target.value })
+        }
+  > 
+   <option >     </option>
+   
+    {refQuittances?.map((refQuittance: any) => (
+      
+            <option key={refQuittance?.id} value={refQuittance?.id}> {refQuittance?.etatQuittance}</option>
           ))}
-            </Select>
-          </Grid>
+ 
+  </NativeSelect>
+</FormControl>
+</Grid>
+
+
+
+
+          
+        
           <Grid item xs={12} sm={6}>
             <TextField
               id="dateDebut"
@@ -300,14 +313,14 @@ const Examples = () => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button onClick={handleSearchClick} variant="contained" color="primary">
               Rechercher  
             </Button>
           </Grid>
         </Grid>
       </div>
-    </Box>
+         </Box>
         <div className={"form-card"}>
         {isLoading ? (
                 // Show the loading animation if isLoading is true
@@ -364,7 +377,9 @@ const Examples = () => {
                 onClose={() => setCreateModalOpen(false)}
                 onSubmit={handleCreateNewRow}
             />
+            </div>
         </>
+        
     );
 };
 
@@ -396,7 +411,7 @@ export const CreateNewAccountModal = ({
     };
 
     return (
-        <Dialog open={open}>
+        <Dialog open={open} >
             <DialogTitle textAlign="center">Create New Account</DialogTitle>
             <DialogContent>
                 <form onSubmit={(e) => e.preventDefault()}>

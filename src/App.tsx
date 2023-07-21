@@ -22,6 +22,8 @@ import store from "./routage/store";
 import { Provider } from 'react-redux';
 import StepperQuittanceAdd from "./components/Forms/Quittance/Add/stepperQuittanceAdd";
 import { RecoilRoot } from "recoil";
+import UpdatePolice from "./components/Forms/Police/Update/UpdatePolice";
+import QuittanceUpdate from "./components/Forms/Quittance/Update/QuittanceUpdate"; 
  
 
 

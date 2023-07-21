@@ -54,6 +54,11 @@ function QuittanceAdd( ) {
     if(dateDebut < dateFin){
       const jsonData = JSON.stringify(formData);
       setJsonQuittance(jsonData);  
+      if(jsonData !=null){
+      toast.success("Quittance  bien Enregistrer  veuillez passer a l'etape  suivante");}
+      else{
+        toast.error('Erreur  il y  a un probleme', { position: toast.POSITION.TOP_RIGHT });
+      }
     }else{
       toast.error('Date date debut ne  doit pas etre  inferrieur au  date  fin !', { position: toast.POSITION.TOP_RIGHT });
     }}
@@ -62,6 +67,7 @@ function QuittanceAdd( ) {
       toast.error('Erreur lors de la requête !', { position: toast.POSITION.TOP_RIGHT });
     };
     
+
   }
 
 
@@ -622,8 +628,14 @@ function QuittanceAdd( ) {
       Veuillez  Ajouter  la  quittance
     </Button> */}
 
-<input color="primary" type="submit" value="Veuillez  Ajouter  la  quittance" />
+{/* <input color="primary"   type="submit" value="Veuillez  Ajouter  la  quittance" /> */}
 
+
+<Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button type="submit" variant="contained" color="primary">
+            Veuillez  Ajouter  la  quittance 
+            </Button>
+          </Grid>
 
 </Grid>
 </Grid>
