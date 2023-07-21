@@ -7,15 +7,16 @@ import {   MenuItem } from '@mui/material';
 import { Ville, VersionCom, Interm, Period, EtatPolice, PoliceData, TypeTerme } from '../Types/types';
 import { fetchVilles, fetchVersions, fetchInterm, fetchPeriodes, fetchEtats, fetchTypesTermes } from '../Api/policeApi';
 import { Stepper, Step, StepLabel } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import AlertDialog from '../../../AlertDialog';
+import { useNavigate } from 'react-router-dom';
 
 const AddPolice: React.FC = () => {
+  const navigate = useNavigate();
     const [policeData, setPoliceData] = useState<PoliceData>({
         id: 0,
         codePolice: '',
@@ -54,6 +55,8 @@ const AddPolice: React.FC = () => {
     const [selectedPeriode, setSelectedPeriode] = useState<Period | null>(null);
     const [selectedEtat, setSelectedEtat] = useState<EtatPolice | null>(null);
     const [activeStep, setActiveStep] = useState(0);
+    const [showPopup, setShowPopup] = useState(false);
+
     const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
 
     useEffect(() => {
@@ -156,14 +159,20 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8080/polices/add', requestData);
-      
-          window.location.href = `/consult-page/${response.data.codePolice}`;
+          const response = await axios.post('http://localhost:8081/polices/add', requestData);
+          policeData.codePolice = requestData.codePolice;
+          setShowPopup(true);
         } catch (error) {
           console.error(error);
         }
       };
-      
+      const handleDetails = () => {
+        const codePolice = policeData.codePolice;
+        navigate(`/police-details/${codePolice}`);
+      };
+      const handleList = () => {
+        navigate(`/police-search`);
+      };
     const formik = useFormik<PoliceData>({
         initialValues: {
           id: 0,
@@ -579,9 +588,18 @@ const isStepComplete = () => {
         {activeStep === steps.length - 1 ? 'Ajouter' : 'Suivant'} <KeyboardArrowRight />
       </Button>
     </div>
+    {showPopup && (
+        <AlertDialog
+          message="La Police a été bien créée !"
+          buttonText1="Détails"
+          buttonText2="Liste des Polices"
+          handleDetails={handleDetails}
+          handleList={handleList}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
         </Box>
     );
 };
 
 export default AddPolice;
-
