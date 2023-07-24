@@ -68,7 +68,7 @@ function QuittanceUpdate () {
       });
       const { codequittance } = useParams()
 
-
+      const options = [0, 10, 15, 20, 30];
       function provideDateQuittance(){
        return fetchQuittance(codequittance);
       }
@@ -80,8 +80,11 @@ function QuittanceUpdate () {
         const fetchData = async () => {
 
           const quittanceData = await fetchQuittance(codequittance);
+          
           setquittance(quittanceData);
           setFormData(quittanceData);
+          console.log(quittanceData)
+          console.log(quittance)
           const quittanceGarantieData = await fetchGarantieToEachQuittance(codequittance);
           setquittancegarantie(quittanceGarantieData);
           
@@ -284,7 +287,7 @@ function QuittanceUpdate () {
      name="habUtilisateurid"
      label="habUtilisateurid"
      variant="outlined"
-     value={formData.habUtilisateurid}
+     value={formData?.habUtilisateurid}
      
      type="text"
      fullWidth
@@ -300,7 +303,7 @@ function QuittanceUpdate () {
     name="dateemission"
     label="Date Emission"
     variant="outlined"
-    value={new Date(formData.dateemission).toLocaleDateString()}
+    value={new Date(formData?.dateemission).toLocaleDateString()}
     // onChange={handleInputChange}
     type="text"
     fullWidth
@@ -316,7 +319,7 @@ function QuittanceUpdate () {
      name="dateetat"
      label="Date Etat"
      variant="outlined"
-     value={formData.dateetat}
+     value={formData?.dateetat}
    //  onChange={handleInputChange}
      type="text"
      fullWidth
@@ -332,7 +335,7 @@ function QuittanceUpdate () {
      name="datedebut"
      label="Date Debut"
      variant="outlined"
-     value={formData.datedebut} 
+     value={formData?.datedebut} 
    //  onChange={handleInputChange}
      type="text"
      fullWidth
@@ -348,7 +351,7 @@ function QuittanceUpdate () {
      name="datefin"
      label="Date Fin"
      variant="outlined"
-     value={formData.datefin}
+     value={formData?.datefin}
  //    onChange={handleInputChange}
      type="text"
      fullWidth
@@ -366,7 +369,7 @@ function QuittanceUpdate () {
      name="tauxtaxe"
      label="Taux Taxe"
      variant="outlined"
-     value={formData.tauxtaxe}
+     value={formData?.tauxtaxe}
     // onChange={handleInputChange}
      type="number"
      fullWidth
@@ -382,7 +385,7 @@ function QuittanceUpdate () {
      name="tauxprimenette"
      label="Taux Prime Nette"
      variant="outlined"
-     value={formData.tauxprimenette}
+     value={formData?.tauxprimenette}
    //  onChange={handleInputChange}
      type="number"
      fullWidth
@@ -400,7 +403,7 @@ function QuittanceUpdate () {
              name="tauxcommission"
              label="Taux Commission"
              variant="outlined"
-             value={formData.tauxcommission}
+             value={formData?.tauxcommission}
             // onChange={handleInputChange}
              type="number"
              fullWidth
@@ -415,7 +418,7 @@ function QuittanceUpdate () {
              name="montanttaxeparafiscale"
              label="Montant Taxe Parafiscale"
              variant="outlined"
-             value={formData.montanttaxeparafiscale}
+             value={formData?.montanttaxeparafiscale}
            //  onChange={handleInputChange}
              type="number"
              fullWidth
@@ -436,15 +439,15 @@ function QuittanceUpdate () {
        id="montantaccessoire"
        name="montantaccessoire" 
        variant="outlined"
-       value={formData.montantaccessoire}
+       value={formData?.montantaccessoire}
      //  onChange={handleInputChange}
  > 
- {/* <option  > Selectionner Etat Quittance </option>
+   <option  > {formData?.montantaccessoire} </option>
   
    {options?.map((option: any) => (
      
            <option key={option} value={option}>{option}</option>
-         ))} */}
+         ))} 
 
  </NativeSelect>
 </FormControl>
@@ -460,7 +463,7 @@ function QuittanceUpdate () {
          name="primeGareEve"
          label="Prime Gare Eve"
          variant="outlined"
-         value={formData.primeGareEve}
+         value={formData?.primeGareEve}
        //  onChange={handleInputChange}
          type="number"
          fullWidth
@@ -528,10 +531,10 @@ function QuittanceUpdate () {
               <TableCell component="th" scope="row">
                 Garantie PVE
               </TableCell> 
-              <TableCell align="right">{row.montantcommission}</TableCell>
-              <TableCell align="right">{row.qtcQuittance}</TableCell>
-              <TableCell align="right">{row.Montantaccessoire}</TableCell>
-              <TableCell align="right">{row.primenette}</TableCell>
+              <TableCell align="right">{row?.montantcommission}</TableCell>
+              <TableCell align="right">{row?.qtcQuittance}</TableCell>
+              <TableCell align="right">{row?.Montantaccessoire}</TableCell>
+              <TableCell align="right">{row?.primenette}</TableCell>
             </TableRow>
           ))}
         </TableBody>

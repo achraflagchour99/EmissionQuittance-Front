@@ -36,7 +36,14 @@ function SuccessMessage() {
   return (
     <>
     {saveStatus === 'successful' ? (
+      <div>
       <Successful />
+    
+        <Button onClick={handleClick} variant="contained" color="primary">
+              Enregistrer Quittance  
+            </Button>
+      
+      </div>
     ) : saveStatus === 'error' ? (
       <Error />
     ) : (
