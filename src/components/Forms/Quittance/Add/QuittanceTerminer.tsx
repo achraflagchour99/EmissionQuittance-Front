@@ -6,6 +6,8 @@ import axios from 'axios';
 import Successful from '../../tools/successful';
 import Error from '../../tools/error';
 import { Grid } from 'rsuite';
+import { Button } from '@mui/material';
+import './style.css'; // Import the CSS file
  
 
 function SuccessMessage() {
@@ -38,13 +40,17 @@ function SuccessMessage() {
     ) : saveStatus === 'error' ? (
       <Error />
     ) : (
-      <div >
+      <div  className="centered-content">
         <Grid>
         Valider  l'enregistrement   pour  ajouter quittance
         </Grid>
+        <Button onClick={handleClick} variant="contained" color="primary">
+              Enregistrer Quittance  
+            </Button>
       </div>
     )}
-    <input type="submit" value="Enregistrer Quittance" onClick={handleClick} />
+   
+  
   </>
   );
 }

@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useMemo, useState, ChangeEvent} from 'react';
-import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import { fetchVilles, fetchVersions} from '../Api/policeApi';
 import { Ville, VersionCom} from '../Types/types';
 import MaterialReactTable, {
@@ -29,6 +28,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import {Link} from "react-router-dom";
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 
 const ENDPOINT_URL = 'http://localhost:8081/polices/search';
@@ -106,6 +106,12 @@ const SearchPolice = () => {
           // Redirect to the update component with the codePolice as a URL parameter
           navigate(`/police-update/${codePolice}`);
         };
+        const handleSetConsultingRow = (row: any) => {
+            const codePolice = row.original.codePolice;
+            // Redirect to the update component with the codePolice as a URL parameter
+            navigate(`/police-details/${codePolice}`);
+          };
+  
           
     const fetchTableData = async (pageIndex: number, pageSize: number) => {
         setIsLoading(true);
@@ -119,10 +125,11 @@ const SearchPolice = () => {
             if (codePolice) params.codePolice = codePolice;
             if (selectedVersion) params.versioncommerciale = selectedVersion?.nomcommercial ?? '';
             if (selectedVille) params.ville = selectedVille?.libelle ?? '';
-            const response = await axios.get<Police[]>(ENDPOINT_URL, { params });
-            setTableData(response.data)
+            const response = await axios.get(ENDPOINT_URL, { params });
+            const fetchedPoliceData = response.data;
+            setTableData(fetchedPoliceData);
             setTotalItems(parseInt(response.headers['x-total-count']));
-        } catch (error) {
+        } catch (error) { 
             console.error(error);
         } finally {
             setIsLoading(false);
@@ -236,7 +243,7 @@ const SearchPolice = () => {
                 size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                     ...getCommonEditTextFieldProps(cell),
-                }),
+                }), 
             },
             {
                 accessorKey: 'primeNette',
@@ -469,7 +476,7 @@ const SearchPolice = () => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip arrow placement="right" title="Consulter">
-                            <IconButton  onClick={() => handleDeleteRow(row)}>
+                            <IconButton  onClick={() => handleSetConsultingRow(row)}>
                                 <VisibilityIcon />
                             </IconButton>
                         </Tooltip>
