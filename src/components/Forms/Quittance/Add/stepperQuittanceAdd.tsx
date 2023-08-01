@@ -77,7 +77,7 @@ export default function StepperQuittanceAdd() {
 
   return (
     <RecoilRoot>
-      <Box sx={{ marginLeft: 'auto', marginRight: 'auto', maxWidth: '80%' }}>
+      <Box sx={{ marginLeft: 'auto', padding: '5rem',marginRight: 'auto', maxWidth: '80%', backgroundColor: '#FFFFFF',justifyContent: 'center' }}>
         <Stepper nonLinear activeStep={activeStep}>
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>

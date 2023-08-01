@@ -14,6 +14,7 @@ import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import AlertDialog from '../../../AlertDialog';
 import { useNavigate } from 'react-router-dom';
+import config from '../../../../config/config';
 
 const AddPolice: React.FC = () => {
   const navigate = useNavigate();
@@ -159,7 +160,7 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8081/polices/add', requestData);
+          const response = await axios.post(`${config.apiUrl}/polices/add`, requestData);
           policeData.codePolice = requestData.codePolice;
           setShowPopup(true);
         } catch (error) {

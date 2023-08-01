@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import { Form  } from 'rsuite';
 import { Container } from 'react-bootstrap/lib/Tab';
-import { fetchGarantieToEachQuittance, fetchQuittance } from '../../../../api/service/provideData';
+import { UpdateQuittance, fetchGarantieToEachQuittance, fetchQuittance } from '../../../../api/service/provideData';
 import QuittancePayload from '../Add/QuittancePayload';
 import { QuittanceDetailGarantiePayload } from '../../../../api/interface/QuittanceDetailGarantiePayload';
 import Table from '@mui/material/Table';
@@ -87,7 +87,8 @@ function QuittanceUpdate () {
           console.log(quittance)
           const quittanceGarantieData = await fetchGarantieToEachQuittance(codequittance);
           setquittancegarantie(quittanceGarantieData);
-          
+          console.log("Boucca")
+          console.log(quittanceGarantie)
         };
     
         fetchData();
@@ -108,13 +109,24 @@ function QuittanceUpdate () {
       };
       
       
-
+      const HandlClickUpdateQuittance = () => { 
+    
+        UpdateQuittance(formData)
+        .then(() => {
+           alert("Good")
+          })
+          .catch(() => {
+            alert("bad")
+          });
+        
+    
+      }
        
     return (
       <>
      
      <Box  sx={{ margin: '2rem', padding: '1rem', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
-     <Form  id="printable-content" > 
+     <Form onSubmit={HandlClickUpdateQuittance} id="printable-content" > 
      <Grid item xs={12} sm={4}>
         <h1>Quittance</h1>
         </Grid>
@@ -525,15 +537,15 @@ function QuittanceUpdate () {
         <TableBody>
           {quittanceGarantie?.map((row ) => (
             <TableRow
-              key={row.idgarantie}
+              key={row?.idgarantie}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row">
                 Garantie PVE
               </TableCell> 
+              <TableCell align="right">{row?.TauxTaxeParafiscale}</TableCell>
+              <TableCell align="right">{row?.PrimeGareEve}</TableCell>
               <TableCell align="right">{row?.montantcommission}</TableCell>
-              <TableCell align="right">{row?.qtcQuittance}</TableCell>
-              <TableCell align="right">{row?.Montantaccessoire}</TableCell>
               <TableCell align="right">{row?.primenette}</TableCell>
             </TableRow>
           ))}

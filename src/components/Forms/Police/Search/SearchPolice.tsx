@@ -29,9 +29,10 @@ import {Link} from "react-router-dom";
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import config from '../../../../config/config';
 
 
-const ENDPOINT_URL = 'http://localhost:8081/polices/search';
+const ENDPOINT_URL = `${config.apiUrl}/polices/search`;
 
 export type Etat = {
     libelle: string;
@@ -77,7 +78,7 @@ const SearchPolice = () => {
 
     const handleCreateNewRow = async (values: Police) => {
         try {
-            const response = await axios.post('http://localhost:8081/polices/add', values);
+            const response = await axios.post(`${config.apiUrl}/polices/add`, values);
 
             if (response.status === 201) {
                 fetchTableData(pagination.pageIndex, pagination.pageSize);

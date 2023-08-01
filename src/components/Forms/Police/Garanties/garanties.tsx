@@ -10,6 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { garantie } from '../Types/types';
 import { format } from 'date-fns';
+import config from '../../../../config/config';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,7 +41,7 @@ export default function CustomizedTables({ versionId }: { versionId: number | nu
     const fetchData = async () => {
       try {
         if (versionId) {
-          const response = await fetch(`http://localhost:8081/versioncom/garanties/version/${versionId}`);
+          const response = await fetch(`${config.apiUrl}/versioncom/garanties/version/${versionId}`);
           const data = await response.json();
           setTableData(data);
         }
