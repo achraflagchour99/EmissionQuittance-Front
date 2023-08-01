@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react';
 import rma from './RMA_WANATNIYA.jpg';
 import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, LineChart, Line, CartesianGrid, XAxis, Label, YAxis, Tooltip } from 'recharts';
+import { Pie, Cell, ResponsiveContainer, BarChart, Bar, LineChart, Line, CartesianGrid, XAxis, Label, YAxis, Tooltip } from 'recharts';
 import { BsFileCheckFill, BsFillPersonCheckFill } from 'react-icons/bs';
 import { FaMoneyCheckAlt } from 'react-icons/fa';
 import { GiNotebook } from 'react-icons/gi';
+import ArticleIcon from '@mui/icons-material/Article';
+import { PieChart } from '@mui/x-charts/PieChart';
 
 const data = [
   { name: '2016', uv: 4000, pv: 2400, amt: 2400 },
@@ -17,7 +19,7 @@ const data = [
 ];
 
 const dataA = [
-  { name: 'Group A', value: 400 },
+  { name: 'Polices', value: 400 },
 ];
 const dataB = [
   { name: 'Group b', value: 200 },
@@ -41,34 +43,12 @@ export default class Dashboard extends PureComponent {
       <div style={{  }}>
       <div style={{ display: 'flex', margin: '2rem' }}>
         <div style={{ flex: '1', marginRight: '1rem', backgroundColor: '#fff', padding: '1rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-          <h1>Client   <BsFillPersonCheckFill /></h1>
-          <PieChart width={200} height={200}>
-            <Pie
-              data={dataA}
-              cx={100}
-              cy={100}
-              innerRadius={40}
-              outerRadius={60}
-              fill="#8884d8"
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {dataA.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS1[index % COLORS1.length]} values='client' />
-              ))}
-            </Pie>
-          </PieChart>
-          <Typography variant="subtitle1" style={{ marginTop: '1rem' }}>
-            Name: {dataA[0].name}
-          </Typography>
-          <Typography variant="subtitle1">
-            Value: {dataA[0].value}
-          </Typography>
+          <h1>Polices   <ArticleIcon style={{ color: 'black' }} /></h1>
         </div>
 
         <div style={{ flex: '1', marginRight: '1rem', backgroundColor: '#fff', padding: '1rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <h1>Checked <BsFileCheckFill/></h1>
-          <PieChart width={200} height={200}>
+          <PieChart width={200} height={200} series={[]}>
             <Pie
               data={dataB}
               cx={100}
@@ -94,7 +74,7 @@ export default class Dashboard extends PureComponent {
 
         <div style={{ flex: '1', marginRight: '1rem', backgroundColor: '#fff', padding: '1rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <h1>Quittance <FaMoneyCheckAlt />  </h1>
-          <PieChart width={200} height={200}>
+          <PieChart width={200} height={200} series={[]}>
             <Pie
               data={dataC}
               cx={100}
@@ -120,7 +100,7 @@ export default class Dashboard extends PureComponent {
 
         <div style={{ flex: '1', marginRight: '1rem', backgroundColor: '#fff', padding: '1rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <h1>Police <GiNotebook /></h1>
-          <PieChart width={200} height={200}>
+          <PieChart width={200} height={200} series={[]}>
             <Pie
               data={dataD}
               cx={100}
@@ -180,7 +160,6 @@ export default class Dashboard extends PureComponent {
       paddingX="2rem"
       boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)"
     >
-    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>  
     </Box>     
 
          

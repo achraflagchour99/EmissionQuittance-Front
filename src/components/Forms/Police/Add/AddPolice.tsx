@@ -12,6 +12,8 @@ import * as Yup from 'yup';
 import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import AlertDialog from '../../../AlertDialog';
+import { useNavigate } from 'react-router-dom';
 
 const AddPolice: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +25,10 @@ const AddPolice: React.FC = () => {
         raisonSociale: '',
         adresse: '',
         dateEffet: new Date(),
+        dateEffetFormatted:'',
+        dateTermeFormatted: '',
+        dateEtatFormatted: '',
+        dateEcheanceFormatted: '',
         primeNette: 0.0,
         taxe: 0.0,
         acce: 0.0,
@@ -55,7 +61,7 @@ const AddPolice: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [showPopup, setShowPopup] = useState(false);
 
-    const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
+    const steps = ['Données de la Police', 'Vérification des Garanties'];
 
     useEffect(() => {
       fetchVilles(setVilles);
@@ -68,12 +74,14 @@ const AddPolice: React.FC = () => {
 
 
     const validationSchema = Yup.object({
-    taxe: Yup.number().positive().integer().nullable()
+    taxe: Yup.number().positive().integer()
     .required('La taxe est requise')
     .test('taxe-sup', 'La taxe dépasse 15% de la prime', function (value) {
       const montantPrime = Number(this.parent.primeNette);
       return value <= 0.15 * montantPrime;
     }),
+    prdVersioncommerciale: Yup.string().required('Le produit est requis'),
+    raisonSociale: Yup.string().required('La raison sociale est requise'),
     dateEffet: Yup.date().required('La date d\'effet est requise'),
     dateEcheance: Yup.date()
       .min(Yup.ref('dateEffet'), 'La date d\'échéance doit être supérieure à la date d\'effet')
@@ -81,34 +89,31 @@ const AddPolice: React.FC = () => {
       acce: Yup.number()
       .oneOf([0, 10, 15, 20, 30], 'La valeur de l\'accessoire doit être 0, 10, 15, 20 ou 30')
       .required('L\'accessoire est requis'),
+
+    dateTerme: Yup.date()
+    .min(Yup.ref('dateEcheance'), 'La date Terme doit être supérieure à la date de la prochaine échéance')
+    .required('La date Terme est requise')
 });
 const isStepComplete = () => {
     const { taxe, dateEffet, dateEcheance } = formik.values;
     return !!taxe && !!dateEffet && !!dateEcheance /* et les autres conditions pour les autres champs */;
   };
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setPoliceData((prevData) => ({
-          ...prevData,
-          [name]: value,
-        }));
-      };
       const handleNext = () => {
         if (formik.isValid && isStepComplete()) {
             setActiveStep((prevActiveStep) => prevActiveStep + 1);
         }
       };
-      const handleTaxeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const handleCodePoliceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const input = event.target.value;
         const onlyNumbers = input.replace(/[^0-9]/g, ''); // Filtrer uniquement les chiffres
-        formik.setFieldValue('taxe', onlyNumbers);
+        formik.setFieldValue('codePolice', onlyNumbers);
       };
     
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { checked } = event.target;
         setHasTerme(checked);
-        formik.values.terme='N';
+        formik.setFieldValue('terme', checked ? 'O' : 'N');
     };
     const handleVilleChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedVilleLibelle = event.target.value as string;
@@ -157,9 +162,9 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8080/polices/add', requestData);
-      
-          window.location.href = `/consult-page/${response.data.codePolice}`;
+          const response = await axios.post('http://localhost:8081/polices/add', requestData);
+          policeData.codePolice = requestData.codePolice;
+          setShowPopup(true);
         } catch (error) {
           console.error(error);
         }
@@ -180,6 +185,10 @@ const isStepComplete = () => {
           raisonSociale: '',
           adresse: '',
           dateEffet: new Date(),
+          dateEffetFormatted: '',
+          dateTermeFormatted: '',
+          dateEtatFormatted: '',
+          dateEcheanceFormatted: '',
           primeNette: 0.0,
           taxe: 0.0,
           acce: 0.0,
@@ -251,7 +260,7 @@ const isStepComplete = () => {
                             name="codePolice"
                             label="Numéro de Police"
                             value={formik.values.codePolice}
-                            onChange={formik.handleChange}
+                            onChange={handleCodePoliceChange}
                             onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
@@ -263,9 +272,11 @@ const isStepComplete = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="prdVersioncommerciale"
-                            label="Produit"
+                            label={formik.touched.prdVersioncommerciale && formik.errors.prdVersioncommerciale ? 'Le produit est requis':'Produit'}
+                            error={formik.touched.prdVersioncommerciale && formik.errors.prdVersioncommerciale ? true : false}
                             value={selectedVersion ? selectedVersion.nomcommercial : ''}
                             onChange={handleVersionChange}
+                            onBlur={formik.handleBlur}
                             fullWidth
                             select
                             size="small"
@@ -307,7 +318,8 @@ const isStepComplete = () => {
                     <Grid item xs={12} sm={4}>
                         <TextField
                             name="raisonSociale"
-                            label="Raison Sociale"
+                            label={formik.touched.raisonSociale && formik.errors.raisonSociale ? 'La raison sociale est requise':'Raison sociale'}
+                            error={formik.touched.raisonSociale && formik.errors.raisonSociale ? true : false}
                             value={formik.values.raisonSociale}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
@@ -407,7 +419,8 @@ const isStepComplete = () => {
                         <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateTerme"
-                            label="Date Terme"
+                            label={formik.touched.dateTerme && formik.errors.dateTerme ? 'La date Terme doit etre supérieure à la date de prochaine échéance' : 'Date Terme'}
+                            error={formik.touched.dateTerme && formik.errors.dateTerme ? true : false}
                             value={formik.values.dateTerme}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
@@ -457,7 +470,7 @@ const isStepComplete = () => {
                             name="taxe"
                             label={formik.touched.taxe && formik.errors.taxe ? 'La taxe dépasse 15% du montant de la prime.' : 'Taxe'}
                             value={formik.values.taxe}
-                            onChange={handleTaxeChange}
+                            onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.taxe && formik.errors.taxe ? true : false}
                             fullWidth
@@ -588,7 +601,7 @@ const isStepComplete = () => {
     </div>
     {showPopup && (
         <AlertDialog
-          message="La Police a été bien créée !"
+          message="Police Créée !"
           buttonText1="Détails"
           buttonText2="Liste des Polices"
           handleDetails={handleDetails}

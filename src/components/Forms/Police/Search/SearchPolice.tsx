@@ -3,21 +3,15 @@ import { fetchVilles, fetchVersions} from '../Api/policeApi';
 import { Ville, VersionCom} from '../Types/types';
 import MaterialReactTable, {
     type MaterialReactTableProps,
-    type MRT_Cell,
+
     type MRT_ColumnDef,
-    type MRT_Row,
 } from 'material-react-table';
 import {
     Box,
     Button,
     CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     IconButton,
     MenuItem,
-    Stack,
     TextField,
     Tooltip,
 } from '@mui/material';
@@ -43,6 +37,10 @@ export type Police = {
     raisonSociale: string;
     adresse: string;
     dateEffet: Date;
+    dateEffetFormatted: string;
+    dateTermeFormatted: string;
+    dateEtatFormatted: string;
+    dateEcheanceFormatted: string;
     primeNette: bigint;
     taxe: bigint;
     acce: bigint;
@@ -62,7 +60,6 @@ const SearchPolice = () => {
     const [villes, setVilles] = useState<Ville[]>([]);
     const [versions, setVersions] = useState<VersionCom[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [createModalOpen, setCreateModalOpen] = useState(false);
     const [tableData, setTableData] = useState<Police[]>([]);
     const [validationErrors, setValidationErrors] = useState<{
         [cellId: string]: string;
@@ -149,14 +146,6 @@ const SearchPolice = () => {
         setValidationErrors({});
     };
 
-    const handleDeleteRow = useCallback(
-        (row: MRT_Row<Police>) => {
-            //send api delete request here, then refetch or update local table data for re-render
-            tableData.splice(row.index, 1);
-            setTableData([...tableData]);
-        },
-        [tableData],
-    );
     const handleVilleChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedVilleLibelle = event.target.value as string;
         const ville = villes.find((v) => v.libelle === selectedVilleLibelle);
@@ -168,39 +157,6 @@ const SearchPolice = () => {
         setSelectedVersion(nomcommercial || null);
     };
 
-    const getCommonEditTextFieldProps = useCallback(
-        (
-            cell: MRT_Cell<Police>,
-        ): MRT_ColumnDef<Police>['muiTableBodyCellEditTextFieldProps'] => {
-            return {
-                error: !!validationErrors[cell.id],
-                helperText: validationErrors[cell.id],
-                onBlur: (event) => {
-                    const isValid =
-                        cell.column.id === 'email'
-                            ? validateEmail(event.target.value)
-                            : cell.column.id === 'age'
-                                ? validateAge(+event.target.value)
-                                : validateRequired(event.target.value);
-                    if (!isValid) {
-                        //set validation error for cell if invalid
-                        setValidationErrors({
-                            ...validationErrors,
-                            [cell.id]: `${cell.column.columnDef.header} is required`,
-                        });
-                    } else {
-                        //remove validation error for cell if valid
-                        delete validationErrors[cell.id];
-                        setValidationErrors({
-                            ...validationErrors,
-                        });
-                    }
-                },
-            };
-        },
-        [validationErrors],
-    );
-
     const columns = useMemo<MRT_ColumnDef<Police>[]>(
         () => [
             {
@@ -208,7 +164,6 @@ const SearchPolice = () => {
                 header: 'Code Police',
                 size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
@@ -216,7 +171,13 @@ const SearchPolice = () => {
                 header: 'Numero Client',
                 size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
+                }),
+            },
+            {
+                accessorKey: 'prdVersioncommerciale.nomcommercial',
+                header: 'Produit VC',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
                 }),
             },
             {
@@ -224,7 +185,6 @@ const SearchPolice = () => {
                 header: 'Raison sociale',
                 size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                     type: 'string',
                 }),
             },
@@ -233,88 +193,77 @@ const SearchPolice = () => {
                 header: 'Adresse',
                 size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                     type: 'string',
                 }),
             },
             {
-                accessorKey: 'dateEffet',
+                accessorKey: 'dateEffetFormatted',
                 header: 'Date Effet',
                 size: 100,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }), 
+            },
+            {
+                accessorKey: 'dateEtatFormatted',
+                header: 'Date Etat',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                }),
+            },
+            {
+                accessorKey: 'dateEcheanceFormatted',
+                header: 'Date Pr Echéance',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                }),
+            },
+            {
+                accessorKey: 'dateTermeFormatted',
+                header: 'Date Terme',
+                size: 140,
+                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
+                }),
             },
             {
                 accessorKey: 'primeNette',
                 header: 'Prime Nette',
-                size: 100,
+                size: 70,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
                 accessorKey: 'taxe',
                 header: 'Taxe',
-                size: 140,
+                size: 70,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
                 accessorKey: 'acce',
                 header: 'Accessoires',
-                size: 140,
+                size: 70,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
                 accessorKey: 'tauxComm',
                 header: 'Taux Commission',
-                size: 140,
+                size: 70,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
-            },
-            {
-                accessorKey: 'dateTerme',
-                header: 'Date Terme',
-                size: 140,
-                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
-            },
-            {
-                accessorKey: 'dateEtat',
-                header: 'Date Etat',
-                size: 140,
-                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
                 accessorKey: 'mnt_taxe_eve',
                 header: 'Mnt Taxe Eve',
-                size: 140,
+                size: 70,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
                 accessorKey: 'mnt_taxe_parafiscale',
                 header: 'Mnt Taxe Paraf',
-                size: 140,
+                size: 70,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
-                }),
-            },
-            {
-                accessorKey: 'prdVersioncommerciale.nomcommercial',
-                header: 'Produit VC',
-                size: 140,
-                muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
@@ -322,7 +271,6 @@ const SearchPolice = () => {
                 header: 'Ville',
                 size: 140,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
             {
@@ -330,12 +278,11 @@ const SearchPolice = () => {
                 header: 'Etat de Police',
                 size: 140,
                 muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-                    ...getCommonEditTextFieldProps(cell),
                 }),
             },
 
         ],
-        [getCommonEditTextFieldProps],
+        [],
     );
 
     return (
@@ -355,6 +302,19 @@ const SearchPolice = () => {
 >
 <Box sx={{ marginBottom: '2rem', marginLeft: '1rem' }}>
   <form onSubmit={handleSubmit}>
+  <TextField
+    id="outlined-basic"
+    label="Code Police"
+    variant="outlined"
+    type="text"
+    value={codePolice}
+    onChange={(event) => setCodePolice(event.target.value)}
+    InputLabelProps={{
+        shrink: true,
+    }}
+    inputProps={{ maxLength: 15 }}
+    className="customTextField"
+/>
     <TextField
       id="outlined-basic"
       label="Numéro de client"
@@ -368,20 +328,6 @@ const SearchPolice = () => {
       }}
       className="customTextField"
     />
-        <TextField
-    id="outlined-basic"
-    label="Code Police"
-    variant="outlined"
-    type="text"
-    value={codePolice}
-    onChange={(event) => setCodePolice(event.target.value)}
-    InputLabelProps={{
-        shrink: true,
-    }}
-    inputProps={{ maxLength: 15 }}
-    className="customTextField"
-/>
-
     <TextField
       id="outlined-basic"
       variant="outlined"
@@ -432,6 +378,12 @@ const SearchPolice = () => {
   </form>
 </Box>
 </Box>
+{isLoading ? (
+                // Show the loading animation if isLoading is true
+                <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                    <CircularProgress />
+                </div>
+            ) : (
             <Box  sx={{marginLeft:'1.8rem',
                        marginRight:'2.5rem', 
                        marginBottom:'2rem', 
@@ -442,12 +394,6 @@ const SearchPolice = () => {
                        '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
                      }}>
             <Box>
-            {isLoading ? (
-                // Show the loading animation if isLoading is true
-                <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
-                    <CircularProgress />
-                </div>
-            ) : (
             <MaterialReactTable
                 displayColumnDefOptions={{
                     'mrt-row-actions': {
@@ -462,6 +408,8 @@ const SearchPolice = () => {
                 manualPagination
                 rowCount={totalItems}
                 onPaginationChange={setPagination}
+                enableGlobalFilter={false}
+                enableHiding={false}
                 state={{pagination}}
                 editingMode="modal" //default
                 enableColumnOrdering
@@ -494,90 +442,11 @@ const SearchPolice = () => {
                     </Link>
                 )}
             />
+            </Box>
+            
+            </Box>
             )}
-            </Box>
-            </Box>
-            <CreateNewAccountModal
-                columns={columns}
-                open={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-                onSubmit={handleCreateNewRow}
-            />
         </>
-        
     );
 };
-
-interface CreateModalProps {
-    columns: MRT_ColumnDef<Police>[];
-    onClose: () => void;
-    onSubmit: (values: Police) => void;
-    open: boolean;
-}
-
-//example of creating a mui dialog modal for creating new rows
-export const CreateNewAccountModal = ({
-                                          open,
-                                          columns,
-                                          onClose,
-                                          onSubmit,
-                                      }: CreateModalProps) => {
-    const [values, setValues] = useState<any>(() =>
-        columns.reduce((acc, column) => {
-            acc[column.accessorKey ?? ''] = '';
-            return acc;
-        }, {} as any),
-    );
-
-    const handleSubmit = () => {
-        //put your validation logic here
-        onSubmit(values);
-        onClose();
-    };
-
-    return (
-        <Dialog open={open}>
-            <DialogTitle textAlign="center">Police</DialogTitle>
-            <DialogContent>
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <Stack
-                        sx={{
-                            width: '100%',
-                            minWidth: { xs: '300px', sm: '360px', md: '400px' },
-                            gap: '1.5rem',
-                        }}
-                    >
-                        {columns.map((column) => (
-                            <TextField
-                                key={column.accessorKey}
-                                label={column.header}
-                                name={column.accessorKey}
-                                onChange={(e) =>
-                                    setValues({ ...values, [e.target.name]: e.target.value })
-                                }
-                            />
-                        ))}
-                    </Stack>
-                </form>
-            </DialogContent>
-            <DialogActions sx={{ p: '1.25rem' }}>
-                <Button variant="outlined" onClick={onClose}>Fermer</Button>
-                <Button color="primary" onClick={handleSubmit} variant="contained">
-                    Créer
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
-};
-
-const validateRequired = (value: string) => !!value.length;
-const validateEmail = (email: string) =>
-    !!email.length &&
-    email
-        .toLowerCase()
-        .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        );
-const validateAge = (age: number) => age >= 18 && age <= 50;
-
 export default SearchPolice;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, CircularProgress, Grid } from '@mui/material';
+import { TextField, Button, Box, Typography, CircularProgress, Grid, Checkbox, FormControlLabel } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import Garanties from '../Garanties/garanties';
 
 const ConsultPolice: React.FC = () => {
   const { codePolice } = useParams();
@@ -208,6 +209,45 @@ const ConsultPolice: React.FC = () => {
               size="small"
             />
             </Grid>
+            <Grid item xs={12} sm={4}>
+            <FormControlLabel
+                        value="start"
+                        control={<Checkbox
+                        checked={policeData.terme === 'O'}/>}
+                        label="Terme"
+                        labelPlacement="start"
+            />
+        </Grid>
+        {policeData.terme === 'O' && (
+                    <>
+                    <Grid item xs={12} sm={4}>
+                    <TextField
+                      name="dateTerme"
+                      variant="outlined"
+                      label="Date Terme"
+                      value={policeData.dateTerme}
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                      fullWidth
+                      size="small"
+                    />
+                  </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                        name="typeTerme"
+                        variant="outlined"
+                        label="Type Terme"
+                        value={policeData.typeTerme?.terme}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                        fullWidth
+                        size="small"
+                      />
+                    </Grid>
+                  </>
+              )}
             <Grid item xs={12} />
             <Grid item xs={12} />
             <Grid item xs={12} sm={4}>
@@ -288,6 +328,11 @@ const ConsultPolice: React.FC = () => {
               size="small"
             />
             </Grid>
+            <Grid item xs={12}>
+            <Box sx={{ marginTop: '2rem', marginBottom: '3rem' }}>
+                  {policeData.prdVersioncommerciale && <Garanties versionId={policeData.prdVersioncommerciale.id} />}
+             </Box>
+             </Grid>
             <Grid item xs={12} />
             <Grid item xs={12} />
             <Grid item xs={12} sm={4}>

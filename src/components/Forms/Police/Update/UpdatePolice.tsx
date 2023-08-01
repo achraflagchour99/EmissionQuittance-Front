@@ -28,6 +28,10 @@ const UpdatePolice: React.FC = () => {
         raisonSociale: '',
         adresse: '',
         dateEffet: new Date(),
+        dateEffetFormatted: '',
+        dateTermeFormatted: '',
+        dateEtatFormatted: '',
+        dateEcheanceFormatted: '',
         primeNette: 0.0,
         taxe: 0.0,
         acce: 0.0,
@@ -59,7 +63,7 @@ const UpdatePolice: React.FC = () => {
     const [selectedType, setSelectedType] = useState<TypeTerme | null>(null);
     const [activeStep, setActiveStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-    const steps = ['Données de la Police', 'Vérification des Garanties', 'Validation de la Police'];
+    const steps = ['Données de la Police', 'Vérification des Garanties'];
     const [showPopup, setShowPopup] = useState(false);
 
     const fetchUpdateData = async () => {
@@ -105,35 +109,47 @@ const UpdatePolice: React.FC = () => {
       const montantPrime = Number(this.parent.primeNette);
       return value <= 0.15 * montantPrime;
     }),
+    prdVersioncommerciale: Yup.object()
+    .shape({
+      id: Yup.number().required('Le produit est requis'),
+      nomcommercial: Yup.string().required('Le produit est requis'),
+    })
+    .required('Le produit est requis'),
+    raisonSociale: Yup.string().required('La raison sociale est requise'),
     dateEffet: Yup.date().required('La date d\'effet est requise'),
     dateEcheance: Yup.date()
-      .min(Yup.ref('dateEffet'), 'La date d\'échéance doit être supérieure à la date d\'effet')
+      .min(Yup.ref('dateEffet'), 'La date de la prochaine échéance doit être supérieure à la date d\'effet')
       .required('La date d\'échéance est requise'),
       acce: Yup.number()
       .oneOf([0, 10, 15, 20, 30], 'La valeur de l\'accessoire doit être 0, 10, 15, 20 ou 30')
       .required('L\'accessoire est requis'),
+    
+    dateTerme: Yup.date()
+    .min(Yup.ref('dateEcheance'), 'La date Terme doit être supérieure à la date de la prochaine échéance')
+    .required('La date Terme est requise')
 });
+
 const isStepComplete = () => {
     const { taxe, dateEffet, dateEcheance } = formik.values;
     return !!taxe && !!dateEffet && !!dateEcheance /* et les autres conditions pour les autres champs */;
   };
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setPoliceData((prevData) => ({
-          ...prevData,
-          [name]: value,
-        }));
-      };
-      const handleNext = () => {
-        //if (formik.isValid && isStepComplete()) {
-            setActiveStep((prevActiveStep) => prevActiveStep + 1);
-          //}
-      };
-      const handleTaxeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNext = () => {
+    const fieldsToValidate = ['prdVersioncommerciale', 'acce', 'taxe', 'dateEffet', 'dateEcheance', 'dateTerme'];
+
+    fieldsToValidate.forEach((field) => {
+      formik.validateField(field);
+      formik.setFieldTouched(field, true);
+    });
+
+    if (formik.isValid && isStepComplete()) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
+      const handleCodePoliceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const input = event.target.value;
         const onlyNumbers = input.replace(/[^0-9]/g, ''); // Filtrer uniquement les chiffres
-        formik.setFieldValue('taxe', onlyNumbers);
+        formik.setFieldValue('codePolice', onlyNumbers);
       };
     
     const handleTermeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -146,11 +162,12 @@ const isStepComplete = () => {
         const ville = villes.find((v) => v.libelle === selectedVilleLibelle);
         setSelectedVille(ville || null); 
       };
-    const handleVersionChange = (event: ChangeEvent<{ value: unknown }>) => {
+      const handleVersionChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedVersion = event.target.value as string;
         const nomcommercial = versions.find((v) => v.nomcommercial === selectedVersion);
         setSelectedVersion(nomcommercial || null);
-    };
+        formik.setFieldValue('prdVersioncommerciale', nomcommercial || null);
+      };
     const handleIntermChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedInterm = event.target.value as string;
         const intermediaire = intermediaires.find((i) => i.nomCommercial === selectedInterm);
@@ -211,6 +228,10 @@ const handleList = () => {
           raisonSociale: '',
           adresse: '',
           dateEffet: new Date(),
+          dateEffetFormatted: '',
+          dateTermeFormatted: '',
+          dateEtatFormatted: '',
+          dateEcheanceFormatted: '',
           primeNette: 0.0,
           taxe: 0.0,
           acce: 0.0,
@@ -228,15 +249,15 @@ const handleList = () => {
           typeTerme: { id: 0, terme: '' },
         },
         validationSchema: validationSchema,
+        validateOnChange: true,
+        validateOnBlur: true,
         onSubmit: () => {
-            // No need to define an async function here
             handleSubmit();
           },
         });
     return (
       <Box>
             {isLoading ? (
-                // Show the loading animation if isLoading is true
                 <div style={{ marginLeft:10, marginTop:100, display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
                     <CircularProgress />
                 </div>
@@ -259,7 +280,7 @@ const handleList = () => {
         }}
         >
             <Typography marginBottom={"20px"} variant="h6" align="center" color="primary" gutterBottom>
-                    Nouvelle Police
+                    Modifier une Police
             </Typography>
             <Box sx={{ paddingBottom: '1rem' }}>
   <Stepper activeStep={activeStep} alternativeLabel>
@@ -289,7 +310,7 @@ const handleList = () => {
                             name="codePolice"
                             label="Numéro de Police"
                             value={formik.values?.codePolice}
-                            onChange={formik.handleChange}
+                            onChange={handleCodePoliceChange}
                             onBlur={formik.handleBlur}
                             fullWidth
                             size="small"
@@ -301,9 +322,11 @@ const handleList = () => {
                     <Grid item xs={12} sm={4}>
                      <TextField
                       name="prdVersioncommerciale"
-                      label="Produit"
+                      label={formik.touched.prdVersioncommerciale && formik.errors.prdVersioncommerciale ? 'Le produit est requis':'Produit'}
+                      error={formik.touched.prdVersioncommerciale && formik.errors.prdVersioncommerciale ? true : false}
                       value={selectedVersion ? selectedVersion?.nomcommercial : ''}
                       onChange={handleVersionChange}
+                      onBlur={formik.handleBlur}
                       fullWidth
                       select
                       size="small"
@@ -437,19 +460,20 @@ const handleList = () => {
                     <FormControlLabel
                         value="start"
                         control={<Checkbox
-                        checked={hasTerme}
+                        checked={formik.values.terme === 'O'}
                         onChange={handleTermeChange}  />}
                         label="Terme"
                         labelPlacement="start"
         />
                     </Grid>
                     
-                    {hasTerme && (
+                    {formik.values.terme === 'O' && (
                     <>
                         <Grid item xs={12} sm={4}>
                         <TextField
                             name="dateTerme"
-                            label="Date Terme"
+                            label={formik.touched.dateTerme && formik.errors.dateTerme ? 'La date Terme doit etre supérieure à la date de prochaine échéance' : 'Date Terme'}
+                            error={formik.touched.dateTerme && formik.errors.dateTerme ? true : false}
                             value={formik.values?.dateTerme}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
@@ -492,6 +516,9 @@ const handleList = () => {
                             size="small"
                             required
                             type='number'
+                            inputProps={{
+                              min: 0,
+                            }}
                         />
                     </Grid>
                     
@@ -500,13 +527,16 @@ const handleList = () => {
                             name="taxe"
                             label={formik.touched.taxe && formik.errors.taxe ? 'La taxe dépasse 15% du montant de la prime.' : 'Taxe'}
                             value={formik.values?.taxe}
-                            onChange={handleTaxeChange}
+                            onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             error={formik.touched.taxe && formik.errors.taxe ? true : false}
                             fullWidth
                             size="small"
                             required
                             type='number'
+                            inputProps={{
+                              min: 0,
+                            }}
                         />
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -521,6 +551,9 @@ const handleList = () => {
                             size="small"
                             required
                             type='number'
+                            inputProps={{
+                              min: 0,
+                            }}
                         />
                     </Grid>
                     <Grid item xs={10} sm={4}>
@@ -633,7 +666,7 @@ const handleList = () => {
         )}
         {showPopup && (
         <AlertDialog
-          message="La Police a été bien créée !"
+          message="Police Modifiée !"
           buttonText1="Détails"
           buttonText2="Liste des Polices"
           fullWidth={true}

@@ -42,6 +42,10 @@ export interface Ville {
     raisonSociale: string;
     adresse: string;
     dateEffet: Date;
+    dateEffetFormatted: string;
+    dateTermeFormatted: string,
+    dateEtatFormatted: string;
+    dateEcheanceFormatted: string;
     primeNette: number;
     taxe: number;
     acce: number;
