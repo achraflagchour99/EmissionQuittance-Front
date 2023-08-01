@@ -56,7 +56,7 @@ export const fetchVilles = async (setVilles: React.Dispatch<React.SetStateAction
   };
   export const fetchTypesTermes = async (setTypesTerme: React.Dispatch<React.SetStateAction<TypeTerme[]>>) => {
     try {
-        const response = await axios.get<any[]>('http://localhost:8081/termes');
+        const response = await axios.get<any[]>(`${config.apiUrl}/termes`);
         const typesData: TypeTerme[] = response.data;
         setTypesTerme(typesData)
         const etats = typesData.map((e) => e.terme);

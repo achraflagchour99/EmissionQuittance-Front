@@ -12,7 +12,6 @@ import * as Yup from 'yup';
 import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import AlertDialog from '../../../AlertDialog';
 import { useNavigate } from 'react-router-dom';
 
 const AddPolice: React.FC = () => {
@@ -162,9 +161,9 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8081/polices/add', requestData);
-          policeData.codePolice = requestData.codePolice;
-          setShowPopup(true);
+          const response = await axios.post('http://localhost:8080/polices/add', requestData);
+      
+          window.location.href = `/consult-page/${response.data.codePolice}`;
         } catch (error) {
           console.error(error);
         }

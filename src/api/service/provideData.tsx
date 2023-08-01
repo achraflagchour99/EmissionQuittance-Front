@@ -117,7 +117,7 @@ export const fetchQuittance = async (idQuittance: any) => {
 
 
 export const fetchGarantieToEachQuittance = async (idQuittance: any) => {
-  const url = `${config.apiUrl}/api/garantie-quittance/quittance/${idQuittance}/garantie`;
+  const url = `${config.apiUrl}/api/garantie-quittance/quittancegarantie/${idQuittance}`;
   try {
     const response = await axios.get(url);
     const data = response.data;
@@ -129,12 +129,36 @@ export const fetchGarantieToEachQuittance = async (idQuittance: any) => {
 };
 
 
-     
+export const UpdateQuittance = async (quittance: any) => { 
+  axios.post(`${config.apiUrl}/quittances`, quittance, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => {
+    console.log(response); 
+  })
+  .catch(error => { 
+    console.log(error);
+  });
+ 
+};   
 
  
 
   
 
+export const fetchmaxValues = async () => {
+  const url = `${config.apiUrl}/quittances/maxValues`;
+  try {
+    const response = await axios.get(url);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}; 
    
   
  

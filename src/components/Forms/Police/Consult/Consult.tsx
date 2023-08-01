@@ -3,7 +3,6 @@ import { TextField, Button, Box, Typography, CircularProgress, Grid, Checkbox, F
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import Garanties from '../Garanties/garanties';
 
 const ConsultPolice: React.FC = () => {
   const { codePolice } = useParams();
@@ -37,7 +36,7 @@ const ConsultPolice: React.FC = () => {
   const fetchConsultData = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`http://localhost:8081/polices/consult/${codePolice}`);
+      const response = await axios.get(`${config.apiUrl}/polices/consult/${codePolice}`);
       const fetchedPoliceData = response.data;
       fetchedPoliceData.dateEffet = format(new Date(fetchedPoliceData.dateEffet), 'dd/MM/yyyy');
       fetchedPoliceData.dateTerme = format(new Date(fetchedPoliceData.dateTerme), 'dd/MM/yyyy');

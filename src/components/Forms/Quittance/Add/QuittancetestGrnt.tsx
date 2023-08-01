@@ -7,7 +7,7 @@ type Post = {
   Taxe: number;
   Accessoire: number;
   Tauxcommission: number;
-  Commission: number;
+  Montantcommision: number;
   TauxprimeEVE: number;
   PrimeGarEve: number;
   TauxParafiscale: number;
@@ -23,7 +23,7 @@ const fetchData = async (): Promise<Post[]> => {
     Taxe: 0,
     Accessoire: 0,
     Tauxcommission: 0,
-    Commission: 0,
+    Montantcommision: 0,
     TauxprimeEVE: 0,
     PrimeGarEve: 0,
     TauxParafiscale: 0,
@@ -40,7 +40,7 @@ const TableExample = () => {
     Taxe: 0,
     Accessoire: 0,
     Tauxcommission: 0,
-    Commission: 0,
+    Montantcommision: 0,
     TauxprimeEVE: 0,
     PrimeGarEve: 0,
     TauxParafiscale: 0,
@@ -72,7 +72,7 @@ const TableExample = () => {
       Taxe: 0,
       Accessoire: 0,
       Tauxcommission: 0,
-      Commission: 0,
+      Montantcommision: 0,
       TauxprimeEVE: 0,
       PrimeGarEve: 0,
       TauxParafiscale: 0,
@@ -83,7 +83,7 @@ const TableExample = () => {
       acc.Taxe += post.Taxe;
       acc.Accessoire += post.Accessoire;
       acc.Tauxcommission += post.Tauxcommission;
-      acc.Commission += post.Commission;
+      acc.Montantcommision += post.Montantcommision;
       acc.TauxprimeEVE += post.TauxprimeEVE;
       acc.PrimeGarEve += post.PrimeGarEve;
       acc.TauxParafiscale += post.TauxParafiscale;
@@ -101,7 +101,7 @@ const TableExample = () => {
       console.log('Taxe:', post.Taxe);
       console.log('Accessoire:', post.Accessoire);
       console.log('Tauxcommission:', post.Tauxcommission);
-      console.log('Commission:', post.Commission);
+      console.log('Commission:', post.Montantcommision);
       console.log('TauxprimeEVE:', post.TauxprimeEVE);
       console.log('PrimeGarEve:', post.PrimeGarEve);
       console.log('TauxParafiscale:', post.TauxParafiscale);
@@ -111,7 +111,7 @@ const TableExample = () => {
     console.log('Total Taxe:', sums.Taxe);
     console.log('Total Accessoire:', sums.Accessoire);
     console.log('Total Tauxcommission:', sums.Tauxcommission);
-    console.log('Total Commission:', sums.Commission);
+    console.log('Total Commission:', sums.Montantcommision);
     console.log('Total TauxprimeEVE:', sums.TauxprimeEVE);
     console.log('Total PrimeGarEve:', sums.PrimeGarEve);
     console.log('Total TauxParafiscale:', sums.TauxParafiscale);
@@ -150,7 +150,7 @@ const TableExample = () => {
                 <input className="borderless" type="text" value={post.Tauxcommission} onChange={(event) => handleChange(event, index, 'Tauxcommission')} />
               </td>
               <td>
-                <input className="borderless" type="text" value={post.Commission} onChange={(event) => handleChange(event, index, 'Commission')} />
+                <input className="borderless" type="text" value={post.Montantcommision} onChange={(event) => handleChange(event, index, 'Montantcommision')} />
               </td>
               <td>
                 <input className="borderless" type="text" value={post.TauxprimeEVE} onChange={(event) => handleChange(event, index, 'TauxprimeEVE')} />
@@ -169,7 +169,7 @@ const TableExample = () => {
             <td>{sums.Taxe}</td>
             <td>{sums.Accessoire}</td>
             <td>{sums.Tauxcommission}</td>
-            <td>{sums.Commission}</td>
+            <td>{sums.Montantcommision}</td>
             <td>{sums.TauxprimeEVE}</td>
             <td>{sums.PrimeGarEve}</td>
             <td>{sums.TauxParafiscale}</td>

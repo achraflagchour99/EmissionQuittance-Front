@@ -15,6 +15,7 @@ import {
     fetchRefQuittances,
     fetchRemise,
     ExtractSaveQuittance,
+    fetchmaxValues,
   } from '../../../../api/service/provideData';
 
   import  { PolicePayload } from '../../../../api/interface/policePayload';
@@ -81,13 +82,13 @@ function QuittanceAdd( ) {
 
     const [formData, setFormData] = useState({
         exercice: "",
-        ordre: "", 
+        ordre: new Date().getFullYear().toString(), 
         intermediaireid: 1,
         refQuittanceid: 1,
         qtcRemiseid: 1,
         habUtilisateurid: 5923310,
-         policeid: 21,  
-        versioncommerciale:9985338,
+        policeid: 21,  
+        versioncommerciale:0,
         datedebut: "",
         datefin: "",
         tauxtaxe:0,
@@ -190,12 +191,13 @@ function QuittanceAdd( ) {
         };
     
         fetchData();
-      }, [formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
+      }, [formData.ordre,formData.exercice,formData.numeroquittance,formData.primenette,formData.montantaccessoire,formData.tauxcommission,formData.tauxtaxe,formData.versioncommerciale,formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
  
 
 
-      const handleBlur = () => {
-        const codePolice = formData.idCodePolice; 
+      const handleBlur =   ()  => {
+       
+        const codePolice = formData.idCodePolice;  
         const apiUrl = `${config.apiUrl}/polices/search?codePolice=${codePolice}`;
       
         fetch(apiUrl)
@@ -206,15 +208,33 @@ function QuittanceAdd( ) {
               throw new Error("Erreur lors de la recherche de la police");
             }
           })
-          .then(data => {
+          .then(async data => {
            
             if (data.length === 0) {
               alert("Police non trouvée");
             }  
             else{
+
+              const maxValues = await fetchmaxValues();  
+              console.log('maxValues')
+             console.log(data)
+
               setIdCodePolice(codePolice.toString());
-              console.log('codePolice.toString() '+ codePolice.toString());  
-              const updatedFormData = { ...formData, policeid: data[0].id };
+             
+          
+              const updatedFormData = { ...formData, policeid: data[0].id
+              ,  versioncommerciale: data[0].prdVersioncommerciale.id
+            ,tauxprimenette: data[0].primeNette
+          ,tauxcommission: data[0].tauxComm
+        ,tauxtaxe:data[0].taxe
+      ,montanttaxeparafiscale:data[0].mnt_taxe_parafiscale
+    ,montantaccessoire:data[0].acce
+    ,exercice:maxValues.exercice+1
+    ,numeroquittance:maxValues.numeroquittance+1
+  };
+ 
+ 
+          
               setFormData(updatedFormData); 
             }
           })
@@ -255,6 +275,9 @@ function QuittanceAdd( ) {
           InputLabelProps={{
             shrink: true,
           }}
+          InputProps={{
+            readOnly: true,
+          }}
         />
       </Grid>
 
@@ -279,26 +302,24 @@ function QuittanceAdd( ) {
 
 
       <Grid item xs={12} sm={4}>
-      <FormControl fullWidth>
-  <InputLabel variant="standard" htmlFor="uncontrolled-native">
-  Version commerciale
-  </InputLabel>
-  <NativeSelect 
+ 
+  <TextField 
        id="versioncommerciale"
        name="versioncommerciale" 
+       label="version commerciale"
        variant="outlined"
        value={formData.versioncommerciale}
        onChange={handleInputChange} 
-  > 
-  <option  > Selectionner Version comm </option>
-   
-    {versionsCommerciales?.map((versionsCommerciale: any) => (
-      
-            <option key={versionsCommerciale.id} value={versionsCommerciale.id}>{versionsCommerciale.nomcommercial}</option>
-          ))}
+       type="text"
+       fullWidth
+       InputLabelProps={{
+         shrink: true,
+       }}
+       InputProps={{
+        readOnly: true,
+      }}
+  /> 
  
-  </NativeSelect>
-</FormControl>
 </Grid>
       <Grid item xs={12} sm={4}>
         <TextField
@@ -312,6 +333,9 @@ function QuittanceAdd( ) {
           fullWidth
           InputLabelProps={{
             shrink: true,
+          }}
+          InputProps={{
+            readOnly: true,
           }}
         />
       </Grid>
@@ -328,6 +352,9 @@ function QuittanceAdd( ) {
           fullWidth
           InputLabelProps={{
             shrink: true,
+          }}
+          InputProps={{
+            readOnly: true,
           }}
         />
       </Grid>
@@ -441,6 +468,7 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      
     />
   </Grid>
 
@@ -523,6 +551,7 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      
     />
   </Grid>
 
@@ -539,11 +568,14 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      InputProps={{
+        readOnly: true,
+      }}
     />
   </Grid>
     
       
-
+ 
           <Grid item xs={12} sm={4}>
             <TextField
               id="tauxcommission"
@@ -557,6 +589,10 @@ function QuittanceAdd( ) {
               InputLabelProps={{
                 shrink: true,
               }}
+              InputProps={{
+                readOnly: true,
+              }}
+             
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -572,6 +608,10 @@ function QuittanceAdd( ) {
               InputLabelProps={{
                 shrink: true,
               }}
+              InputProps={{
+                readOnly: true,
+              }}
+              
             />
           </Grid>
           
@@ -582,12 +622,14 @@ function QuittanceAdd( ) {
   <InputLabel variant="standard" htmlFor="uncontrolled-native">
   Montant Accessoire
   </InputLabel>
+  
   <NativeSelect 
         id="montantaccessoire"
         name="montantaccessoire" 
         variant="outlined"
         value={formData.montantaccessoire}
         onChange={handleInputChange}
+     
   > 
   <option  > Selectionner Etat Quittance </option>
    
