@@ -4,6 +4,10 @@
     align-items: center;
     justify-content: center;
     height: 50vh;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
   }
   
 
@@ -36,9 +40,38 @@
 
 .label-row {
   display: flex;
-  margin-bottom: 10px; /* Add margin between each label row */
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #ccc;
 }
 
 .label-row label {
   margin-right: 20px; /* Add margin between each label in a row */
+}
+.hidden-textfield {
+  display: none;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.label-row label {
+  font-weight: bold;
+}
+.span-size {
+  font-size: larger;
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+ 
+  font-weight: bold;
+ 
+  flex-direction: column;
+  align-items: center;
+  margin: auto 0; 
 }

@@ -160,9 +160,41 @@ export const fetchmaxValues = async () => {
   }
 }; 
    
-  
- 
 
+
+  
+export const ModificationQuittance = async ( quittance: any) => {
+  axios
+    .put(`${config.apiUrl}/quittances`, quittance, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      console.log(response);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};
+
+
+
+  
+export const ModificationGarantieQuittance = async ( garantie: any) => {
+  axios
+    .put(`${config.apiUrl}/api/garantie-quittance`, garantie, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      console.log(response);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};
 
 
    

@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import { Navigate } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import MaterialReactTable, {
   MRT_ColumnFiltersState,
     type MaterialReactTableProps,
@@ -360,9 +361,14 @@ const Examples = () => {
                 enableEditing  
                 renderRowActions={({ row, table }) => (
                     <Box sx={{ display: 'flex', gap: '1rem' }}>
-                        <Tooltip arrow placement="left" title="Edit">
+                        <Tooltip arrow placement="left" title="Modifier">
                             <IconButton onClick={() =>   navigate('/quittance-update/'+row.original.id)  }>
                                 <Edit />
+                            </IconButton>
+                        </Tooltip> 
+                        <Tooltip arrow placement="left" title="Consulter">
+                            <IconButton onClick={() =>   navigate('/quittance-consult/'+row.original.id)  }>
+                                <VisibilityIcon />
                             </IconButton>
                         </Tooltip> 
                     </Box>

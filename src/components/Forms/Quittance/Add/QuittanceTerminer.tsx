@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { jsonDataQuittance, jsonDataState } from '../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { jsonDataQuittance, jsonDataState, jsonDatalibelle } from '../recoil/atoms';
 import { saveQuittanceGarantie } from '../../../../api/service/provideData';
 import axios from 'axios';
 import Successful from '../../tools/successful';
@@ -12,13 +12,14 @@ import './style.css'; // Import the CSS file
 function SuccessMessage() {
     const [jsonDataP, setJsonDataP] = useRecoilState(jsonDataState);
     const [jsonQuittances, setJsonQuittance] = useRecoilState(jsonDataQuittance);
-
+    const [jsonDataLibelle, setJsonDataLibelle] = useRecoilState(jsonDatalibelle);
     const [saveStatus, setSaveStatus] = useState('');
     
     console.log("viewer jsonDataP")
     console.log(jsonDataP)
     console.log("viewer jsonQuittances")
     console.log(jsonQuittances)
+
 
     const jsonQuittancesObj = JSON.parse(jsonQuittances);
     
@@ -43,12 +44,100 @@ function SuccessMessage() {
       const { Column, HeaderCell, Cell } = Table; 
       const jsonQuittancesArray = JSON.parse(jsonQuittances);
       const jsonDataPArray = JSON.parse(jsonDataP).map((item: string) => JSON.parse(item));
+     
+      const data = useRecoilValue(jsonDatalibelle);
+      const versionCommercialElement = data.size > 0 ? data.toArray()[0] : undefined; // Check if the list is not empty before accessing the element
+      const IntermmediaireElement = data.size > 0 ? data.toArray()[1] : undefined; 
+
+      console.log("viewer json Libelle")
+      console.log(versionCommercialElement)
+      console.log(IntermmediaireElement)
+ 
+      
 
   return (
     <>
 
+
+ 
+ 
+ 
+<div className="centered-content">
+  <h2>Quittance # {jsonQuittancesObj.numeroquittance}</h2>
+  
+  <Grid className="grid-container">      
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Exercice:</span> {jsonQuittancesObj.exercice}</label>
+      <label htmlFor=""><span className="span-size">Ordre: </span>{jsonQuittancesObj.ordre}</label>
+    </div>
+<br />
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Intermediaire:</span> {IntermmediaireElement}</label>
+      <label htmlFor=""><span className="span-size">Version commerciale:</span> {versionCommercialElement}</label>
+    </div>
+    <br />
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Date debut:</span> {jsonQuittancesObj.datedebut}</label>
+      <label htmlFor=""><span className="span-size">Date fin:</span> {jsonQuittancesObj.datefin}</label>
+    </div>
+    <br />
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Date etat:</span> {jsonQuittancesObj.dateetat}</label>
+      <label htmlFor=""><span className="span-size">Date emission:</span> {jsonQuittancesObj.dateemission}</label>
+    </div>
+    <br />
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Montant remise: </span>{jsonQuittancesObj.montontremise}</label>
+      <label htmlFor=""><span className="span-size">Taux taxe: </span>{jsonQuittancesObj.tauxtaxe}</label>
+    </div>
+    <br />
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Montantaccessoire: </span>{jsonQuittancesObj.montantaccessoire}</label>
+      <label htmlFor=""><span className="span-size">Taux commission: </span>{jsonQuittancesObj.tauxcommission}</label>
+    </div>
+    <br />
+    <div className="label-row">
+      <label htmlFor=""><span className="span-size">Prime nette:</span> {jsonQuittancesObj.tauxprimenette}</label>
+      <label htmlFor=""><span className="span-size">Montant taxe parafiscale:</span> {jsonQuittancesObj.montanttaxeparafiscale}</label>
+    </div>
+    <br />
+  </Grid>
+</div>
+
+ 
+      <table className="styled-table">
+        <thead>
+          <tr>
+            <th>libelle</th> 
+            <th>PrimeNette</th>
+            <th>Taxe</th>
+            <th>Accessoire</th>
+            <th>Tauxcommission</th>
+            <th>Commission</th>
+            <th>TauxprimeEVE</th>
+            <th>PrimeGarEve</th>
+            <th>TauxParafiscale</th>
+          </tr>
+        </thead>
+        <tbody>
+          {jsonDataPArray.map((each_datarecord: any) => (
+            <tr key={each_datarecord.id}>
+              <td>{each_datarecord.libelle}</td> 
+              <td>{each_datarecord.PrimeNette}</td>
+              <td>{each_datarecord.Taxe}</td>
+              <td>{each_datarecord.Accessoire}</td>
+              <td>{each_datarecord.Tauxcommission}</td>
+              <td>{each_datarecord.Commission}</td>
+              <td>{each_datarecord.TauxprimeEVE}</td>
+              <td>{each_datarecord.PrimeGarEve}</td>
+              <td>{each_datarecord.TauxParafiscale}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
     
-    {saveStatus === 'successful' ? (
+      {saveStatus === 'successful' ? (
       <div>
       <Successful />
     
@@ -69,82 +158,6 @@ function SuccessMessage() {
             </Button>
       </div>
     )}
- 
- 
- 
-<div className="centered-content">
-        <h2>jsonQuittances</h2>
-        <Grid   >
-        <div className="label-row" >
-        <Grid   >     <label htmlFor="">numeroquittance: {jsonQuittancesObj.numeroquittance}</label>  </Grid>
-            <label htmlFor="">Exercice: {jsonQuittancesObj.exercice}</label>
-            <label htmlFor="">ordre: {jsonQuittancesObj.ordre}</label>
-          </div>
-        
-          <div className="label-row">
-            <label htmlFor="">intermediaire: {jsonQuittancesObj.intermediaireid}</label>
-            <label htmlFor="">versioncommerciale: {jsonQuittancesObj.versioncommerciale}</label>
-          </div>
-          <div className="label-row">
-            <label htmlFor="">datedebut: {jsonQuittancesObj.datedebut}</label>
-            <label htmlFor="">datefin: {jsonQuittancesObj.datefin}</label>
-            <label htmlFor="">dateetat: {jsonQuittancesObj.dateetat}</label>
-          </div>
-          <div className="label-row">
-            <label htmlFor="">dateemission: {jsonQuittancesObj.dateemission}</label>
-            <label htmlFor="">montontremise: {jsonQuittancesObj.montontremise}</label>
-          </div>
-          <div className="label-row">
-            <label htmlFor="">Tauxtaxe: {jsonQuittancesObj.tauxtaxe}</label>
-            <label htmlFor="">Montantaccessoire: {jsonQuittancesObj.montantaccessoire}</label>
-            <label htmlFor="">Tauxcommission: {jsonQuittancesObj.tauxcommission}</label>
-          </div>
-          <div className="label-row">
-            <label htmlFor="">Tauxprimenette: {jsonQuittancesObj.tauxprimenette}</label>
-            <label htmlFor="">Montanttaxeparafiscale: {jsonQuittancesObj.montanttaxeparafiscale}</label>
-          </div>
-        </Grid>
-      </div>
-
- 
-      <table className="styled-table">
-        <thead>
-          <tr>
-            <th>libelle</th>
-            <th>taux</th>
-            <th>datedebut</th>
-            <th>datefin</th>
-            <th>PrimeNette</th>
-            <th>Taxe</th>
-            <th>Accessoire</th>
-            <th>Tauxcommission</th>
-            <th>Commission</th>
-            <th>TauxprimeEVE</th>
-            <th>PrimeGarEve</th>
-            <th>TauxParafiscale</th>
-          </tr>
-        </thead>
-        <tbody>
-          {jsonDataPArray.map((each_datarecord: any) => (
-            <tr key={each_datarecord.id}>
-              <td>{each_datarecord.libelle}</td>
-              <td>{each_datarecord.taux}</td>
-              <td>{each_datarecord.datedebut}</td>
-              <td>{each_datarecord.datefin}</td>
-              <td>{each_datarecord.PrimeNette}</td>
-              <td>{each_datarecord.Taxe}</td>
-              <td>{each_datarecord.Accessoire}</td>
-              <td>{each_datarecord.Tauxcommission}</td>
-              <td>{each_datarecord.Commission}</td>
-              <td>{each_datarecord.TauxprimeEVE}</td>
-              <td>{each_datarecord.PrimeGarEve}</td>
-              <td>{each_datarecord.TauxParafiscale}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-
   </>
   );
 }
