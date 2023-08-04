@@ -1,4 +1,5 @@
 export interface QuittanceDetailGarantiePayload {
+    id:null | number;
     idquittance: null | number;
     idgarantie: null | number;
     pourcentagegarantie: number;
@@ -18,4 +19,5 @@ export interface QuittanceDetailGarantiePayload {
     PrimeGareEve: number;
     TauxTaxeParafiscale: number;
     TauxPrimeEVE: number;
+    libelle:String;
 }

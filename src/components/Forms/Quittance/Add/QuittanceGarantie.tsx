@@ -13,7 +13,7 @@ type Post = {
   Taxe: number;
   Accessoire: number;
   Tauxcommission: number;
-  Commission: number;
+  montantcommision: number;
   TauxprimeEVE: number;
   PrimeGarEve: number;
   TauxParafiscale: number;
@@ -85,7 +85,7 @@ const QuittanceGarantie = (props: any) => {
     Taxe: 0,
     Accessoire: 0,
     Tauxcommission: 0,
-    Commission: 0,
+    montantcommision: 0,
     TauxprimeEVE: 0,
     PrimeGarEve: 0,
     TauxParafiscale: 0,
@@ -130,7 +130,7 @@ const QuittanceGarantie = (props: any) => {
       Taxe: 0,
       Accessoire: 0,
       Tauxcommission: 0,
-      Commission: 0,
+      montantcommision: 0,
       TauxprimeEVE: 0,
       PrimeGarEve: 0,
       TauxParafiscale: 0,
@@ -141,7 +141,7 @@ const QuittanceGarantie = (props: any) => {
       acc.Taxe += post.Taxe;
       acc.Accessoire += post.Accessoire;
       acc.Tauxcommission += post.Tauxcommission;
-      acc.Commission += post.Commission;
+      acc.montantcommision += post.montantcommision;
       acc.TauxprimeEVE += post.TauxprimeEVE;
       acc.PrimeGarEve += post.PrimeGarEve;
       acc.TauxParafiscale += post.TauxParafiscale;
@@ -159,7 +159,7 @@ const QuittanceGarantie = (props: any) => {
       console.log('Taxe:', post.Taxe);
       console.log('Accessoire:', post.Accessoire);
       console.log('Tauxcommission:', post.Tauxcommission);
-      console.log('Commission:', post.Commission);
+      console.log('Commission:', post.montantcommision);
       console.log('TauxprimeEVE:', post.TauxprimeEVE);
       console.log('PrimeGarEve:', post.PrimeGarEve);
       console.log('TauxParafiscale:', post.TauxParafiscale);
@@ -169,7 +169,7 @@ const QuittanceGarantie = (props: any) => {
     console.log('Total Taxe:', sums.Taxe);
     console.log('Total Accessoire:', sums.Accessoire);
     console.log('Total Tauxcommission:', sums.Tauxcommission);
-    console.log('Total Commission:', sums.Commission);
+    console.log('Total Commission:', sums.montantcommision);
     console.log('Total TauxprimeEVE:', sums.TauxprimeEVE);
     console.log('Total PrimeGarEve:', sums.PrimeGarEve);
     console.log('Total TauxParafiscale:', sums.TauxParafiscale);
@@ -197,10 +197,12 @@ const QuittanceGarantie = (props: any) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {posts.map((post, index) => (
+            {posts?.map((post, index) => (
               <TableRow key={post.id}>
-                  <TableCell >{post.id}</TableCell>
-                <TableCell>{post.libelle}</TableCell>
+                  <TableCell >{post?.id}</TableCell>
+                <TableCell>{post?.libelle}</TableCell>
+                 
+                
                 <TableCell>
                   <input className="borderless" type="text" value={post.PrimeNette} onChange={(event) => handleChange(event, index, 'PrimeNette')} />
                 </TableCell>
@@ -214,7 +216,7 @@ const QuittanceGarantie = (props: any) => {
                   <input className="borderless" type="text" value={post.Tauxcommission} onChange={(event) => handleChange(event, index, 'Tauxcommission')} />
                 </TableCell>
                 <TableCell>
-                  <input className="borderless" type="text" value={post.Commission} onChange={(event) => handleChange(event, index, 'Commission')} />
+                  <input className="borderless" type="text" value={post.montantcommision} onChange={(event) => handleChange(event, index, 'montantcommision')} />
                 </TableCell>
                 <TableCell>
                   <input className="borderless" type="text" value={post.TauxprimeEVE} onChange={(event) => handleChange(event, index, 'TauxprimeEVE')} />
@@ -234,7 +236,7 @@ const QuittanceGarantie = (props: any) => {
               <TableCell>{sums.Taxe}</TableCell>
               <TableCell>{sums.Accessoire}</TableCell>
               <TableCell>{sums.Tauxcommission}</TableCell>
-              <TableCell>{sums.Commission}</TableCell>
+              <TableCell>{sums.montantcommision}</TableCell>
               <TableCell>{sums.TauxprimeEVE}</TableCell>
               <TableCell>{sums.PrimeGarEve}</TableCell>
               <TableCell>{sums.TauxParafiscale}</TableCell>

@@ -14,9 +14,6 @@ import {
     Grid,
     IconButton,
     InputLabel,
-    ListItem,
-    ListItemAvatar,
-    ListItemText,
     MenuItem,
     NativeSelect,
     Select,
@@ -24,9 +21,9 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-import { Avatar, Form, List  } from 'rsuite';
+import { Form  } from 'rsuite';
 import { Container } from 'react-bootstrap/lib/Tab';
-import { UpdateQuittance, fetchGarantieToEachQuittance, fetchQuittance,ModificationQuittance } from '../../../../api/service/provideData';
+import { UpdateQuittance, fetchGarantieToEachQuittance, fetchQuittance } from '../../../../api/service/provideData';
 import QuittancePayload from '../Add/QuittancePayload';
 import { QuittanceDetailGarantiePayload } from '../../../../api/interface/QuittanceDetailGarantiePayload';
 import Table from '@mui/material/Table';
@@ -36,44 +33,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { dateFormat, formatDateForTextField } from '../../../../utils/features';
-import AlertDialog from '../../../AlertDialog';
-import { ListItemButton } from '@mui/joy';
-import { blue } from '@mui/material/colors';
-import { Typography } from '@mui/material';
-
-
-export interface SimpleDialogProps {
-   
-  open: boolean;
-  selectedValue: string;
-  onClose: (value: string) => void;
-}
+import { dateFormat } from '../../../../utils/features';
 
  
-function SimpleDialog(props: SimpleDialogProps ) {
-  const { onClose, selectedValue, open } = props;
-
-  const handleClose = () => {
-    onClose(selectedValue);
-  };
-
- 
-  return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle style={{ textAlign: 'center' }}>Modification</DialogTitle>
-      <List  >
-        <Typography variant="h6" align="center"> Mis à jour avec succés</Typography>
-      </List>
-    </Dialog>
-  );
-}
- 
-
- 
-function QuittanceUpdate () {
-
- 
+function QuittanceView () {
 
 
     const [formData, setFormData] = useState ({
@@ -102,7 +65,7 @@ function QuittanceUpdate () {
         montontremise:0,
         etatquittance:"",
         libelle:"",
-        police :{ codePolice: "" ,intermediaire:{nomCommercial:""},prdVersioncommerciale:{nomcommercial:""},primeNette:""}
+        police :{ codePolice: "" ,intermediaire:{nomCommercial:""},prdVersioncommerciale:{nomcommercial:""},primeNette:"" }
       
       });
       const { codequittance } = useParams()
@@ -111,26 +74,10 @@ function QuittanceUpdate () {
       function provideDateQuittance(){
        return fetchQuittance(codequittance);
       }
-      const [quittance, setquittance] = useState<QuittancePayload[] | null>(null);  
+      const [quittance, setquittance] = useState<QuittancePayload[] | null>(null); 
+      const [quittanceGarantie, setquittancegarantie] = useState<QuittanceDetailGarantiePayload[]   >( ); 
        
  
-      const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
-        //  handleFormSubmit();
-          const { name, value } = event.target;
-          setFormData((prevState) => ({
-           
-            ...prevState,
-            [name]: value,
-           
-          }),
-          ); 
-           
-          console.log(formData)
-          //Update  the  data  from  the formData to  Json
-        //  handleFormSubmit();
-        };
-
-        
       useEffect(() => {
         const fetchData = async () => {
 
@@ -138,10 +85,12 @@ function QuittanceUpdate () {
           
           setquittance(quittanceData);
           setFormData(quittanceData);
-          console.log("Dragon")
           console.log(quittanceData)
           console.log(quittance)
-          
+          const quittanceGarantieData = await fetchGarantieToEachQuittance(codequittance);
+          setquittancegarantie(quittanceGarantieData);
+          console.log("Boucca")
+          console.log(quittanceGarantie)
         };
     
         fetchData();
@@ -164,60 +113,20 @@ function QuittanceUpdate () {
       
       const HandlClickUpdateQuittance = () => { 
     
-        ModificationQuittance(formData)
+        UpdateQuittance(formData)
         .then(() => {
-
-          handleClickOpen("msg:any");
-          console.log(formData)
-          console.log("Fin")
-         
+           alert("Good")
           })
           .catch(() => {
             alert("bad")
           });
+        
+    
       }
-      const [openDialog, setOpenDialog] = useState(false);
-      const handleOpenDialog = () => {
-        setOpenDialog(true);
-      };
-    
-      const handleCloseDialog = () => {
-        setOpenDialog(false);
-      };
-
-
-
-
-      const [open, setOpen] = React.useState(false);
-      const [selectedValue, setSelectedValue] = React.useState();
-    
-      const handleClickOpen = (msg:String) => {
-        setOpen(true);
-      };
-    
-      const handleClose = (value: string) => {
-        setOpen(false); 
-      };
-
-
        
     return (
       <>
-        <Box  >
-     
-
-
-    
-      <SimpleDialog 
-       
-           
-            open={open}
-            onClose={handleClose} selectedValue={''}      />
-
-
-
-
-
+        <Box sx={{ marginLeft: 'auto', padding: '5rem',marginRight: 'auto', maxWidth: '80%', backgroundColor: '#FFFFFF',justifyContent: 'center' }}>
      
      <Form onSubmit={HandlClickUpdateQuittance} id="printable-content" > 
      <Grid item xs={12} sm={4}>
@@ -233,7 +142,7 @@ function QuittanceUpdate () {
          label="Numero quittance"
          variant="outlined"
          placeholder="9900202308905182" 
-        value={formData.numeroquittance}
+        value={formData?.numeroquittance}
          type="text"
          fullWidth
          InputLabelProps={{
@@ -248,7 +157,7 @@ function QuittanceUpdate () {
          name="idCodePolice"
          label="Numero police"
          variant="outlined"
-         value={formData?.police.codePolice} 
+         value={formData?.police?.codePolice} 
          type="text" 
          fullWidth
          InputLabelProps={{
@@ -266,7 +175,7 @@ function QuittanceUpdate () {
          name="prdVersioncommerciale"
          label="nomcommercial"
          variant="outlined"
-         value={formData?.police.prdVersioncommerciale?.nomcommercial} 
+         value={formData.police?.prdVersioncommerciale.nomcommercial} 
          type="text"
          fullWidth
          InputLabelProps={{
@@ -280,7 +189,7 @@ function QuittanceUpdate () {
          name="exercice"
          label="Exercice"
          variant="outlined"
-         value={formData.exercice} 
+         value={formData?.exercice} 
          type="text"
          fullWidth
          InputLabelProps={{
@@ -295,7 +204,7 @@ function QuittanceUpdate () {
          name="ordre"
          label="Ordre"
          variant="outlined"
-         value={formData.ordre}
+         value={formData?.ordre}
          
          type="text"
          fullWidth
@@ -313,7 +222,7 @@ function QuittanceUpdate () {
          name="intermediaire"
          label="intermediaire"
          variant="outlined"
-         value={formData.police.intermediaire.nomCommercial}
+         value={formData.police?.intermediaire.nomCommercial}
          
          type="text"
          fullWidth
@@ -339,7 +248,7 @@ function QuittanceUpdate () {
        name="etatquittance"
        label="etatquittance"
        variant="outlined"
-       value={formData.etatquittance} 
+       value={formData?.etatquittance} 
        type="text"
        fullWidth
        InputLabelProps={{
@@ -356,7 +265,7 @@ function QuittanceUpdate () {
        name="qtcRemiseid"
        label="qtcRemiseid"
        variant="outlined"
-       value={formData.qtcRemiseid} 
+       value={formData?.qtcRemiseid} 
        type="text"
        fullWidth
        InputLabelProps={{
@@ -371,7 +280,7 @@ function QuittanceUpdate () {
        name="remise"
        label="Remise"
        variant="outlined"
-       value={formData.montontremise}
+       value={formData?.montontremise}
         
        
        type="text"
@@ -408,9 +317,9 @@ function QuittanceUpdate () {
     name="dateemission"
     label="Date Emission"
     variant="outlined"
-    value={  formData?.dateemission?formatDateForTextField(formData?.dateemission): ""  }
-     onChange={handleInputChange}
-    type="date"
+    value={ (new Date(formData?.dateemission).toLocaleDateString())}
+    // onChange={handleInputChange}
+    type="text"
     fullWidth
     InputLabelProps={{
       shrink: true,
@@ -424,9 +333,9 @@ function QuittanceUpdate () {
      name="dateetat"
      label="Date Etat"
      variant="outlined"
-     value={ formData?.dateetat?formatDateForTextField(formData?.dateetat): "" }
-     onChange={handleInputChange}
-     type="date"
+     value={(new Date(formData?.dateetat).toLocaleDateString())}
+   //  onChange={handleInputChange}
+     type="text"
      fullWidth
      InputLabelProps={{
        shrink: true,
@@ -440,9 +349,9 @@ function QuittanceUpdate () {
      name="datedebut"
      label="Date Debut"
      variant="outlined"
-     value={formData?.datedebut ? formatDateForTextField(formData.datedebut) : ""}
-   onChange={handleInputChange}
-     type="date"
+     value={ (new Date(formData?.datedebut).toLocaleDateString())} 
+   //  onChange={handleInputChange}
+     type="text"
      fullWidth
      InputLabelProps={{
        shrink: true,
@@ -456,9 +365,9 @@ function QuittanceUpdate () {
      name="datefin"
      label="Date Fin"
      variant="outlined"
-     value={formData?.datefin?formatDateForTextField(formData?.datefin):""}
-     onChange={handleInputChange}
-     type="date"
+     value={(new Date(formData?.datefin).toLocaleDateString())}
+ //    onChange={handleInputChange}
+     type="text"
      fullWidth
      InputLabelProps={{
        shrink: true,
@@ -490,7 +399,7 @@ function QuittanceUpdate () {
      name="tauxprimenette"
      label="Taux Prime Nette"
      variant="outlined"
-     value={formData?.police.primeNette}
+     value={formData.police?.primeNette}
    //  onChange={handleInputChange}
      type="number"
      fullWidth
@@ -591,28 +500,75 @@ function QuittanceUpdate () {
 
 </Grid>
 </Grid>
-
-<Grid container spacing={2} justifyContent="flex-end">
-  <Grid item>
-    <Button startIcon={<PrintIcon />} variant="contained" color="primary" onClick={handlePrint}>
-      Imprimer
-    </Button>
-  </Grid>
-  <Grid item>
-    <Button  type="submit" variant="contained" color="primary">
-      Update
-    </Button>
-  </Grid>
-</Grid>
  
 </Form>
 
  
+      
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Garantie</TableCell>
+            <TableCell align="right">Primenette</TableCell>
+            <TableCell align="right">Montant commission</TableCell>
+            <TableCell align="right">TauxTaxeParafiscale</TableCell>
+            <TableCell align="right">PrimeGareEve</TableCell>
+            <TableCell align="right">Taux taxe</TableCell>
+            <TableCell align="right">Montant accessoire</TableCell>
+            
+            
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {quittanceGarantie?.map((row ) => (
+            <TableRow
+              key={row?.idgarantie}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+              {row?.libelle}
+              </TableCell> 
+              <TableCell align="right">{row?.primenette}</TableCell>
+              <TableCell align="right">{row?.montantcommission}</TableCell>
+              <TableCell align="right">{row?.TauxTaxeParafiscale}</TableCell>
+              <TableCell align="right">{row?.Tauxtaxe}</TableCell>
+              <TableCell align="right">{row?.Montantaccessoire}</TableCell>
+              
+              <TableCell align="right">{row?.PrimeGareEve}</TableCell>
+               
+              
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+
+    <Grid item xs={12}>
+          <Button startIcon={<PrintIcon/> } variant="contained" color="primary" onClick={handlePrint}>
+             Imprimer
+          </Button>
+        </Grid>
 
     </Box>
  </>
     );
   };
   
-  export default QuittanceUpdate;
+  export default QuittanceView;

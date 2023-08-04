@@ -108,6 +108,7 @@ const ConnectedUserInfo = () => {
         }
         sx={{ textTransform: "none", textAlign: "left", p: "3px 15px" }}
       >
+       
         <ListItemText
           primary={user.nom + ' ' + user.prenom}
           secondary="Admin"
@@ -132,22 +133,7 @@ const ConnectedUserInfo = () => {
         anchorEl={anchorElUser}
         open={open}
         onClose={handleCloseUserMenu}
-        /*
-        sx={{ mt: "40px" }}
-        id="menu-appbar"
-        anchorEl={anchorElUser}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        open={Boolean(anchorElUser)}
-        onClose={handleCloseUserMenu}
-        */
+     
       >
         <MenuItem key="1">Roles</MenuItem>
         <MenuItem
@@ -160,62 +146,7 @@ const ConnectedUserInfo = () => {
     </>
   );
 
-  /*
-  return (
-    <Box sx={{ flexGrow: 0 }}>
-      <Tooltip title="Open settings">
-        <Button
-          id="basic-button"
-          aria-controls={open ? "basic-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleOpenUserMenu}
-          variant="outlined"
-          sx={{
-            p: 0,
-            m: 0,
-            ml: 1,
-            //color: "supported.header.user"
-          }}
-          startIcon={
-            <Avatar
-              //alt="Connected User"}
-              src={loginUserImg}
-              sx={{ width: "40px", height: "39px" }}
-            />
-          }
-          endIcon={open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        >
-          Connected User
-        </Button>
-      </Tooltip>
-      <Menu
-        sx={{ mt: "40px" }}
-        id="menu-appbar"
-        anchorEl={anchorElUser}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        open={Boolean(anchorElUser)}
-        onClose={handleCloseUserMenu}
-      >
-        <MenuItem key="1">Roles</MenuItem>
-        <MenuItem
-          key="2"
-          //onClick={signOut}
-        >
-          Log out
-        </MenuItem>
-      </Menu>
-    </Box>
-  );
-  */
+ 
 };
 
 export default ConnectedUserInfo;

@@ -22,6 +22,8 @@ import StepperQuittanceAdd from "./components/Forms/Quittance/Add/stepperQuittan
 import { RecoilRoot } from "recoil";
 import UpdatePolice from "./components/Forms/Police/Update/UpdatePolice";
 import QuittanceUpdate from "./components/Forms/Quittance/Update/QuittanceUpdate"; 
+import QuittanceView from "./components/Forms/Quittance/Consulter/QuittanceView";
+import StepperQuittanceUpdate from "./components/Forms/Quittance/Update/stepperQuittanceUpdate";
  
 
 
@@ -62,11 +64,13 @@ function App() {
               {/* <Route path="quittance-add" element={<QuittanceAdd />} /> */} 
               
               <Route path="quittance-add" element={<StepperQuittanceAdd />} />
-              <Route path="quittance-update/:codequittance" element={<QuittanceUpdate />} />
+              <Route path="quittance-update/:codequittance" element={<StepperQuittanceUpdate />} />
+              <Route path="quittance-consult/:codequittance" element={<QuittanceView />} />
                <Route path="police-add" element={<AddPolice />} />   
               <Route path="police-details/:codePolice" element={<ConsultPolicePage />} />
               <Route path="police-update/:codePolice" element={<UpdatePolice />} />
               <Route path="quittance-search" element={<Examples />} />
+
             </Route>
             <Route path="/loginUp" element={<SignUpSide />} />
             <Route path="/signIn" element={<SignInSide />} />

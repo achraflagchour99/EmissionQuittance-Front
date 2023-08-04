@@ -27,17 +27,20 @@ import config from '../../../../config/config';
 import QuittanceGarantie from './QuittanceGarantie';
 import TableExample from './QuittancetestGrnt';
 import { useRecoilState } from 'recoil';
-import { idCodePoliceState, jsonDataQuittance } from '../recoil/atoms';
-  
+import { idCodePoliceState, jsonDataQuittance, jsonDatalibelle } from '../recoil/atoms';
+import '../style.css'; // Import the CSS file 
+import { List } from 'immutable';
  
  
 
 
 function QuittanceAdd( ) {  
 
+ 
   const [tableData, setTableData] = useState([]);
   const [idCodePolice, setIdCodePolice] = useRecoilState(idCodePoliceState);
   const [jsonQuittances, setJsonQuittance] = useRecoilState(jsonDataQuittance);
+  const [jsonDataLibelle, setJsonDataLibelle] = useRecoilState(jsonDatalibelle);
   
 
   const handleTableDataChange = (data: React.SetStateAction<never[]>) => {
@@ -52,7 +55,11 @@ function QuittanceAdd( ) {
       const dateDebut = new Date(formData.datedebut);
       const dateFin = new Date(formData.datefin);
   
-    if(dateDebut < dateFin){
+    if(dateDebut < dateFin  ){
+      if( formData.primenette-formData.tauxcommission>formData.montontremise){
+        toast.error('Montant  de remise insufisant', { position: toast.POSITION.TOP_RIGHT });
+        return;
+      }
       const jsonData = JSON.stringify(formData);
       setJsonQuittance(jsonData);  
       if(jsonData !=null){
@@ -107,6 +114,14 @@ function QuittanceAdd( ) {
       
       });
     
+      const [formDataLibelle, setFormDataLibelle] = useState({
+        
+        versionCommerialLibelle:"",
+        intermediairesLibelle:""
+      
+      });
+
+
       const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
       //  handleFormSubmit();
         const { name, value } = event.target;
@@ -191,7 +206,7 @@ function QuittanceAdd( ) {
         };
     
         fetchData();
-      }, [formData.ordre,formData.exercice,formData.numeroquittance,formData.primenette,formData.montantaccessoire,formData.tauxcommission,formData.tauxtaxe,formData.versioncommerciale,formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
+      }, [formDataLibelle.intermediairesLibelle,formDataLibelle.versionCommerialLibelle,formData.ordre,formData.exercice,formData.numeroquittance,formData.primenette,formData.montantaccessoire,formData.tauxcommission,formData.tauxtaxe,formData.versioncommerciale,formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
  
 
 
@@ -224,18 +239,34 @@ function QuittanceAdd( ) {
           
               const updatedFormData = { ...formData, policeid: data[0].id
               ,  versioncommerciale: data[0].prdVersioncommerciale.id
+              ,  intermediaireid: data[0].intermediaire.id
+
+     
+
             ,tauxprimenette: data[0].primeNette
           ,tauxcommission: data[0].tauxComm
         ,tauxtaxe:data[0].taxe
       ,montanttaxeparafiscale:data[0].mnt_taxe_parafiscale
     ,montantaccessoire:data[0].acce
+
+
     ,exercice:maxValues.exercice+1
     ,numeroquittance:maxValues.numeroquittance+1
   };
- 
- 
-          
+
+  const updatedFormDataLibelle = { ...formDataLibelle, 
+    
+     versionCommerialLibelle: data[0].prdVersioncommerciale.nomcommercial
+    ,intermediairesLibelle:data[0].intermediaire.nomCommercial
+};
+
+     
               setFormData(updatedFormData); 
+              setFormDataLibelle(updatedFormDataLibelle);
+               
+              const updatedData =[updatedFormDataLibelle.versionCommerialLibelle, updatedFormDataLibelle.intermediairesLibelle];
+              const updatedList = List<string>(updatedData); // Convert the array to List<string>
+              setJsonDataLibelle(updatedList);
             }
           })
           .catch(error => {
@@ -245,9 +276,22 @@ function QuittanceAdd( ) {
 
   return (
     <> 
+
+
+<ToastContainer />
+    
+  
+
+
+<Box sx={{ padding: '5rem', margin:'20px', backgroundColor: '#FFFFFF',justifyContent: 'center' }}  >
+  <Typography variant="h5" align="center" color="primary" gutterBottom>
+    Ajouter quittance
+  </Typography>
+
+
 <Form  onSubmit={extractSaveQuittance}>
   
-   <Grid container spacing={2} sx={{ margin: '0 auto', paddingRight:'2rem'}} >
+   <Grid container spacing={1} xs={12} sm={12}  sx={{  }} >
       <Grid item xs={12} sm={4}>
         <TextField
           id="numeroquittance"
@@ -258,7 +302,6 @@ function QuittanceAdd( ) {
           value={formData.numeroquittance}
           onChange={handleInputChange}
           type="text"
-          size='small'
           fullWidth
           InputLabelProps={{
             shrink: true,
@@ -278,7 +321,6 @@ function QuittanceAdd( ) {
           value={formData.idCodePolice}
           onChange={handleInputChange}
           type="text"
-          size='small'
           onBlur={handleBlur}
           fullWidth
           InputLabelProps={{
@@ -290,17 +332,27 @@ function QuittanceAdd( ) {
      
 
 
-      <Grid item xs={12} sm={4}>
- 
-  <TextField 
-       id="versioncommerciale"
-       name="versioncommerciale" 
+  
+<input 
+  id="versioncommerciale"
+  name="versioncommerciale"   
+  value={formData.versioncommerciale}
+  onChange={handleInputChange} 
+  type="hidden" 
+  
+  className="hidden-textfield" // Add the CSS class here
+/>
+
+
+<Grid item xs={12} sm={4}> 
+   <TextField 
+       id="versionCommerialLibelle"
+       name="versionCommerialLibelle" 
        label="version commerciale"
        variant="outlined"
-       value={formData.versioncommerciale}
+       value={formDataLibelle.versionCommerialLibelle}
        onChange={handleInputChange} 
        type="text"
-       size='small'
        fullWidth
        InputLabelProps={{
          shrink: true,
@@ -321,7 +373,6 @@ function QuittanceAdd( ) {
           onChange={handleInputChange}
           type="text"
           fullWidth
-          size='small'
           InputLabelProps={{
             shrink: true,
           }}
@@ -341,7 +392,6 @@ function QuittanceAdd( ) {
           onChange={handleInputChange}
           type="text"
           fullWidth
-          size='small'
           InputLabelProps={{
             shrink: true,
           }}
@@ -351,31 +401,45 @@ function QuittanceAdd( ) {
         />
       </Grid>
 
-   
+      <input 
+  id="intermediaireid"
+  name="intermediaireid"   
+  value={formData.intermediaireid}
+  onChange={handleInputChange} 
+  type="hidden" 
+  
+  className="hidden-textfield" // Add the CSS class here
+/>
 
       <Grid item xs={12} sm={4}>
-      <FormControl fullWidth>
-  <InputLabel variant="standard" htmlFor="uncontrolled-native">
-  Intermediaire
-  </InputLabel>
-  <NativeSelect 
-       id="intermediaireid"
-       name="intermediaireid" 
+      <TextField 
+       id="intermediairesLibelle"
+       name="intermediairesLibelle" 
+       label="Intermediaire"
        variant="outlined"
-       size='small'
-       value={formData.intermediaireid}
+       value={formDataLibelle.intermediairesLibelle}
        onChange={handleInputChange} 
-  > 
-  <option  > Selectionner Intermediaire </option>
-   
-    {intermediaires?.map((intermediaire: any) => (
-      
-            <option key={intermediaire.id} value={intermediaire.id}>{intermediaire.nomCommercial}</option>
-          ))}
- 
-  </NativeSelect>
-</FormControl>
+       type="text"
+       fullWidth
+       InputLabelProps={{
+         shrink: true,
+       }}
+       InputProps={{
+        readOnly: true,
+      }}
+  /> 
 </Grid>
+
+
+      
+
+      
+ 
+
+
+
+        
+
 
       <Grid item xs={12} sm={4}>
       <FormControl fullWidth>
@@ -386,7 +450,6 @@ function QuittanceAdd( ) {
         id="refQuittanceid"
         name="refQuittanceid" 
        variant="outlined"
-       size='small'
        value={formData.refQuittanceid}
           onChange={handleInputChange}
   > 
@@ -410,7 +473,6 @@ function QuittanceAdd( ) {
         variant="outlined"
         value={formData.qtcRemiseid}
         onChange={handleInputChange}
-        size='small'
         type="text"
         fullWidth
         InputLabelProps={{
@@ -425,7 +487,6 @@ function QuittanceAdd( ) {
         name="remise"
         label="Montant de Remise"
         variant="outlined"
-        size='small'
         value={formData.montontremise}
          
         onChange={handleInputChange}
@@ -447,7 +508,6 @@ function QuittanceAdd( ) {
       name="habUtilisateurid"
       label="habUtilisateurid"
       variant="outlined"
-      size='small'
       value={formData.habUtilisateurid}
       onChange={handleInputChange}
       type="text"
@@ -465,7 +525,6 @@ function QuittanceAdd( ) {
       name="dateemission"
       label="Date Emission"
       variant="outlined"
-      size='small'
       value={formData.dateemission}
       onChange={handleInputChange}
       type="date"
@@ -482,7 +541,6 @@ function QuittanceAdd( ) {
       name="dateetat"
       label="Date Etat"
       variant="outlined"
-      size='small'
       value={formData.dateetat}
       onChange={handleInputChange}
       type="date"
@@ -499,7 +557,6 @@ function QuittanceAdd( ) {
       name="datedebut"
       label="Date Debut"
       variant="outlined"
-      size='small'
       value={formData.datedebut}
       onChange={handleInputChange}
       type="date"
@@ -516,7 +573,6 @@ function QuittanceAdd( ) {
       name="datefin"
       label="Date Fin"
       variant="outlined"
-      size='small'
       value={formData.datefin}
       onChange={handleInputChange}
       type="date"
@@ -535,7 +591,6 @@ function QuittanceAdd( ) {
       name="tauxtaxe"
       label="Taux Taxe"
       variant="outlined"
-      size='small'
       value={formData.tauxtaxe}
       onChange={handleInputChange}
       type="number"
@@ -553,7 +608,6 @@ function QuittanceAdd( ) {
       name="tauxprimenette"
       label="Taux Prime Nette"
       variant="outlined"
-      size='small'
       value={formData.tauxprimenette}
       onChange={handleInputChange}
       type="number"
@@ -575,7 +629,6 @@ function QuittanceAdd( ) {
               name="tauxcommission"
               label="Taux Commission"
               variant="outlined"
-              size='small'
               value={formData.tauxcommission}
               onChange={handleInputChange}
               type="number"
@@ -595,7 +648,6 @@ function QuittanceAdd( ) {
               name="montanttaxeparafiscale"
               label="Montant Taxe Parafiscale"
               variant="outlined"
-              size='small'
               value={formData.montanttaxeparafiscale}
               onChange={handleInputChange}
               type="number"
@@ -622,7 +674,6 @@ function QuittanceAdd( ) {
         id="montantaccessoire"
         name="montantaccessoire" 
         variant="outlined"
-        size='small'
         value={formData.montantaccessoire}
         onChange={handleInputChange}
      
@@ -648,7 +699,6 @@ function QuittanceAdd( ) {
           name="primeGareEve"
           label="Prime Gare Eve"
           variant="outlined"
-          size='small'
           value={formData.primeGareEve}
           onChange={handleInputChange}
           type="number"
@@ -670,9 +720,9 @@ function QuittanceAdd( ) {
 {/* <input color="primary"   type="submit" value="Veuillez  Ajouter  la  quittance" /> */}
 
 
-<Grid item xs={12} style={{marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+<Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
             <Button type="submit" variant="contained" color="primary">
-            Valider la quittance 
+            Veuillez  Ajouter  la  quittance 
             </Button>
           </Grid>
 
@@ -680,6 +730,9 @@ function QuittanceAdd( ) {
 </Grid>
 </Form>
 
+</Box>
+
+ 
 </>
   )
 }
@@ -692,4 +745,3 @@ function configureStore(arg0: { reducer: { value: any; }; }) {
 function styled(TableCell: (props: import("@mui/material").TableCellProps) => JSX.Element) {
   throw new Error('Function not implemented.');
 }
-
