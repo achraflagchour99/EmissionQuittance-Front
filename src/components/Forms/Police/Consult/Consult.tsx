@@ -3,6 +3,8 @@ import { TextField, Button, Box, Typography, CircularProgress, Grid, Checkbox, F
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import Garanties from '../Garanties/garanties';
+import config from '../../../../config/config';
 
 const ConsultPolice: React.FC = () => {
   const { codePolice } = useParams();

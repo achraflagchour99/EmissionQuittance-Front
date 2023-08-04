@@ -10,7 +10,7 @@ import QuittanceGarantie from './QuittanceGarantie';
 import { RecoilRoot } from 'recoil';
 import SuccessMessage from './QuittanceTerminer';
 
-const steps = ['Inserer  Quittance', 'Inserer Garantie quittance', 'Finaliser quittance'];
+const steps = ['Informations de la Quittance', 'Informations des Garanties', 'Validation de la Quittance'];
 
 export default function StepperQuittanceAdd() {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -77,8 +77,28 @@ export default function StepperQuittanceAdd() {
 
   return (
     <RecoilRoot>
-      <Box sx={{ marginLeft: 'auto', padding: '5rem',marginRight: 'auto', maxWidth: '80%', backgroundColor: '#FFFFFF',justifyContent: 'center' }}>
-        <Stepper nonLinear activeStep={activeStep}>
+       <Box
+        sx={{
+          padding: '2rem',
+          marginTop: '0.5rem',
+          marginBottom:'3rem',
+          height: 'auto', // Utilisation de 'auto' pour la hauteur
+          backgroundColor: 'white',
+          border: 2,
+          borderColor: '#a7bcb9',
+          justifyContent: 'center',
+          marginLeft: '1.8rem',
+          marginRight: '2rem',
+          borderRadius: '5px',
+          boxShadow:
+            '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
+        }}
+        >
+           <Typography marginBottom={"50px"} variant="h5" align="center" color="primary" gutterBottom>
+                    Nouvelle Quittance
+            </Typography>
+  <Box sx={{ paddingBottom: '2rem' }}>
+        <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>
               <StepButton color="inherit" onClick={handleStep(index)}>
@@ -87,7 +107,7 @@ export default function StepperQuittanceAdd() {
             </Step>
           ))}
         </Stepper>
-        
+        </Box>
         <div>{getStepContent(activeStep)}</div>
         <div>
           {allStepsCompleted() ? (
@@ -110,11 +130,11 @@ export default function StepperQuittanceAdd() {
                   onClick={handleBack}
                   sx={{ mr: 1 }}
                 >
-                  Back
+                  Retour
                 </Button>
                 <Box sx={{ flex: '1 1 auto' }} />
                 <Button onClick={handleNext} sx={{ mr: 1 }}>
-                  Next
+                  Suivant
                 </Button>
                 {activeStep !== steps.length &&
                   (completed[activeStep] ? (
@@ -125,7 +145,7 @@ export default function StepperQuittanceAdd() {
                     <Button onClick={handleComplete}>
                       {completedSteps() === totalSteps() - 1
                         ? 'Finish'
-                        : 'Complete Step'}
+                        : ' étape compléte'}
                     </Button>
                   ))}
               </Box>

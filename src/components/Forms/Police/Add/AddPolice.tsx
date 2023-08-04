@@ -13,6 +13,7 @@ import Garanties from '../Garanties/garanties';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import { useNavigate } from 'react-router-dom';
+import AlertDialog from '../../../AlertDialog';
 
 const AddPolice: React.FC = () => {
   const navigate = useNavigate();
@@ -79,7 +80,12 @@ const AddPolice: React.FC = () => {
       const montantPrime = Number(this.parent.primeNette);
       return value <= 0.15 * montantPrime;
     }),
-    prdVersioncommerciale: Yup.string().required('Le produit est requis'),
+    prdVersioncommerciale: Yup.object()
+    .shape({
+      id: Yup.number().required('Le produit est requis'),
+      nomcommercial: Yup.string().required('Le produit est requis'),
+    })
+    .required('Le produit est requis'),
     raisonSociale: Yup.string().required('La raison sociale est requise'),
     dateEffet: Yup.date().required('La date d\'effet est requise'),
     dateEcheance: Yup.date()
@@ -98,11 +104,18 @@ const isStepComplete = () => {
     return !!taxe && !!dateEffet && !!dateEcheance /* et les autres conditions pour les autres champs */;
   };
 
-      const handleNext = () => {
-        if (formik.isValid && isStepComplete()) {
-            setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        }
-      };
+  const handleNext = () => {
+    const fieldsToValidate = ['prdVersioncommerciale', 'acce', 'taxe', 'dateEffet', 'dateEcheance', 'dateTerme'];
+
+    fieldsToValidate.forEach((field) => {
+      formik.validateField(field);
+      formik.setFieldTouched(field, true);
+    });
+
+    if (formik.isValid && isStepComplete()) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
+  };
       const handleCodePoliceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const input = event.target.value;
         const onlyNumbers = input.replace(/[^0-9]/g, ''); // Filtrer uniquement les chiffres
@@ -119,11 +132,12 @@ const isStepComplete = () => {
         const ville = villes.find((v) => v.libelle === selectedVilleLibelle);
         setSelectedVille(ville || null); 
       };
-    const handleVersionChange = (event: ChangeEvent<{ value: unknown }>) => {
+      const handleVersionChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedVersion = event.target.value as string;
         const nomcommercial = versions.find((v) => v.nomcommercial === selectedVersion);
         setSelectedVersion(nomcommercial || null);
-    };
+        formik.setFieldValue('prdVersioncommerciale', nomcommercial || null);
+      };
     const handleIntermChange = (event: ChangeEvent<{ value: unknown }>) => {
         const selectedInterm = event.target.value as string;
         const intermediaire = intermediaires.find((i) => i.nomCommercial === selectedInterm);
@@ -161,9 +175,8 @@ const isStepComplete = () => {
             requestData.typeTerme = null;
           }
       
-          const response = await axios.post('http://localhost:8080/polices/add', requestData);
-      
-          window.location.href = `/consult-page/${response.data.codePolice}`;
+          const response = await axios.post('http://localhost:8081/polices/add', requestData);
+          setShowPopup(true);
         } catch (error) {
           console.error(error);
         }
@@ -228,7 +241,7 @@ const isStepComplete = () => {
             '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
         }}
         >
-            <Typography marginBottom={"20px"} variant="h6" align="center" color="primary" gutterBottom>
+            <Typography marginBottom={"50px"} variant="h5" align="center" color="primary" gutterBottom>
                     Nouvelle Police
             </Typography>
             <Box sx={{ paddingBottom: '1rem' }}>
