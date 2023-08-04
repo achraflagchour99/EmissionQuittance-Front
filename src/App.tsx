@@ -67,7 +67,7 @@ function App() {
               <Route path="quittance-update/:codequittance" element={<StepperQuittanceUpdate />} />
               <Route path="quittance-consult/:codequittance" element={<QuittanceView />} />
                <Route path="police-add" element={<AddPolice />} />   
-              <Route path="consult-page/:codePolice" element={<ConsultPolicePage />} />
+              <Route path="police-details/:codePolice" element={<ConsultPolicePage />} />
               <Route path="police-update/:codePolice" element={<UpdatePolice />} />
               <Route path="quittance-search" element={<Examples />} />
 

@@ -469,7 +469,7 @@ function QuittanceAdd( ) {
       <TextField
         id="qtcRemiseid"
         name="qtcRemiseid"
-        label="qtcRemiseid"
+        label="Numero de Remise"
         variant="outlined"
         value={formData.qtcRemiseid}
         onChange={handleInputChange}
@@ -485,7 +485,7 @@ function QuittanceAdd( ) {
       <TextField
         id="remise"
         name="remise"
-        label="Remise"
+        label="Montant de Remise"
         variant="outlined"
         value={formData.montontremise}
          

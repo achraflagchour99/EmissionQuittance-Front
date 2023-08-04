@@ -14,14 +14,14 @@ import config from '../../../../config/config';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: '#243075',
+    backgroundColor: '#1563a3',
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 15,
   },
   '&.garantie-cell': {
-    width: '40%',
+    width: '70%',
   },
 }));
 
