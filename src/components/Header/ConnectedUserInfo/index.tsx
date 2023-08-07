@@ -135,12 +135,11 @@ const ConnectedUserInfo = () => {
         onClose={handleCloseUserMenu}
      
       >
-        <MenuItem key="1">Roles</MenuItem>
         <MenuItem
           key="2"
            onClick={signOut}
         >
-          Log out
+          Déconnexion
         </MenuItem>
       </StyledMenu>
     </>

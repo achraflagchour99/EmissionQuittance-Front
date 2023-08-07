@@ -9,6 +9,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import DifferenceIcon from '@mui/icons-material/Difference';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
+import DonutLargeIcon from '@mui/icons-material/DonutLarge';
 const ListItems = () => {
   const [policeOpen, setPoliceOpen] = useState(false);
   const [quittanceOpen, setQuittanceOpen] = useState(false);
@@ -23,6 +24,18 @@ const ListItems = () => {
 
   return (
     <div>
+       <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton>
+              <ListItemIcon>
+                <DonutLargeIcon style={{ color: 'white' }}/>
+              </ListItemIcon>
+              <ListItemText primary="Tableau de Bord" />
+            </ListItemButton>
+          </Link>
+          <div style={{ margin: '10px 0' }}></div>
+      <Divider style={{ backgroundColor: 'white' }} />
+      <div style={{ margin: '10px 0' }}></div>
+
       <ListItemButton onClick={handlePoliceClick}>
         <ListItemIcon>
           <ArticleIcon style={{ color: 'white' }} />
@@ -51,7 +64,6 @@ const ListItems = () => {
         </div>
       )}
       <div style={{ margin: '10px 0' }}></div>
-      <Divider style={{ backgroundColor: 'white' }} />
       <Divider style={{ backgroundColor: 'white' }} />
       <div style={{ margin: '10px 0' }}></div>
 
