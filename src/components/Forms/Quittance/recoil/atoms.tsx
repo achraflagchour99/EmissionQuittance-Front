@@ -19,3 +19,12 @@ export const jsonDataQuittance = atom<string>({
     key: 'jsonDatalibelle',
     default: List<string>(),// Use an empty array for the default value
   });
+
+
+ 
+
+  
+  export const StatusQuittance = atom<string>({
+    key: 'StatusQuittance',
+    default: ''
+  });

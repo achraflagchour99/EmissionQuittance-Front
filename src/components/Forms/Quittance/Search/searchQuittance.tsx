@@ -53,8 +53,19 @@ export type Person = {
     ordre:string
     exercice:string, 
     police: {
-      codePolice: string;
-    };
+      codePolice: string,
+      primeNette: number,
+      taxe: number,
+      tauxComm: number;
+      prdVersioncommerciale: {
+        nomcommercial: string
+    },
+    },
+    refQuittance: {
+      etatQuittance: string,
+    },
+    tauxtaxe:0;
+    montantcommision:0;
 };
 
 const Examples = () => {
@@ -189,19 +200,35 @@ const Examples = () => {
           render: (rowData: Person) => rowData?.police?.codePolice || '',
           
         },
+        {
+          accessorKey: 'police.primeNette',
+          header: 'primeNette', 
+          render: (rowData: Person) => rowData?.police?.primeNette || '',
+          
+        },
+        {
+          accessorKey: 'police.taxe',
+          header: 'taxe', 
+          render: (rowData: Person) => rowData?.police?.taxe || '',
+          
+        },
+        {
+          accessorKey: 'police.tauxComm',
+          header: 'tauxComm', 
+          render: (rowData: Person) => rowData?.police?.tauxComm || '', 
+        },
+        {
+          accessorKey: 'police.prdVersioncommerciale.nomcommercial',
+          header: 'prdVersioncommerciale', 
+          render: (rowData: Person) => rowData?.police?.prdVersioncommerciale?.nomcommercial || '', 
+        },
+        {
+          accessorKey: 'refQuittance.etatQuittance',
+          header: 'refQuittance', 
+          render: (rowData: Person) => rowData?.refQuittance?.etatQuittance || '', 
+        },
+       
 
-            {
-                accessorKey: 'nomclient',
-                header: '  nomclient', 
-                
-            },
-
-            {
-                accessorKey: 'dateEcheance',
-                header: 'dateEcheance: ',
-                size: 80,
-                
-            },
                 
         ],
         [],

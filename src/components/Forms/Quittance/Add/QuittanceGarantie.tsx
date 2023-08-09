@@ -4,6 +4,8 @@ import '../style.css'; // Import your custom styles
 import { idCodePoliceState, jsonDataState } from '../recoil/atoms';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import config from '../../../../config/config';
+import { ModificationstatusGarantieQuittance } from '../../../../utils/localstorage';
+import { ToastContainer, toast } from 'react-toastify';
 
 type Post = {
   id: number;
@@ -27,9 +29,15 @@ const QuittanceGarantie = (props: any) => {
   const [jsonDataP, setJsonDataP] = useRecoilState(jsonDataState);
 
   const saveJsonData = () => {
+    if(jsonData!=null){
     const json = JSON.stringify(jsonData);
-    setJsonDataP(json); // Update the state with the new JSON string
-    // Perform any desired action with the JSON data (e.g., send it to the backend)
+    setJsonDataP(json);
+    ModificationstatusGarantieQuittance(true);
+  }
+    else{
+      ModificationstatusGarantieQuittance(false)
+      toast.error('Erreur probleme garantie', { position: toast.POSITION.TOP_RIGHT });
+    }  
     
   };
  
@@ -177,6 +185,8 @@ const QuittanceGarantie = (props: any) => {
 
   return (
     <div>
+      <ToastContainer />
+    
           <div>
       <p>  Code Police: {idCodePolice}</p>
     </div>

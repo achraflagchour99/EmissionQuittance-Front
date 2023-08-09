@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react' 
+import React, { useEffect,useRef,useState } from 'react' 
 import { useParams } from 'react-router-dom'
 import  PrintIcon from '@mui/icons-material/Print';
 import {
@@ -12,6 +12,7 @@ import {
     Divider,
     FormControl,
     Grid,
+    Hidden,
     IconButton,
     InputLabel,
     MenuItem,
@@ -33,11 +34,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { dateFormat } from '../../../../utils/features';
+import { dateFormat } from '../../../../utils/features';  
+import ReactToPrint from 'react-to-print';
+import ComponentToPrint from '../Print/ComponentToPrint';
 
  
 function QuittanceView () {
 
+  const componentRef = useRef(null);
+  // Initialize with the correct type
 
     const [formData, setFormData] = useState ({
         exercice: "",
@@ -123,6 +128,7 @@ function QuittanceView () {
         
     
       }
+ 
        
     return (
       <>
@@ -518,9 +524,6 @@ function QuittanceView () {
 
 
 
-
-
-
 <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -560,11 +563,16 @@ function QuittanceView () {
       </Table>
     </TableContainer>
 
-    <Grid item xs={12}>
-          <Button startIcon={<PrintIcon/> } variant="contained" color="primary" onClick={handlePrint}>
-             Imprimer
-          </Button>
-        </Grid>
+    <ReactToPrint
+        trigger={() => <Button startIcon={<PrintIcon />} variant="contained" color="primary">Imprimer</Button>}
+        content={() => componentRef.current}
+      />
+
+      <div style={{ display: 'none'  }}>
+<ComponentToPrint 
+  ref={componentRef}
+  quittanceData={formData}  
+/></div>
 
     </Box>
  </>

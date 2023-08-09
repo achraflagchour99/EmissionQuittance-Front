@@ -1,6 +1,6 @@
 import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import "./App.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 
 import { MainContent } from "./layout/MainContent";
@@ -24,6 +24,7 @@ import UpdatePolice from "./components/Forms/Police/Update/UpdatePolice";
 import QuittanceUpdate from "./components/Forms/Quittance/Update/QuittanceUpdate"; 
 import QuittanceView from "./components/Forms/Quittance/Consulter/QuittanceView";
 import StepperQuittanceUpdate from "./components/Forms/Quittance/Update/stepperQuittanceUpdate";
+import { ModificationstatusQuittance } from "./utils/localstorage";
  
 
 
@@ -43,13 +44,24 @@ function App() {
     setOpen(!open);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+   
+
+    };
+  
+    
+;      },  );
  
  
 
     return (
+     
       <Provider store={store}>
         <BrowserRouter>
+        <RecoilRoot>
           <Routes>
+         
             <Route
               path="/"
               element={
@@ -72,9 +84,11 @@ function App() {
               <Route path="quittance-search" element={<Examples />} />
 
             </Route>
+           
             <Route path="/loginUp" element={<SignUpSide />} />
             <Route path="/signIn" element={<SignInSide />} />
           </Routes>
+          </RecoilRoot>
         </BrowserRouter>
       </Provider>
     );

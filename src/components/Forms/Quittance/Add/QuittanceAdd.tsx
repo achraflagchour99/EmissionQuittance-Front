@@ -27,9 +27,10 @@ import config from '../../../../config/config';
 import QuittanceGarantie from './QuittanceGarantie';
 import TableExample from './QuittancetestGrnt';
 import { useRecoilState } from 'recoil';
-import { idCodePoliceState, jsonDataQuittance, jsonDatalibelle } from '../recoil/atoms';
+import { idCodePoliceState, jsonDataQuittance, jsonDatalibelle,StatusQuittance } from '../recoil/atoms';
 import '../style.css'; // Import the CSS file 
 import { List } from 'immutable';
+import { ModificationstatusQuittance } from '../../../../utils/localstorage';
  
  
 
@@ -41,6 +42,8 @@ function QuittanceAdd( ) {
   const [idCodePolice, setIdCodePolice] = useRecoilState(idCodePoliceState);
   const [jsonQuittances, setJsonQuittance] = useRecoilState(jsonDataQuittance);
   const [jsonDataLibelle, setJsonDataLibelle] = useRecoilState(jsonDatalibelle);
+  const [statusQuittance, setstatusQuittance] = useRecoilState(StatusQuittance);
+  
   
 
   const handleTableDataChange = (data: React.SetStateAction<never[]>) => {
@@ -49,22 +52,30 @@ function QuittanceAdd( ) {
   };
 
 
-  const extractSaveQuittance = () => { 
-    
+  const extractSaveQuittance = () => {  
     try{
+      
+      const montantPrimeComission = formData.primenette - formData.tauxcommission;
+    
       const dateDebut = new Date(formData.datedebut);
       const dateFin = new Date(formData.datefin);
   
     if(dateDebut < dateFin  ){
-      if( formData.primenette-formData.tauxcommission>formData.montontremise){
+    
+      if( formData.tauxprimenette>formData.montontremise){
         toast.error('Montant  de remise insufisant', { position: toast.POSITION.TOP_RIGHT });
         return;
       }
+      
       const jsonData = JSON.stringify(formData);
-      setJsonQuittance(jsonData);  
+      setJsonQuittance(jsonData);   
       if(jsonData !=null){
+        ModificationstatusQuittance(true)
+        setstatusQuittance("true")
       toast.success("Quittance  bien Enregistrer  veuillez passer a l'etape  suivante");}
       else{
+        setstatusQuittance("false")
+         ModificationstatusQuittance(false) 
         toast.error('Erreur  il y  a un probleme', { position: toast.POSITION.TOP_RIGHT });
       }
     }else{
@@ -87,54 +98,22 @@ function QuittanceAdd( ) {
 
  
 
-    const [formData, setFormData] = useState({
-        exercice: "",
-        ordre: new Date().getFullYear().toString(), 
-        intermediaireid: 1,
-        refQuittanceid: 1,
-        qtcRemiseid: 1,
-        habUtilisateurid: 5923310,
-        policeid: 21,  
-        versioncommerciale:0,
-        datedebut: "",
-        datefin: "",
-        tauxtaxe:0,
-        montantaccessoire:0,
-        tauxcommission:25,
-        dateetat:"",
-        villeclient:0   ,
-        primenette   :0  ,
-        montanttaxeparafiscale:0,
-        primeGareEve:0,
-        tauxprimenette:0,
-        dateemission:"",
-        numeroquittance:"",
-        idCodePolice:0,
-        montontremise:0
-      
-      });
+   
     
       const [formDataLibelle, setFormDataLibelle] = useState({
-        
         versionCommerialLibelle:"",
         intermediairesLibelle:""
       
       });
 
 
-      const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
-      //  handleFormSubmit();
+      const handleInputChange = (event: { target: { name: any; value: any; }; }) => { 
         const { name, value } = event.target;
         setFormData((prevState) => ({
-         
           ...prevState,
           [name]: value,
-         
         }),
         ); 
-        console.log(formData)
-        //Update  the  data  from  the formData to  Json
-      //  handleFormSubmit();
       };
     
       const handleSubmit = (event: { preventDefault: () => void; }) => {
@@ -143,6 +122,8 @@ function QuittanceAdd( ) {
 
         axios.post(`${config.apiUrl}/quittances`, formData)
         .then(response => {
+       
+          
           console.log(response.data);
           toast.success('Quittance bien  enregistrer !', { position: toast.POSITION.TOP_RIGHT });
         })
@@ -162,9 +143,8 @@ function QuittanceAdd( ) {
 
 
       const RemiseFunction = async () => {
-        try {  // Provide the ID of the remise you want to fetch
-          const data = await fetchRemise(formData.qtcRemiseid);
-          // Use the data returned by the API call
+        try {  
+          const data = await fetchRemise(formData.qtcRemiseid); 
           setFormData(prevFormData => ({
             ...prevFormData,
             montontremise: data.montantRemise
@@ -182,32 +162,38 @@ function QuittanceAdd( ) {
       };
 
  
-      useEffect(() => {
-        const fetchData = async () => {
+   
 
-          const intermediairesData = await fetchIntermediaires();
-          setIntermediaires(intermediairesData);
-    
-          const policesData = await fetchPolice();
-          setPolices(policesData);
-    
-          const versionsCommercialesData = await fetchVersionsCommerciales();
-          setVersionsCommerciales(versionsCommercialesData);
-    
-          const refQuittancesData = await fetchRefQuittances();
-          setRefQuittances(refQuittancesData);
 
-  
-            setCodePoliceAPI(formData.idCodePolice); 
-
-            RemiseFunction();
-             console.log("voyage")
-          console.log(jsonQuittances);
-        };
     
-        fetchData();
-      }, [formDataLibelle.intermediairesLibelle,formDataLibelle.versionCommerialLibelle,formData.ordre,formData.exercice,formData.numeroquittance,formData.primenette,formData.montantaccessoire,formData.tauxcommission,formData.tauxtaxe,formData.versioncommerciale,formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
- 
+
+
+      const [formData, setFormData] = useState({
+        exercice: "",
+        ordre: new Date().getFullYear().toString(), 
+        intermediaireid: 1,
+        refQuittanceid: 1,
+        qtcRemiseid: 0,
+        habUtilisateurid: 5923310,
+        policeid: 21,  
+        versioncommerciale:0,
+        datedebut: "",
+        datefin: "",
+        tauxtaxe:0,
+        montantaccessoire:0,
+        tauxcommission:25,
+        dateetat:"",
+        villeclient:0   ,
+        primenette:0  ,
+        montanttaxeparafiscale:0,
+        primeGareEve:0,
+        tauxprimenette:0,
+        dateemission:"",
+        numeroquittance:"",
+        idCodePolice:0,
+        montontremise:0
+      
+      });
 
 
       const handleBlur =   ()  => {
@@ -230,9 +216,7 @@ function QuittanceAdd( ) {
             }  
             else{
 
-              const maxValues = await fetchmaxValues();  
-              console.log('maxValues')
-             console.log(data)
+              const maxValues = await fetchmaxValues();    
 
               setIdCodePolice(codePolice.toString());
              
@@ -252,7 +236,11 @@ function QuittanceAdd( ) {
 
     ,exercice:maxValues.exercice+1
     ,numeroquittance:maxValues.numeroquittance+1
+    ,montontremise:0
+    
   };
+
+ 
 
   const updatedFormDataLibelle = { ...formDataLibelle, 
     
@@ -273,6 +261,33 @@ function QuittanceAdd( ) {
             alert(error.message);
           });
       };
+
+
+      useEffect(() => {
+        const fetchData = async () => {
+
+         
+          RemiseFunction(); 
+
+          const intermediairesData = await fetchIntermediaires();
+          setIntermediaires(intermediairesData);
+    
+          const policesData = await fetchPolice();
+          setPolices(policesData);
+     
+     
+
+  
+            setCodePoliceAPI(formData.idCodePolice); 
+
+           
+        };
+       
+        RemiseFunction(); 
+        fetchData(); 
+;      }, [formData.montontremise,formDataLibelle.intermediairesLibelle,formDataLibelle.versionCommerialLibelle,formData.ordre,formData.exercice,formData.numeroquittance,formData.primenette,formData.montantaccessoire,formData.tauxcommission,formData.tauxtaxe,formData.versioncommerciale,formData.idCodePolice,formData.qtcRemiseid,jsonQuittances]);
+ 
+      
 
   return (
     <> 
@@ -360,7 +375,9 @@ function QuittanceAdd( ) {
        InputProps={{
         readOnly: true,
       }}
+      required
   /> 
+  
  
 </Grid>
       <Grid item xs={12} sm={4}>
@@ -432,38 +449,24 @@ function QuittanceAdd( ) {
 
 
       
-
-      
- 
-
-
-
-        
-
-
-      <Grid item xs={12} sm={4}>
-      <FormControl fullWidth>
-  <InputLabel variant="standard" htmlFor="uncontrolled-native">
-  Etat Quittance
-  </InputLabel>
-  <NativeSelect 
-        id="refQuittanceid"
-        name="refQuittanceid" 
+<Grid item xs={12} sm={4}>
+      <TextField 
+       id="refQuittanceid"
+       name="refQuittanceid" 
+       label="refQuittanceid"
        variant="outlined"
-       value={formData.refQuittanceid}
-          onChange={handleInputChange}
-  > 
-  <option  > Selectionner Etat Quittance </option>
-   
-    {refQuittances?.map((refQuittance: any) => (
-      
-            <option key={refQuittance.id} value={refQuittance.id}>{refQuittance.etatQuittance}</option>
-          ))}
- 
-  </NativeSelect>
-</FormControl>
-</Grid>
-
+       value="EN ATTENTE VALIDATION         "
+       onChange={handleInputChange} 
+       type="text"
+       fullWidth
+       InputLabelProps={{
+         shrink: true,
+       }}
+       InputProps={{
+        readOnly: true,
+      }}
+  /> 
+</Grid>     
 
     <Grid item xs={12} sm={4}>
       <TextField
@@ -478,6 +481,7 @@ function QuittanceAdd( ) {
         InputLabelProps={{
           shrink: true,
         }}
+        required
       />
     </Grid>
 
@@ -486,9 +490,8 @@ function QuittanceAdd( ) {
         id="remise"
         name="remise"
         label="Montant de Remise"
-        variant="outlined"
-        value={formData.montontremise}
-         
+        variant="outlined" 
+        value={formData.montontremise} 
         onChange={handleInputChange}
         type="text"
         fullWidth
@@ -498,6 +501,7 @@ function QuittanceAdd( ) {
         InputProps={{
           readOnly: true,
         }}
+        required 
       />
     </Grid>
 
@@ -532,6 +536,7 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      required
     />
   </Grid>
 
@@ -548,6 +553,7 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      required
     />
   </Grid>
 
@@ -564,6 +570,7 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      required
     />
   </Grid>
 
@@ -580,6 +587,7 @@ function QuittanceAdd( ) {
       InputLabelProps={{
         shrink: true,
       }}
+      required
     />
   </Grid>
 

@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import { Avatar, Form, List  } from 'rsuite';
 import { Container } from 'react-bootstrap/lib/Tab';
-import { UpdateQuittance, fetchGarantieToEachQuittance, fetchQuittance,ModificationQuittance } from '../../../../api/service/provideData';
+import { UpdateQuittance, fetchGarantieToEachQuittance, fetchQuittance,ModificationQuittance, fetchRefQuittances } from '../../../../api/service/provideData';
 import QuittancePayload from '../Add/QuittancePayload';
 import { QuittanceDetailGarantiePayload } from '../../../../api/interface/QuittanceDetailGarantiePayload';
 import Table from '@mui/material/Table';
@@ -41,6 +41,7 @@ import AlertDialog from '../../../AlertDialog';
 import { ListItemButton } from '@mui/joy';
 import { blue } from '@mui/material/colors';
 import { Typography } from '@mui/material';
+import { RefQuittancePayload } from '../../../../api/interface/refQuittancePayload';
 
 
 export interface SimpleDialogProps {
@@ -74,18 +75,18 @@ function SimpleDialog(props: SimpleDialogProps ) {
 function QuittanceUpdate () {
 
  
-
+  const [refQuittances, setRefQuittances] = useState<RefQuittancePayload[] | null>(null);
 
     const [formData, setFormData] = useState ({
         exercice: "",
         ordre: "", 
         intermediaireid: 1,
         refQuittanceid: 1,
-        qtcRemiseid: 1,
+        qtcRemiseid: 0,
         habUtilisateurid: 5923310,
-         policeid: 21,  
-        versioncommerciale:9985338,
-        datedebut: "2023-06-08",
+        policeid: 0,  
+        versioncommerciale:0,
+        datedebut: "",
         datefin: "",
         tauxtaxe:0,
         montantaccessoire:0,
@@ -138,9 +139,9 @@ function QuittanceUpdate () {
           
           setquittance(quittanceData);
           setFormData(quittanceData);
-          console.log("Dragon")
-          console.log(quittanceData)
-          console.log(quittance)
+          const refQuittancesData = await fetchRefQuittances();
+          setRefQuittances(refQuittancesData);
+         
           
         };
     
@@ -466,6 +467,32 @@ function QuittanceUpdate () {
    />
  </Grid>
 
+
+    <Grid item xs={12} sm={4}>
+      <FormControl fullWidth>
+  <InputLabel variant="standard" htmlFor="uncontrolled-native">
+  Etat Quittance
+  </InputLabel>
+  <NativeSelect 
+        id="refQuittanceid"
+        name="refQuittanceid" 
+       variant="outlined"
+       value={formData.refQuittanceid}
+          onChange={handleInputChange}
+  > 
+  
+  <option  >   </option>
+    {refQuittances?.map((refQuittance: any) => (
+      
+            <option key={refQuittance.id} value={refQuittance.id}>{refQuittance.etatQuittance}</option>
+          ))}
+ 
+  </NativeSelect>
+</FormControl>
+</Grid>
+
+
+<br />
  <Divider orientation="vertical" sx={{ my: 10 }} variant="fullWidth" color="secondary" />
 
  <Grid item xs={12} sm={4}>

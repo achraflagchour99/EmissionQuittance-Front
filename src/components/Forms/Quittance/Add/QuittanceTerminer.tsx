@@ -8,6 +8,7 @@ import Error from '../../tools/error';
 import { Grid,Table } from 'rsuite';
 import { Button } from '@mui/material';
 import './style.css'; // Import the CSS file 
+import { ModificationstatusQuittance, ModificationstatusGarantieQuittance } from '../../../../utils/localstorage';
 
 function SuccessMessage() {
     const [jsonDataP, setJsonDataP] = useRecoilState(jsonDataState);
@@ -26,19 +27,17 @@ function SuccessMessage() {
 
 
 
-    const handleClick = () => {
-        // Function to handle the click event
+    const handleClick = () => { 
 
         saveQuittanceGarantie(jsonDataP,jsonQuittances)
         .then(() => {
             setSaveStatus('successful');
+            ModificationstatusQuittance(false) ;
+            ModificationstatusGarantieQuittance(false);
           })
           .catch(() => {
             setSaveStatus('error');
           });
-       
-      
-
       };
 
       const { Column, HeaderCell, Cell } = Table; 

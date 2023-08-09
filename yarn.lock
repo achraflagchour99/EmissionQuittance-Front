@@ -1881,9 +1881,9 @@
     react-is "^18.2.0"
 
 "@mui/x-charts@^6.0.0-alpha.5":
-  version "6.0.0-alpha.5"
-  resolved "https://registry.npmjs.org/@mui/x-charts/-/x-charts-6.0.0-alpha.5.tgz"
-  integrity sha512-XWG5RyHCfbt4Pm7CbztLNSIex69gHGBDcFSWNAVPKl2WMSh8j9D4gV7OMaK4PjYEAIAOOHtsAY3m8q6pKlifAw==
+  version "6.0.0-alpha.6"
+  resolved "https://registry.npmjs.org/@mui/x-charts/-/x-charts-6.0.0-alpha.6.tgz"
+  integrity sha512-WAFwfu3LBDrztRDaH3Q6Ny83bDlTBX1vjQWYf5iTc2Fz3CPfpeLW3ipZOZpfc+GKno8dZ6vUohzyOqc2CXmQZQ==
   dependencies:
     "@babel/runtime" "^7.22.6"
     clsx "^1.2.1"
@@ -8996,6 +8996,11 @@ react-smooth@^2.0.2:
   dependencies:
     fast-equals "^4.0.3"
     react-transition-group "2.9.0"
+
+react-to-print@^2.14.13:
+  version "2.14.13"
+  resolved "https://registry.npmjs.org/react-to-print/-/react-to-print-2.14.13.tgz"
+  integrity sha512-PqUGgTRZvkyBzWgaZHVBECWPX2nGEc3HOUy6WNXof6HT4yTFI92wtIkqQtr4jfvHbadqjwTgzgh6vgN8KXlWWw==
 
 react-toastify@^9.1.2:
   version "9.1.2"
