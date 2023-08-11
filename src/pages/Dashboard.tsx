@@ -101,11 +101,9 @@ export default class Dashboard extends PureComponent {
   series={[
     {
       data: [
-        { id: 0, value: 7, label: 'ArabBank' },
-        { id: 1, value: 5, label: 'BMCE' },
-        { id: 2, value: 4, label: 'BMCI' },
-        { id: 3, value: 9, label: 'Maghrebail' },
-        { id: 4, value: 8, label: 'SALAFIN' },
+        { id: 0, value: 7, label: 'Dommage' },
+        { id: 1, value: 5, label: 'Epargne' },
+        { id: 2, value: 4, label: 'Prévoyance' },
       ],
     },
   ]}

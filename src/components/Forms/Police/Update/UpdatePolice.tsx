@@ -279,9 +279,9 @@ const handleList = () => {
             '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
         }}
         >
-            <Typography marginBottom={"20px"} variant="h6" align="center" color="primary" gutterBottom>
-                    Modifier une Police
-            </Typography>
+        <Grid item xs={12} sm={4}>
+          <h1>Police #{formik.values.codePolice}</h1>
+        </Grid>
             <Box sx={{ paddingBottom: '1rem' }}>
   <Stepper activeStep={activeStep} alternativeLabel>
     {steps.map((label, index) => (

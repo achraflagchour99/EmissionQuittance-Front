@@ -79,9 +79,9 @@ const ConsultPolice: React.FC = () => {
             boxShadow: '0px 2px 1px -1px rgba(0, 0, 0, 0.2), 1px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.2)',
           }}
         >
-          <Typography marginBottom={'20px'} variant="h6" align="center" color="primary" gutterBottom>
-            Détails de Police
-          </Typography>
+             <Grid item xs={12} sm={4}>
+        <h1>Police #{policeData.codePolice}</h1>
+        </Grid>
           <form>
           <Grid container spacing={2} sx={{ margin: '0 auto', paddingRight:'2rem'}}>
           <Grid item xs={12} sm={4}>

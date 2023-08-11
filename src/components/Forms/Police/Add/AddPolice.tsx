@@ -182,7 +182,7 @@ const isStepComplete = () => {
         }
       };
       const handleDetails = () => {
-        const codePolice = policeData.codePolice;
+        const codePolice = formik.values.codePolice;
         navigate(`/police-details/${codePolice}`);
       };
       const handleList = () => {

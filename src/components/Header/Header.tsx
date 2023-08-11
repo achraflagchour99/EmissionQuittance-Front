@@ -48,10 +48,9 @@ const Header = (props: { Handler: React.MouseEventHandler<HTMLButtonElement> | u
     minute: "2-digit",
   });
   const formattedDate = currentTime.toLocaleDateString([], {
-    weekday: "long",
     year: "numeric",
-    month: "long",
-    day: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
   return (
     <AppBar position="absolute" open={props.Open}>
@@ -81,9 +80,9 @@ const Header = (props: { Handler: React.MouseEventHandler<HTMLButtonElement> | u
           <RmaLogo />
         </Stack> 
         <div color="black" style={{ display: "flex", alignItems: "center", marginLeft:"55rem"}}>
-        <AccessTimeIcon style={{ color: "#243075", marginRight:"0.3rem", marginBottom:"0.2rem" }} />
+          <h3 style={{ color: "#243075", margin: 0, marginRight: "15px" }}>{formattedDate}</h3>
+          <AccessTimeIcon style={{ color: "#243075", marginLeft:"0.5rem", marginRight:"0.2rem", marginBottom:"0.2rem" }} />
           <h3 style={{ color: "#243075", margin: 0 }}> {formattedTime}</h3>
-          <h3 style={{ color: "#243075", margin: 0, marginLeft: "10px" }}>{formattedDate}</h3>
         </div>
 
         <Stack direction="row" spacing={2} alignItems="center">
